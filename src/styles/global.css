@@ -1,0 +1,70 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+:root {
+  --bg-primary: #000000;
+  --bg-secondary: #0d0d0d;
+  --bg-card: #1a1015;
+  --bg-card-hover: #2a1520;
+  --bg-completed: #0d0a0a;
+  --bg-overlay: rgba(0, 0, 0, 0.94);
+
+  --text-primary: #f0f0f0;
+  --text-secondary: #b0a0a5;
+  --text-muted: #665555;
+
+  --accent-primary: #be1332;
+  --accent-primary-hover: #a01028;
+  --accent-secondary: #e85c1a;
+  --accent-success: #4caf50;
+  --accent-warning: #e8a825;
+
+  --border-color: #2a1520;
+  --border-active: #be1332;
+
+  --font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+  --font-size-hero: 3rem;
+  --font-size-xl: 2rem;
+  --font-size-lg: 1.5rem;
+  --font-size-md: 1.2rem;
+  --font-size-sm: 1rem;
+  --font-size-xs: 0.85rem;
+
+  --radius: 12px;
+  --radius-sm: 8px;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-family);
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  min-height: 100vh;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+button {
+  font-family: var(--font-family);
+  cursor: pointer;
+  border: none;
+  outline: none;
+}
+
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+input {
+  font-family: var(--font-family);
+  outline: none;
+}
+
+#root {
+  min-height: 100vh;
+}
