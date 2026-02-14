@@ -48,6 +48,9 @@
   max-height: none;
   overflow-y: visible;
   word-wrap: break-word;
+  text-align: justify;
+  hyphens: auto;
+  text-justify: inter-word;
 }
 
 .question-view__media-btn {
