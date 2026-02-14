@@ -6,11 +6,12 @@ import TopicGrid from './TopicGrid';
 import QuestionView from './QuestionView';
 import AnswerView from './AnswerView';
 import ResultsView from './ResultsView';
+import LandingPage from './LandingPage';
 import { saveSession, loadSession, clearSession } from '../utils/sessionPersistence';
 import '../styles/Setup.css';
 
 const initialState = {
-  view: 'setup',
+  view: 'landing',
   topics: [],
   participants: [],
   selectedQuestion: null,
@@ -74,6 +75,9 @@ function quizReducer(state, action) {
         participants: state.participants.map(p => ({ ...p, score: 0 })),
       };
 
+    case 'GOTO_QUIZ':
+      return { ...state, view: 'setup' };
+
     case 'RESTORE_SESSION':
       return {
         ...state,
@@ -110,6 +114,10 @@ export default function App() {
 
   function handleQuizLoaded(topics) {
     dispatch({ type: 'LOAD_QUIZ', payload: { topics } });
+  }
+
+  function handleGoToQuiz() {
+    dispatch({ type: 'GOTO_QUIZ' });
   }
 
   function handleStart(names) {
@@ -150,6 +158,11 @@ export default function App() {
 
   function handlePlayAgain() {
     dispatch({ type: 'PLAY_AGAIN' });
+  }
+
+  // Landing page
+  if (state.view === 'landing') {
+    return <LandingPage onStartQuiz={handleGoToQuiz} />;
   }
 
   // Setup screen
