@@ -1,4 +1,5 @@
 import '../styles/Scoreboard.css';
+import TimerControl from './TimerControl';
 
 export default function Scoreboard({ participants, onEndQuiz, showEndQuiz }) {
   const maxScore = Math.max(...participants.map(p => p.score), 0);
@@ -7,6 +8,7 @@ export default function Scoreboard({ participants, onEndQuiz, showEndQuiz }) {
   return (
     <div className="scoreboard">
       <img src="/qwizzeria-logo.png" alt="Qwizzeria" className="scoreboard__logo" onError={(e) => { e.target.src = '/qwizzeria-logo.svg'; }} />
+      <TimerControl />
       <div className="scoreboard__teams">
         {participants.map(p => (
           <div

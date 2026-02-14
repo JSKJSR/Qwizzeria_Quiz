@@ -1,4 +1,4 @@
-import { useReducer } from 'react';
+import { useReducer, useEffect } from 'react';
 import FileUpload from './FileUpload';
 import ParticipantSetup from './ParticipantSetup';
 import Scoreboard from './Scoreboard';
@@ -6,6 +6,7 @@ import TopicGrid from './TopicGrid';
 import QuestionView from './QuestionView';
 import AnswerView from './AnswerView';
 import ResultsView from './ResultsView';
+import { saveSession, loadSession, clearSession } from '../utils/sessionPersistence';
 import '../styles/Setup.css';
 
 const initialState = {
@@ -73,6 +74,17 @@ function quizReducer(state, action) {
         participants: state.participants.map(p => ({ ...p, score: 0 })),
       };
 
+    case 'RESTORE_SESSION':
+      return {
+        ...state,
+        view: action.payload.view,
+        topics: action.payload.topics,
+        participants: action.payload.participants,
+        completedQuestionIds: action.payload.completedQuestionIds,
+        selectedQuestion: action.payload.selectedQuestion,
+        quizLoaded: action.payload.quizLoaded,
+      };
+
     default:
       return state;
   }
@@ -80,6 +92,21 @@ function quizReducer(state, action) {
 
 export default function App() {
   const [state, dispatch] = useReducer(quizReducer, initialState);
+
+  // Restore session on mount
+  useEffect(() => {
+    const savedSession = loadSession();
+    if (savedSession && savedSession.topics?.length > 0) {
+      dispatch({ type: 'RESTORE_SESSION', payload: savedSession });
+    }
+  }, []);
+
+  // Save session whenever state changes (only during active quiz)
+  useEffect(() => {
+    if (state.quizLoaded && state.view !== 'setup') {
+      saveSession(state);
+    }
+  }, [state]);
 
   function handleQuizLoaded(topics) {
     dispatch({ type: 'LOAD_QUIZ', payload: { topics } });
@@ -117,6 +144,7 @@ export default function App() {
   }
 
   function handleResetQuiz() {
+    clearSession(); // Clear saved session when starting a new quiz
     dispatch({ type: 'RESET_QUIZ' });
   }
 
@@ -158,7 +186,7 @@ export default function App() {
                 e.target.nextElementSibling.style.display = 'flex';
               }}
             />
-            <div className="setup__qr-placeholder" style={{ display: 'flex' }}>
+            <div className="setup__qr-placeholder" style={{ display: 'none' }}>
               <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
                 <rect x="3" y="3" width="7" height="7" rx="1" />
                 <rect x="14" y="3" width="7" height="7" rx="1" />
