@@ -7,7 +7,7 @@ export default function ResultsView({ participants, onNewQuiz, onPlayAgain }) {
 
   return (
     <div className="results">
-      <img src="/qwizzeria-logo.svg" alt="Qwizzeria" className="results__logo" />
+      <img src="/qwizzeria-logo.png" alt="Qwizzeria" className="results__logo" onError={(e) => { e.target.src = '/qwizzeria-logo.svg'; }} />
       <h1 className="results__title">Final Standings</h1>
 
       <div className="results__standings">

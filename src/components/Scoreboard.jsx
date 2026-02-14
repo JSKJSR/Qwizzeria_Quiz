@@ -6,7 +6,7 @@ export default function Scoreboard({ participants, onEndQuiz, showEndQuiz }) {
 
   return (
     <div className="scoreboard">
-      <img src="/qwizzeria-logo.svg" alt="Qwizzeria" className="scoreboard__logo" />
+      <img src="/qwizzeria-logo.png" alt="Qwizzeria" className="scoreboard__logo" onError={(e) => { e.target.src = '/qwizzeria-logo.svg'; }} />
       <div className="scoreboard__teams">
         {participants.map(p => (
           <div
