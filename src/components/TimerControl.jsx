@@ -3,16 +3,17 @@ import '../styles/TimerControl.css';
 
 export default function TimerControl() {
   const [minutes, setMinutes] = useState(5);
+  const [seconds, setSeconds] = useState(0);
   const [timeLeft, setTimeLeft] = useState(300); // seconds
   const [isRunning, setIsRunning] = useState(false);
   const audioContextRef = useRef(null);
 
-  // Update timeLeft when minutes input changes (only when not running)
+  // Update timeLeft when minutes or seconds input changes (only when not running)
   useEffect(() => {
     if (!isRunning) {
-      setTimeLeft(minutes * 60);
+      setTimeLeft(minutes * 60 + seconds);
     }
-  }, [minutes, isRunning]);
+  }, [minutes, seconds, isRunning]);
 
   // Countdown logic
   useEffect(() => {
@@ -62,12 +63,17 @@ export default function TimerControl() {
 
   function handleReset() {
     setIsRunning(false);
-    setTimeLeft(minutes * 60);
+    setTimeLeft(minutes * 60 + seconds);
   }
 
   function handleMinutesChange(e) {
     const value = parseInt(e.target.value) || 0;
     setMinutes(Math.max(0, Math.min(99, value))); // Limit 0-99 minutes
+  }
+
+  function handleSecondsChange(e) {
+    const value = parseInt(e.target.value) || 0;
+    setSeconds(Math.max(0, Math.min(59, value))); // Limit 0-59 seconds
   }
 
   // Format time as MM:SS
@@ -84,7 +90,7 @@ export default function TimerControl() {
   };
 
   return (
-    <div className={`timer ${getColorClass()}`}>
+    <div className={`timer ${getColorClass()} ${isRunning ? 'timer--running' : ''}`}>
       <div className="timer__input-group">
         <input
           type="number"
@@ -96,6 +102,19 @@ export default function TimerControl() {
           max="99"
         />
         <span className="timer__label">min</span>
+      </div>
+
+      <div className="timer__input-group">
+        <input
+          type="number"
+          className="timer__input"
+          value={seconds}
+          onChange={handleSecondsChange}
+          disabled={isRunning}
+          min="0"
+          max="59"
+        />
+        <span className="timer__label">sec</span>
       </div>
 
       <div className={`timer__display ${timeLeft === 0 ? 'timer__display--pulse' : ''}`}>

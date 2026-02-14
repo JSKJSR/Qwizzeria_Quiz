@@ -30,10 +30,11 @@
 }
 
 .answer-view__text {
-  font-size: var(--font-size-hero);
+  font-size: clamp(1.2rem, 5vw, 3rem);
   font-weight: 800;
   color: var(--text-primary);
   line-height: 1.3;
+  word-wrap: break-word;
 }
 
 .answer-view__media-container {

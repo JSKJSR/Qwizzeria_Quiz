@@ -41,12 +41,13 @@
 }
 
 .question-view__text {
-  font-size: var(--font-size-hero);
+  font-size: clamp(1.2rem, 5vw, 3rem);
   font-weight: 700;
   line-height: 1.3;
   color: var(--text-primary);
-  max-height: 40vh;
-  overflow-y: auto;
+  max-height: none;
+  overflow-y: visible;
+  word-wrap: break-word;
 }
 
 .question-view__media-btn {
