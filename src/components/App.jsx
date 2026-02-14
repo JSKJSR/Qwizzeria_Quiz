@@ -78,6 +78,9 @@ function quizReducer(state, action) {
     case 'GOTO_QUIZ':
       return { ...state, view: 'setup' };
 
+    case 'GOTO_LANDING':
+      return { ...state, view: 'landing' };
+
     case 'RESTORE_SESSION':
       return {
         ...state,
@@ -118,6 +121,10 @@ export default function App() {
 
   function handleGoToQuiz() {
     dispatch({ type: 'GOTO_QUIZ' });
+  }
+
+  function handleBackToLanding() {
+    dispatch({ type: 'GOTO_LANDING' });
   }
 
   function handleStart(names) {
@@ -169,6 +176,13 @@ export default function App() {
   if (state.view === 'setup') {
     return (
       <div className="setup">
+        <button
+          className="setup__back-btn"
+          onClick={handleBackToLanding}
+          aria-label="Back to landing page"
+        >
+          ← Back
+        </button>
         <div className="setup__hero">
           <img
             src="/qwizzeria-logo.png"
@@ -186,33 +200,6 @@ export default function App() {
           <div className="setup__panel-card">
             <ParticipantSetup quizLoaded={state.quizLoaded} onStart={handleStart} />
           </div>
-        </div>
-
-        <div className="setup__qr-section">
-          <div className="setup__qr-frame">
-            <img
-              src="/qr-code.png"
-              alt="QR Code"
-              className="setup__qr-img"
-              onError={(e) => {
-                e.target.style.display = 'none';
-                e.target.nextElementSibling.style.display = 'flex';
-              }}
-            />
-            <div className="setup__qr-placeholder" style={{ display: 'none' }}>
-              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-                <rect x="3" y="3" width="7" height="7" rx="1" />
-                <rect x="14" y="3" width="7" height="7" rx="1" />
-                <rect x="3" y="14" width="7" height="7" rx="1" />
-                <rect x="14" y="14" width="3" height="3" />
-                <rect x="18" y="14" width="3" height="3" />
-                <rect x="14" y="18" width="3" height="3" />
-                <rect x="18" y="18" width="3" height="3" />
-              </svg>
-              <span>QR Code</span>
-            </div>
-          </div>
-          <span className="setup__qr-label">Scan to follow</span>
         </div>
 
         <footer className="setup__footer">

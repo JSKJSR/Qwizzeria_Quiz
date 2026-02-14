@@ -61,6 +61,32 @@
   }
 }
 
+/* ── Back Button ── */
+
+.setup__back-btn {
+  position: absolute;
+  top: 1.5rem;
+  left: 1.5rem;
+  padding: 0.5rem 1rem;
+  background: rgba(26, 16, 21, 0.55);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(190, 19, 50, 0.12);
+  border-radius: 8px;
+  color: var(--text-secondary);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  animation: fadeUp 0.5s ease-out 0.2s both;
+}
+
+.setup__back-btn:hover {
+  border-color: var(--accent-primary);
+  color: var(--text-primary);
+  transform: translateX(-2px);
+}
+
 /* ── Content Panels ── */
 
 .setup__content {
@@ -179,6 +205,13 @@
   .setup {
     padding: 1.5rem 1rem 1rem;
     gap: 2rem;
+  }
+
+  .setup__back-btn {
+    top: 1rem;
+    left: 1rem;
+    padding: 0.4rem 0.75rem;
+    font-size: var(--font-size-xs);
   }
 
   .setup__logo {
