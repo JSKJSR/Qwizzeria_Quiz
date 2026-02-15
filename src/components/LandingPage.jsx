@@ -25,16 +25,26 @@ export default function LandingPage({ onStartQuiz }) {
           Play a Free Quiz
         </button>
 
-        {/* Secondary CTAs (Optional placeholders) */}
+        {/* Secondary CTAs */}
         <div className="landing__cta-secondary">
-          <button className="landing__cta-btn" disabled>
+          <a
+            href="https://www.patreon.com/c/qwizzeria/shop"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="landing__cta-btn"
+          >
             <span className="landing__cta-icon">⭐</span>
             Browse Quiz Packs
-          </button>
-          <button className="landing__cta-btn" disabled>
+          </a>
+          <a
+            href="https://www.patreon.com/c/qwizzeria/shop"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="landing__cta-btn"
+          >
             <span className="landing__cta-icon">🔓</span>
             Unlock Premium
-          </button>
+          </a>
         </div>
       </header>
 
