@@ -1,0 +1,126 @@
+.pack-play {
+  min-height: 100vh;
+  background: var(--bg-primary, #000);
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+}
+
+.pack-play__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.pack-play__logo {
+  height: 36px;
+}
+
+.pack-play__back-btn {
+  background: none;
+  border: none;
+  color: #aaa;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+.pack-play__back-btn:hover {
+  color: #fff;
+}
+
+.pack-play__loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  gap: 1rem;
+}
+
+.pack-play__spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid rgba(255, 255, 255, 0.1);
+  border-top-color: var(--accent-primary, #be1332);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+.pack-play__error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  gap: 1rem;
+  text-align: center;
+  padding: 2rem;
+}
+
+.pack-play__error p {
+  color: #999;
+}
+
+/* Format selection */
+.pack-play__format-select {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  gap: 1.5rem;
+}
+
+.pack-play__format-title {
+  font-size: 1.3rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.pack-play__format-subtitle {
+  color: #999;
+  font-size: 0.95rem;
+  margin-bottom: 1rem;
+}
+
+.pack-play__format-cards {
+  display: flex;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.pack-play__format-card {
+  background: var(--bg-card, #1a1015);
+  border: 2px solid rgba(255, 255, 255, 0.08);
+  border-radius: 14px;
+  padding: 2rem 2.5rem;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color 0.2s, transform 0.2s;
+  width: 220px;
+}
+
+.pack-play__format-card:hover {
+  border-color: var(--accent-primary, #be1332);
+  transform: translateY(-2px);
+}
+
+.pack-play__format-icon {
+  font-size: 2.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.pack-play__format-name {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 0.4rem;
+}
+
+.pack-play__format-desc {
+  font-size: 0.8rem;
+  color: #999;
+}

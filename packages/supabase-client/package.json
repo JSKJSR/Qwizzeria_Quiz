@@ -1,0 +1,14 @@
+{
+  "name": "@qwizzeria/supabase-client",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "main": "./src/index.js",
+  "scripts": {
+    "build": "echo 'No build step for supabase-client'",
+    "lint": "echo 'No lint for supabase-client yet'"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.95.3"
+  }
+}
