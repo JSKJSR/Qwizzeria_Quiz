@@ -1,6 +1,6 @@
 import { useReducer, useEffect, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { createQuizSession, recordAttempt, completeQuizSession } from '@qwizzeria/supabase-client/src/questions.js';
+import { createQuizSession, recordAttempt, completeQuizSession, abandonQuizSession, updateSessionMetadata } from '@qwizzeria/supabase-client/src/questions.js';
 import { incrementPackPlayCount } from '@qwizzeria/supabase-client/src/packs.js';
 import { detectMediaType } from '../utils/mediaDetector';
 import QuestionView from './QuestionView';
@@ -35,6 +35,7 @@ function enrichWithMedia(q) {
 
 const ACTIONS = {
   INIT: 'INIT',
+  RESTORE: 'RESTORE',
   REVEAL_ANSWER: 'REVEAL_ANSWER',
   ANSWER_QUESTION: 'ANSWER_QUESTION',
 };
@@ -55,6 +56,18 @@ function reducer(state, action) {
         questions: action.questions,
         currentIndex: 0,
       };
+
+    case ACTIONS.RESTORE: {
+      const startIndex = action.answeredCount;
+      const allDone = startIndex >= action.questions.length;
+      return {
+        ...initialState,
+        questions: action.questions,
+        currentIndex: allDone ? action.questions.length - 1 : startIndex,
+        score: action.score,
+        phase: allDone ? 'results' : 'question',
+      };
+    }
 
     case ACTIONS.REVEAL_ANSWER:
       return { ...state, phase: 'answer' };
@@ -82,7 +95,7 @@ function reducer(state, action) {
   }
 }
 
-export default function PackPlaySequential({ pack, questions, user }) {
+export default function PackPlaySequential({ pack, questions, user, resumeData }) {
   const navigate = useNavigate();
   const [state, dispatch] = useReducer(reducer, initialState);
   const sessionIdRef = useRef(null);
@@ -90,6 +103,21 @@ export default function PackPlaySequential({ pack, questions, user }) {
 
   useEffect(() => {
     const enriched = questions.map(enrichWithMedia);
+
+    if (resumeData?.sessionId) {
+      // Resume: skip already-answered questions
+      sessionIdRef.current = resumeData.sessionId;
+      const answeredCount = resumeData.answeredQuestionIds?.length || 0;
+      dispatch({
+        type: ACTIONS.RESTORE,
+        questions: enriched,
+        answeredCount,
+        score: resumeData.existingScore || 0,
+      });
+      questionStartRef.current = Date.now();
+      return;
+    }
+
     dispatch({ type: ACTIONS.INIT, questions: enriched });
 
     // Start timer for first question
@@ -102,12 +130,26 @@ export default function PackPlaySequential({ pack, questions, user }) {
       totalQuestions: enriched.length,
       quizPackId: pack.id,
     })
-      .then((session) => { sessionIdRef.current = session.id; })
+      .then((session) => {
+        sessionIdRef.current = session.id;
+        // Save metadata for resume (non-blocking)
+        updateSessionMetadata(session.id, {
+          format: 'sequential',
+          question_ids: enriched.map(q => q.id),
+        }).catch(() => {});
+      })
       .catch(() => { sessionIdRef.current = null; });
 
     // Increment play count (non-critical)
     incrementPackPlayCount(pack.id).catch(() => {});
-  }, [questions, pack.id, user]);
+  }, [questions, pack.id, user, resumeData]);
+
+  const handleQuit = useCallback(() => {
+    if (sessionIdRef.current) {
+      abandonQuizSession(sessionIdRef.current).catch(() => {});
+    }
+    navigate(`/packs/${pack.id}`);
+  }, [navigate, pack.id]);
 
   const handleRevealAnswer = useCallback(() => {
     dispatch({ type: ACTIONS.REVEAL_ANSWER });
@@ -230,7 +272,7 @@ export default function PackPlaySequential({ pack, questions, user }) {
             onError={(e) => { e.target.src = '/qwizzeria-logo.svg'; }}
           />
           <div className="seq-play__score-bar">Score: {score}</div>
-          <button className="seq-play__quit-btn" onClick={() => navigate(`/packs/${pack.id}`)}>
+          <button className="seq-play__quit-btn" onClick={handleQuit}>
             Quit
           </button>
         </div>

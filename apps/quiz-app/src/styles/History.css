@@ -1,0 +1,229 @@
+.history {
+  min-height: 100vh;
+  background: var(--bg-primary, #000);
+  color: #fff;
+  padding: 1.5rem;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.history__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.history__logo {
+  height: 36px;
+}
+
+.history__back-btn {
+  background: none;
+  border: none;
+  color: #aaa;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+.history__back-btn:hover {
+  color: #fff;
+}
+
+.history__title {
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.history__filters {
+  display: flex;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.history__filter-select {
+  padding: 0.5rem 1rem;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+  color: #fff;
+  font-size: 0.9rem;
+}
+
+.history__filter-select option {
+  background: #1a1015;
+  color: #fff;
+}
+
+.history__list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.history__item {
+  background: var(--bg-card, #1a1015);
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  overflow: hidden;
+}
+
+.history__item-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.25rem;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.history__item-row:hover {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.history__item-info {
+  flex: 1;
+}
+
+.history__item-pack {
+  font-weight: 600;
+  margin-bottom: 0.2rem;
+}
+
+.history__item-date {
+  font-size: 0.8rem;
+  color: #999;
+}
+
+.history__item-score {
+  font-weight: 700;
+  color: var(--accent-primary, #be1332);
+  margin-right: 1rem;
+}
+
+.history__item-status {
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+}
+
+.history__item-status--completed {
+  background: rgba(76, 175, 80, 0.15);
+  color: var(--accent-success, #4caf50);
+}
+
+.history__item-status--in_progress {
+  background: rgba(232, 168, 37, 0.15);
+  color: var(--accent-warning, #e8a825);
+}
+
+.history__item-status--abandoned {
+  background: rgba(255, 255, 255, 0.06);
+  color: #888;
+}
+
+.history__item-expand {
+  color: #777;
+  font-size: 0.9rem;
+  transition: transform 0.2s;
+}
+
+.history__item-expand--open {
+  transform: rotate(90deg);
+}
+
+/* Expanded detail */
+.history__detail {
+  padding: 0 1.25rem 1rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.history__detail-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 0.75rem;
+}
+
+.history__detail-table th {
+  text-align: left;
+  font-size: 0.75rem;
+  color: #999;
+  padding: 0.4rem 0.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.history__detail-table td {
+  font-size: 0.85rem;
+  padding: 0.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+}
+
+.history__detail-correct {
+  color: var(--accent-success, #4caf50);
+}
+
+.history__detail-wrong {
+  color: #f44336;
+}
+
+.history__detail-skipped {
+  color: #888;
+}
+
+/* Pagination */
+.history__pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.history__page-btn {
+  padding: 0.5rem 1rem;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+  color: #fff;
+  cursor: pointer;
+  font-size: 0.85rem;
+}
+
+.history__page-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.history__page-text {
+  font-size: 0.85rem;
+  color: #999;
+}
+
+.history__empty {
+  text-align: center;
+  padding: 3rem;
+  color: #999;
+}
+
+.history__loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 30vh;
+  gap: 1rem;
+}
+
+.history__spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid rgba(255, 255, 255, 0.1);
+  border-top-color: var(--accent-primary, #be1332);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}

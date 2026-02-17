@@ -106,6 +106,7 @@ export async function createQuizSession({ userId = null, isFreeQuiz = true, tota
       is_free_quiz: isFreeQuiz,
       total_questions: totalQuestions,
       quiz_pack_id: quizPackId,
+      status: 'in_progress',
     })
     .select('id')
     .single();
@@ -149,11 +150,72 @@ export async function completeQuizSession(sessionId, score) {
     .update({
       completed_at: new Date().toISOString(),
       score,
+      status: 'completed',
     })
     .eq('id', sessionId);
 
   if (error) {
     throw new Error(`Failed to complete session: ${error.message}`);
+  }
+}
+
+/**
+ * Abandon a quiz session (e.g., user quits mid-quiz).
+ */
+export async function abandonQuizSession(sessionId) {
+  const supabase = getSupabase();
+
+  const { error } = await supabase
+    .from('quiz_sessions')
+    .update({ status: 'abandoned' })
+    .eq('id', sessionId);
+
+  if (error) {
+    throw new Error(`Failed to abandon session: ${error.message}`);
+  }
+}
+
+/**
+ * Fetch a resumable (in_progress) session with its answered question IDs.
+ */
+export async function fetchResumableSession(sessionId) {
+  const supabase = getSupabase();
+
+  const [sessionResult, attemptsResult] = await Promise.all([
+    supabase.from('quiz_sessions')
+      .select('*, quiz_packs(id, title, description, category, is_premium, question_count)')
+      .eq('id', sessionId)
+      .eq('status', 'in_progress')
+      .single(),
+    supabase.from('question_attempts')
+      .select('question_id, is_correct, skipped')
+      .eq('session_id', sessionId),
+  ]);
+
+  if (sessionResult.error) {
+    throw new Error(`Session not found or already completed`);
+  }
+
+  return {
+    session: sessionResult.data,
+    answeredQuestionIds: (attemptsResult.data || []).map(a => a.question_id),
+    attempts: attemptsResult.data || [],
+  };
+}
+
+/**
+ * Update session metadata JSONB (e.g., store question_ids for resume).
+ */
+export async function updateSessionMetadata(sessionId, metadata) {
+  const supabase = getSupabase();
+
+  const { error } = await supabase
+    .from('quiz_sessions')
+    .update({ metadata })
+    .eq('id', sessionId);
+
+  if (error) {
+    throw new Error(`Failed to update session metadata: ${error.message}`);
   }
 }
 

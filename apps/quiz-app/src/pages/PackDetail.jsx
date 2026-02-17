@@ -2,8 +2,10 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import { fetchPublicPackById } from '@qwizzeria/supabase-client/src/packs.js';
+import { fetchPackLeaderboard } from '@qwizzeria/supabase-client/src/leaderboard.js';
 import LoginModal from '../components/LoginModal';
 import '../styles/PackDetail.css';
+import '../styles/Leaderboard.css';
 
 export default function PackDetail() {
   const { id } = useParams();
@@ -14,15 +16,23 @@ export default function PackDetail() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [showLogin, setShowLogin] = useState(false);
+  const [packLb, setPackLb] = useState([]);
 
   const isPremiumUser = user?.app_metadata?.is_premium === true;
 
   useEffect(() => {
-    setLoading(true);
+    let cancelled = false;
     fetchPublicPackById(id)
-      .then(setPack)
-      .catch((err) => setError(err.message))
-      .finally(() => setLoading(false));
+      .then((data) => { if (!cancelled) setPack(data); })
+      .catch((err) => { if (!cancelled) setError(err.message); })
+      .finally(() => { if (!cancelled) setLoading(false); });
+
+    // Also fetch pack leaderboard (non-critical)
+    fetchPackLeaderboard(id, 10)
+      .then((data) => { if (!cancelled) setPackLb(data); })
+      .catch(() => {});
+
+    return () => { cancelled = true; };
   }, [id]);
 
   if (loading || authLoading) {
@@ -139,6 +149,46 @@ export default function PackDetail() {
         >
           Start Quiz
         </button>
+      )}
+
+      {/* Pack Leaderboard */}
+      {packLb.length > 0 && (
+        <div className="pack-leaderboard">
+          <h2 className="pack-leaderboard__title">Top Scores</h2>
+          <table className="pack-leaderboard__table">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Player</th>
+                <th>Score</th>
+                <th>Date</th>
+              </tr>
+            </thead>
+            <tbody>
+              {packLb.map((entry, i) => {
+                const isCurrentUser = user?.id === entry.user_id;
+                return (
+                  <tr
+                    key={entry.user_id}
+                    className={isCurrentUser ? 'pack-leaderboard__row--current' : ''}
+                  >
+                    <td>{i + 1}</td>
+                    <td>
+                      {entry.display_name || 'Anonymous'}
+                      {isCurrentUser && ' (You)'}
+                    </td>
+                    <td style={{ fontWeight: 700, color: 'var(--accent-primary, #be1332)' }}>
+                      {entry.best_score ?? 0}
+                    </td>
+                    <td style={{ fontSize: '0.8rem', color: '#999' }}>
+                      {entry.best_date ? new Date(entry.best_date).toLocaleDateString() : '—'}
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
       )}
 
       {showLogin && (

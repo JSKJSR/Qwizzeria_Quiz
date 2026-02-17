@@ -1,0 +1,178 @@
+.leaderboard {
+  min-height: 100vh;
+  background: var(--bg-primary, #000);
+  color: #fff;
+  padding: 1.5rem;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.leaderboard__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.leaderboard__logo {
+  height: 36px;
+}
+
+.leaderboard__back-btn {
+  background: none;
+  border: none;
+  color: #aaa;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+.leaderboard__back-btn:hover {
+  color: #fff;
+}
+
+.leaderboard__title {
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+/* Time filter tabs */
+.leaderboard__tabs {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.leaderboard__tab {
+  padding: 0.5rem 1rem;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+  color: #aaa;
+  cursor: pointer;
+  font-size: 0.85rem;
+  transition: all 0.2s;
+}
+
+.leaderboard__tab:hover {
+  color: #fff;
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.leaderboard__tab--active {
+  background: var(--accent-primary, #be1332);
+  border-color: var(--accent-primary, #be1332);
+  color: #fff;
+}
+
+/* Table */
+.leaderboard__table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.leaderboard__table th {
+  text-align: left;
+  font-size: 0.75rem;
+  color: #999;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 0.75rem 0.75rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.leaderboard__table td {
+  padding: 0.75rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  font-size: 0.9rem;
+}
+
+.leaderboard__row--current {
+  background: rgba(190, 19, 50, 0.08);
+  border-left: 3px solid var(--accent-primary, #be1332);
+}
+
+.leaderboard__rank {
+  font-weight: 700;
+  width: 40px;
+}
+
+.leaderboard__rank--gold {
+  color: #ffd700;
+}
+
+.leaderboard__rank--silver {
+  color: #c0c0c0;
+}
+
+.leaderboard__rank--bronze {
+  color: #cd7f32;
+}
+
+.leaderboard__name {
+  font-weight: 500;
+}
+
+.leaderboard__score {
+  font-weight: 700;
+  color: var(--accent-primary, #be1332);
+}
+
+.leaderboard__empty {
+  text-align: center;
+  padding: 3rem;
+  color: #999;
+}
+
+.leaderboard__loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 30vh;
+  gap: 1rem;
+}
+
+.leaderboard__spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid rgba(255, 255, 255, 0.1);
+  border-top-color: var(--accent-primary, #be1332);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+/* Pack leaderboard (mini version on PackDetail) */
+.pack-leaderboard {
+  margin-top: 2rem;
+}
+
+.pack-leaderboard__title {
+  font-size: 1.1rem;
+  margin-bottom: 0.75rem;
+}
+
+.pack-leaderboard__table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.pack-leaderboard__table th {
+  text-align: left;
+  font-size: 0.7rem;
+  color: #999;
+  text-transform: uppercase;
+  padding: 0.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.pack-leaderboard__table td {
+  padding: 0.5rem;
+  font-size: 0.85rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.pack-leaderboard__row--current {
+  background: rgba(190, 19, 50, 0.08);
+}

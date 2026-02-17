@@ -319,3 +319,40 @@ export async function incrementPackPlayCount(packId) {
     throw new Error(`Failed to increment play count: ${error.message}`);
   }
 }
+
+// ============================================================
+// Admin Analytics RPCs
+// ============================================================
+
+/**
+ * Fetch platform-level analytics (admin-only).
+ */
+export async function fetchAdminAnalytics() {
+  const supabase = getSupabase();
+  const { data, error } = await supabase.rpc('get_admin_analytics');
+
+  if (error) throw new Error(`Failed to fetch analytics: ${error.message}`);
+  return data;
+}
+
+/**
+ * Fetch per-pack performance metrics (admin-only).
+ */
+export async function fetchPackPerformance() {
+  const supabase = getSupabase();
+  const { data, error } = await supabase.rpc('get_pack_performance');
+
+  if (error) throw new Error(`Failed to fetch pack performance: ${error.message}`);
+  return data || [];
+}
+
+/**
+ * Fetch hardest questions by accuracy (admin-only).
+ */
+export async function fetchHardestQuestions(limit = 10) {
+  const supabase = getSupabase();
+  const { data, error } = await supabase.rpc('get_hardest_questions', { result_limit: limit });
+
+  if (error) throw new Error(`Failed to fetch hardest questions: ${error.message}`);
+  return data || [];
+}

@@ -19,11 +19,12 @@ export default function PackBrowse() {
   }, []);
 
   useEffect(() => {
-    setLoading(true);
+    let cancelled = false;
     browsePublicPacks({ category: categoryFilter || undefined })
-      .then(setPacks)
-      .catch(() => setPacks([]))
-      .finally(() => setLoading(false));
+      .then((data) => { if (!cancelled) setPacks(data); })
+      .catch(() => { if (!cancelled) setPacks([]); })
+      .finally(() => { if (!cancelled) setLoading(false); });
+    return () => { cancelled = true; };
   }, [categoryFilter]);
 
   const handleCardClick = (pack) => {

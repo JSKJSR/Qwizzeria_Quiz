@@ -54,6 +54,16 @@ export default function LandingPage() {
             <span className="landing__cta-icon">&#11088;</span>
             Browse Quiz Packs
           </Link>
+          <Link to="/leaderboard" className="landing__cta-btn">
+            <span className="landing__cta-icon">&#127942;</span>
+            Leaderboard
+          </Link>
+          {user && (
+            <Link to="/profile" className="landing__cta-btn">
+              <span className="landing__cta-icon">&#128100;</span>
+              My Profile
+            </Link>
+          )}
         </div>
       </header>
 

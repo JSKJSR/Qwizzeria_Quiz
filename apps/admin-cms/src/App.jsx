@@ -20,13 +20,13 @@ function getSupabaseSafe() {
 }
 
 export default function App() {
+  const supabaseAvailable = Boolean(getSupabaseSafe());
   const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(supabaseAvailable);
 
   useEffect(() => {
     const supabase = getSupabaseSafe();
     if (!supabase) {
-      setLoading(false);
       return;
     }
 

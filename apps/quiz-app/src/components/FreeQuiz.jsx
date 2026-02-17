@@ -1,7 +1,7 @@
 import { useReducer, useEffect, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
-import { fetchGridQuestions, createQuizSession, recordAttempt, completeQuizSession } from '@qwizzeria/supabase-client/src/questions.js';
+import { fetchGridQuestions, createQuizSession, recordAttempt, completeQuizSession, abandonQuizSession, updateSessionMetadata } from '@qwizzeria/supabase-client/src/questions.js';
 import { detectMediaType } from '../utils/mediaDetector';
 import TopicGrid from './TopicGrid';
 import QuestionView from './QuestionView';
@@ -98,7 +98,7 @@ function reducer(state, action) {
   }
 }
 
-export default function FreeQuiz() {
+export default function FreeQuiz({ resumeData } = {}) {
   const navigate = useNavigate();
   const { user } = useAuth();
   const [state, dispatch] = useReducer(reducer, initialState);
@@ -127,6 +127,12 @@ export default function FreeQuiz() {
           totalQuestions: enrichedAll.length,
         });
         sessionIdRef.current = session.id;
+
+        // Save question IDs to session metadata for resume (non-blocking)
+        updateSessionMetadata(session.id, {
+          question_ids: enrichedAll.map(q => q.id),
+          format: 'jeopardy',
+        }).catch(() => {});
       } catch {
         sessionIdRef.current = null;
       }
@@ -136,8 +142,16 @@ export default function FreeQuiz() {
   }, [user]);
 
   useEffect(() => {
+    // If resuming, restore state from resumeData
+    if (resumeData?.sessionId) {
+      sessionIdRef.current = resumeData.sessionId;
+      // For free quiz resume, just load fresh questions (simple approach)
+      // since the grid is random and we can't fully reconstruct it
+      loadQuiz();
+      return;
+    }
     loadQuiz();
-  }, [loadQuiz]);
+  }, [loadQuiz, resumeData]);
 
   const handleSelectQuestion = useCallback((question) => {
     questionStartRef.current = Date.now();
@@ -176,6 +190,13 @@ export default function FreeQuiz() {
       completeQuizSession(sessionIdRef.current, state.score).catch(() => {});
     }
   }, [state.phase, state.score]);
+
+  const handleQuit = useCallback(() => {
+    if (sessionIdRef.current) {
+      abandonQuizSession(sessionIdRef.current).catch(() => {});
+    }
+    navigate('/');
+  }, [navigate]);
 
   const { phase, topics, allQuestions, currentQuestion, completedQuestionIds, results, score, error } = state;
   const totalQuestions = allQuestions.length;
@@ -345,7 +366,7 @@ export default function FreeQuiz() {
         </span>
         <div className="free-quiz__header-right">
           {user && <span className="free-quiz__user-email">{user.email}</span>}
-          <button className="free-quiz__back-btn" onClick={() => navigate('/')}>
+          <button className="free-quiz__back-btn" onClick={handleQuit}>
             Quit
           </button>
         </div>

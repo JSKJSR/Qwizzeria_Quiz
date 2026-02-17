@@ -1,6 +1,6 @@
 import { useReducer, useEffect, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { createQuizSession, recordAttempt, completeQuizSession } from '@qwizzeria/supabase-client/src/questions.js';
+import { createQuizSession, recordAttempt, completeQuizSession, abandonQuizSession, updateSessionMetadata } from '@qwizzeria/supabase-client/src/questions.js';
 import { incrementPackPlayCount } from '@qwizzeria/supabase-client/src/packs.js';
 import { detectMediaType } from '../utils/mediaDetector';
 import TopicGrid from './TopicGrid';
@@ -24,6 +24,7 @@ function enrichWithMedia(q) {
 
 const ACTIONS = {
   INIT: 'INIT',
+  RESTORE: 'RESTORE',
   SELECT_QUESTION: 'SELECT_QUESTION',
   BACK_TO_GRID: 'BACK_TO_GRID',
   REVEAL_ANSWER: 'REVEAL_ANSWER',
@@ -49,6 +50,18 @@ function reducer(state, action) {
         topics: action.topics,
         allQuestions: action.allQuestions,
       };
+
+    case ACTIONS.RESTORE: {
+      const allDone = action.completedQuestionIds.length >= action.allQuestions.length;
+      return {
+        ...initialState,
+        phase: allDone ? 'results' : 'grid',
+        topics: action.topics,
+        allQuestions: action.allQuestions,
+        completedQuestionIds: action.completedQuestionIds,
+        score: action.score,
+      };
+    }
 
     case ACTIONS.SELECT_QUESTION:
       return { ...state, phase: 'question', currentQuestion: action.question };
@@ -83,7 +96,7 @@ function reducer(state, action) {
   }
 }
 
-export default function PackPlayJeopardy({ pack, questions, user }) {
+export default function PackPlayJeopardy({ pack, questions, user, resumeData }) {
   const navigate = useNavigate();
   const [state, dispatch] = useReducer(reducer, initialState);
   const sessionIdRef = useRef(null);
@@ -117,6 +130,20 @@ export default function PackPlayJeopardy({ pack, questions, user }) {
     }));
 
     const allQuestions = topics.flatMap(t => t.questions);
+
+    if (resumeData?.sessionId) {
+      // Resume: restore session state
+      sessionIdRef.current = resumeData.sessionId;
+      dispatch({
+        type: ACTIONS.RESTORE,
+        topics,
+        allQuestions,
+        completedQuestionIds: resumeData.answeredQuestionIds || [],
+        score: resumeData.existingScore || 0,
+      });
+      return;
+    }
+
     dispatch({ type: ACTIONS.INIT, topics, allQuestions });
 
     // Create session (non-critical)
@@ -126,12 +153,26 @@ export default function PackPlayJeopardy({ pack, questions, user }) {
       totalQuestions: allQuestions.length,
       quizPackId: pack.id,
     })
-      .then((session) => { sessionIdRef.current = session.id; })
+      .then((session) => {
+        sessionIdRef.current = session.id;
+        // Save metadata for resume (non-blocking)
+        updateSessionMetadata(session.id, {
+          format: 'jeopardy',
+          question_ids: allQuestions.map(q => q.id),
+        }).catch(() => {});
+      })
       .catch(() => { sessionIdRef.current = null; });
 
     // Increment play count (non-critical)
     incrementPackPlayCount(pack.id).catch(() => {});
-  }, [questions, pack.id, user]);
+  }, [questions, pack.id, user, resumeData]);
+
+  const handleQuit = useCallback(() => {
+    if (sessionIdRef.current) {
+      abandonQuizSession(sessionIdRef.current).catch(() => {});
+    }
+    navigate(`/packs/${pack.id}`);
+  }, [navigate, pack.id]);
 
   const handleSelectQuestion = useCallback((question) => {
     questionStartRef.current = Date.now();
@@ -302,7 +343,7 @@ export default function PackPlayJeopardy({ pack, questions, user }) {
           {completedQuestionIds.length} / {totalQuestions}
         </span>
         <div className="free-quiz__header-right">
-          <button className="free-quiz__back-btn" onClick={() => navigate(`/packs/${pack.id}`)}>
+          <button className="free-quiz__back-btn" onClick={handleQuit}>
             Quit
           </button>
         </div>
