@@ -120,7 +120,7 @@ export async function fetchPackQuestions(packId) {
 
   const { data, error } = await supabase
     .from('pack_questions')
-    .select('id, sort_order, question_id, questions_master(id, question_text, answer_text, answer_explanation, category, media_url, status)')
+    .select('id, sort_order, question_id, questions_master(id, question_text, answer_text, answer_explanation, category, media_url, points, status)')
     .eq('pack_id', packId)
     .order('sort_order', { ascending: true });
 
@@ -148,18 +148,22 @@ export async function addQuestionToPack(packId, questionId, sortOrder = 0) {
   }
 
   // Update question_count on the pack
-  await supabase.rpc('update_pack_question_count', { target_pack_id: packId }).catch(() => {
+  try {
+    await supabase.rpc('update_pack_question_count', { target_pack_id: packId });
+  } catch {
     // Fallback: manual count update
-    supabase
-      .from('pack_questions')
-      .select('id', { count: 'exact', head: true })
-      .eq('pack_id', packId)
-      .then(({ count }) => {
-        if (count != null) {
-          supabase.from('quiz_packs').update({ question_count: count }).eq('id', packId);
-        }
-      });
-  });
+    try {
+      const { count } = await supabase
+        .from('pack_questions')
+        .select('id', { count: 'exact', head: true })
+        .eq('pack_id', packId);
+      if (count != null) {
+        await supabase.from('quiz_packs').update({ question_count: count }).eq('id', packId);
+      }
+    } catch {
+      // Non-critical
+    }
+  }
 
   return data;
 }
@@ -293,7 +297,7 @@ export async function fetchPackPlayQuestions(packId) {
 
   const { data, error } = await supabase
     .from('pack_questions')
-    .select('sort_order, questions_master(id, question_text, answer_text, answer_explanation, category, media_url)')
+    .select('sort_order, questions_master(id, question_text, answer_text, answer_explanation, category, media_url, points)')
     .eq('pack_id', packId)
     .order('sort_order', { ascending: true });
 

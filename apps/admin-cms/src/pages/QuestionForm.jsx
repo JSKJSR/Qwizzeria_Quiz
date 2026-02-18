@@ -13,6 +13,7 @@ const EMPTY_FORM = {
   answer_explanation: '',
   category: '',
   sub_category: '',
+  points: '',
   media_url: '',
   tags: '',
   status: 'active',
@@ -47,6 +48,7 @@ export default function QuestionForm() {
           answer_explanation: q.answer_explanation || '',
           category: q.category || '',
           sub_category: q.sub_category || '',
+          points: q.points != null ? String(q.points) : '',
           media_url: q.media_url || '',
           tags: Array.isArray(q.tags) ? q.tags.join(', ') : (q.tags || ''),
           status: q.status || 'active',
@@ -78,12 +80,14 @@ export default function QuestionForm() {
 
     setSaving(true);
     try {
+      const pointsVal = form.points.trim();
       const payload = {
         question_text: form.question_text.trim(),
         answer_text: form.answer_text.trim(),
         answer_explanation: form.answer_explanation.trim() || null,
         category: form.category.trim() || null,
         sub_category: form.sub_category.trim() || null,
+        points: pointsVal && !isNaN(Number(pointsVal)) ? Number(pointsVal) : null,
         media_url: form.media_url.trim() || null,
         tags: form.tags
           ? form.tags.split(',').map((t) => t.trim()).filter(Boolean)
@@ -182,6 +186,20 @@ export default function QuestionForm() {
               onChange={(e) => handleChange('sub_category', e.target.value)}
             />
           </div>
+        </div>
+
+        <div className="form-group">
+          <label htmlFor="points">Points (optional)</label>
+          <input
+            id="points"
+            type="number"
+            className="form-input"
+            min="1"
+            placeholder="Auto-assigned if empty"
+            value={form.points}
+            onChange={(e) => handleChange('points', e.target.value)}
+            style={{ maxWidth: 200 }}
+          />
         </div>
 
         <div className="form-group">

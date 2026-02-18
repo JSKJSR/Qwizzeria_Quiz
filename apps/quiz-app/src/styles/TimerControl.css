@@ -1,0 +1,68 @@
+.timer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.timer__display {
+  font-size: 3rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 2px;
+  color: var(--text-primary, #f0f0f0);
+  transition: color 0.3s ease;
+}
+
+.timer--warning .timer__display {
+  color: #ff9800;
+}
+
+.timer--critical .timer__display {
+  color: #f44336;
+  animation: pulse 1s ease-in-out infinite;
+}
+
+.timer--expired .timer__display {
+  color: #f44336;
+  animation: pulseBackground 0.5s ease-in-out 3;
+}
+
+.timer__controls {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.timer__btn {
+  padding: 0.4rem 1rem;
+  border-radius: var(--radius-sm, 8px);
+  font-size: 0.85rem;
+  cursor: pointer;
+  border: 1px solid var(--border-color, #2a1520);
+  color: var(--text-primary, #f0f0f0);
+  background: var(--bg-card, #1a1015);
+  transition: all 0.15s ease;
+}
+
+.timer__btn:hover:not(:disabled) {
+  border-color: var(--accent-primary, #be1332);
+}
+
+.timer__btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.timer__btn--toggle {
+  min-width: 70px;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+@keyframes pulseBackground {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}

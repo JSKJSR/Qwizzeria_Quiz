@@ -1,8 +1,12 @@
 import { useState } from 'react';
-import { signInWithEmail, signUpWithEmail, signInWithGoogle } from '@qwizzeria/supabase-client/src/auth.js';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../hooks/useAuth';
+import { signInWithGoogle } from '@qwizzeria/supabase-client/src/auth.js';
 import '../styles/LoginModal.css';
 
 export default function LoginModal({ onClose, onSuccess }) {
+  const navigate = useNavigate();
+  const { signIn, signUp } = useAuth();
   const [mode, setMode] = useState('login'); // 'login' or 'signup'
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -18,12 +22,14 @@ export default function LoginModal({ onClose, onSuccess }) {
 
     try {
       if (mode === 'signup') {
-        await signUpWithEmail(email, password);
+        await signUp(email, password);
         setMessage('Check your email for a confirmation link.');
       } else {
-        await signInWithEmail(email, password);
+        // signIn sets user in context before we navigate
+        await signIn(email, password);
         onSuccess?.();
         onClose();
+        navigate('/dashboard');
       }
     } catch (err) {
       setError(err.message);

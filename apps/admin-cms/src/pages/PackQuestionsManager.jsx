@@ -7,7 +7,7 @@ import {
   removeQuestionFromPack,
   updatePackQuestionOrder,
 } from '@qwizzeria/supabase-client/src/packs.js';
-import { fetchAllQuestions } from '@qwizzeria/supabase-client/src/questions.js';
+import { fetchAllQuestions, fetchCategories } from '@qwizzeria/supabase-client/src/questions.js';
 
 export default function PackQuestionsManager() {
   const { id: packId } = useParams();
@@ -15,11 +15,19 @@ export default function PackQuestionsManager() {
 
   const [pack, setPack] = useState(null);
   const [packQuestions, setPackQuestions] = useState([]);
-  const [searchResults, setSearchResults] = useState([]);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [searching, setSearching] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  // Browse all questions state
+  const [allQuestions, setAllQuestions] = useState([]);
+  const [totalCount, setTotalCount] = useState(0);
+  const [browsePage, setBrowsePage] = useState(1);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [categoryFilter, setCategoryFilter] = useState('');
+  const [categories, setCategories] = useState([]);
+  const [browseLoading, setBrowseLoading] = useState(true);
+
+  const browsePageSize = 20;
 
   const loadPack = useCallback(async () => {
     try {
@@ -36,31 +44,60 @@ export default function PackQuestionsManager() {
     }
   }, [packId]);
 
+  // Load categories once
+  useEffect(() => {
+    fetchCategories().then(setCategories).catch(() => {});
+  }, []);
+
+  // Load pack data
   useEffect(() => {
     loadPack();
   }, [loadPack]);
 
-  const handleSearch = async () => {
-    if (!searchTerm.trim()) return;
-    setSearching(true);
+  // Browse all questions — loads on mount and when filters/page change
+  const loadBrowseQuestions = useCallback(async () => {
+    setBrowseLoading(true);
     try {
-      const result = await fetchAllQuestions({ search: searchTerm, pageSize: 20 });
-      // Filter out questions already in the pack
-      const existingIds = new Set(packQuestions.map(pq => pq.question_id));
-      setSearchResults(result.data.filter(q => !existingIds.has(q.id)));
+      const result = await fetchAllQuestions({
+        search: searchTerm || undefined,
+        category: categoryFilter || undefined,
+        page: browsePage,
+        pageSize: browsePageSize,
+      });
+      setAllQuestions(result.data);
+      setTotalCount(result.count);
     } catch (err) {
-      console.error('Search failed:', err);
+      console.error('Failed to load questions:', err);
+      setAllQuestions([]);
+      setTotalCount(0);
     } finally {
-      setSearching(false);
+      setBrowseLoading(false);
     }
-  };
+  }, [searchTerm, categoryFilter, browsePage]);
+
+  useEffect(() => {
+    loadBrowseQuestions();
+  }, [loadBrowseQuestions]);
+
+  // Filter out questions already in the pack
+  const existingIds = new Set(packQuestions.map(pq => pq.question_id));
+  const availableQuestions = allQuestions.filter(q => !existingIds.has(q.id));
+
+  const handleSearchSubmit = useCallback((e) => {
+    e?.preventDefault();
+    setBrowsePage(1);
+    // loadBrowseQuestions will re-run via useEffect due to browsePage change
+  }, []);
+
+  const handleCategoryChange = useCallback((e) => {
+    setCategoryFilter(e.target.value);
+    setBrowsePage(1);
+  }, []);
 
   const handleAdd = async (questionId) => {
     try {
       const nextOrder = packQuestions.length;
       await addQuestionToPack(packId, questionId, nextOrder);
-      // Remove from search results
-      setSearchResults(prev => prev.filter(q => q.id !== questionId));
       // Reload pack questions
       const questions = await fetchPackQuestions(packId);
       setPackQuestions(questions);
@@ -107,6 +144,8 @@ export default function PackQuestionsManager() {
     }
   };
 
+  const browseTotalPages = Math.ceil(totalCount / browsePageSize);
+
   if (loading) {
     return <p style={{ color: 'var(--text-secondary)' }}>Loading...</p>;
   }
@@ -131,53 +170,105 @@ export default function PackQuestionsManager() {
         </button>
       </div>
 
-      {/* Search to add questions */}
+      {/* Browse & add questions */}
       <div style={{ marginBottom: '2rem' }}>
         <h3 style={{ marginBottom: '0.75rem' }}>Add Questions</h3>
-        <div className="filters-bar">
+        <form className="filters-bar" onSubmit={handleSearchSubmit}>
           <input
             type="text"
             className="form-input"
-            placeholder="Search questions to add..."
+            placeholder="Search questions..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
           />
+          <select
+            className="form-input"
+            value={categoryFilter}
+            onChange={handleCategoryChange}
+          >
+            <option value="">All Categories</option>
+            {categories.map((c) => (
+              <option key={c} value={c}>{c}</option>
+            ))}
+          </select>
           <button
             className="btn btn-primary"
-            onClick={handleSearch}
-            disabled={searching}
+            type="submit"
+            disabled={browseLoading}
           >
-            {searching ? 'Searching...' : 'Search'}
+            {browseLoading ? 'Loading...' : 'Search'}
           </button>
-        </div>
+        </form>
 
-        {searchResults.length > 0 && (
-          <table className="data-table" style={{ marginTop: '0.75rem' }}>
-            <thead>
-              <tr>
-                <th>Question</th>
-                <th>Category</th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody>
-              {searchResults.map((q) => (
-                <tr key={q.id}>
-                  <td className="truncate">{q.question_text}</td>
-                  <td>{q.category || '—'}</td>
-                  <td>
-                    <button
-                      className="btn btn-primary btn-sm"
-                      onClick={() => handleAdd(q.id)}
-                    >
-                      Add
-                    </button>
-                  </td>
+        {browseLoading ? (
+          <p style={{ color: 'var(--text-secondary)', marginTop: '0.75rem' }}>Loading questions...</p>
+        ) : availableQuestions.length === 0 && allQuestions.length === 0 ? (
+          <p style={{ color: 'var(--text-secondary)', marginTop: '0.75rem' }}>
+            No questions found. Try a different search or check the Questions page.
+          </p>
+        ) : (
+          <>
+            <table className="data-table" style={{ marginTop: '0.75rem' }}>
+              <thead>
+                <tr>
+                  <th>Question</th>
+                  <th>Answer</th>
+                  <th>Category</th>
+                  <th>Points</th>
+                  <th></th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {availableQuestions.map((q) => (
+                  <tr key={q.id}>
+                    <td className="truncate">{q.question_text}</td>
+                    <td className="truncate" style={{ maxWidth: '200px', fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
+                      {q.answer_text}
+                    </td>
+                    <td>{q.category || '—'}</td>
+                    <td>{q.points != null ? q.points : '—'}</td>
+                    <td>
+                      <button
+                        className="btn btn-primary btn-sm"
+                        onClick={() => handleAdd(q.id)}
+                      >
+                        Add
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+                {availableQuestions.length === 0 && allQuestions.length > 0 && (
+                  <tr>
+                    <td colSpan={5} style={{ textAlign: 'center', color: 'var(--text-secondary)' }}>
+                      All questions on this page are already in the pack.
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+
+            {browseTotalPages > 1 && (
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginTop: '0.75rem' }}>
+                <button
+                  className="btn btn-secondary btn-sm"
+                  disabled={browsePage <= 1}
+                  onClick={() => setBrowsePage(p => p - 1)}
+                >
+                  Previous
+                </button>
+                <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
+                  Page {browsePage} of {browseTotalPages} ({totalCount} total)
+                </span>
+                <button
+                  className="btn btn-secondary btn-sm"
+                  disabled={browsePage >= browseTotalPages}
+                  onClick={() => setBrowsePage(p => p + 1)}
+                >
+                  Next
+                </button>
+              </div>
+            )}
+          </>
         )}
       </div>
 
@@ -189,7 +280,7 @@ export default function PackQuestionsManager() {
 
         {packQuestions.length === 0 ? (
           <p style={{ color: 'var(--text-secondary)' }}>
-            No questions in this pack yet. Use the search above to add questions.
+            No questions in this pack yet. Use the list above to add questions.
           </p>
         ) : (
           <table className="data-table">
@@ -198,6 +289,7 @@ export default function PackQuestionsManager() {
                 <th>#</th>
                 <th>Question</th>
                 <th>Category</th>
+                <th>Points</th>
                 <th>Order</th>
                 <th></th>
               </tr>
@@ -210,6 +302,7 @@ export default function PackQuestionsManager() {
                     <td>{index + 1}</td>
                     <td className="truncate">{q?.question_text || '—'}</td>
                     <td>{q?.category || '—'}</td>
+                    <td>{q?.points != null ? q.points : '—'}</td>
                     <td>
                       <div style={{ display: 'flex', gap: '0.25rem' }}>
                         <button

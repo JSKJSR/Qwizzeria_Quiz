@@ -1,5 +1,4 @@
 import { useState, useEffect, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import { fetchGlobalLeaderboard } from '@qwizzeria/supabase-client/src/leaderboard.js';
 import '../styles/Leaderboard.css';
@@ -11,7 +10,6 @@ const TIME_FILTERS = [
 ];
 
 export default function Leaderboard() {
-  const navigate = useNavigate();
   const { user } = useAuth();
 
   const [timeFilter, setTimeFilter] = useState('all_time');
@@ -52,18 +50,6 @@ export default function Leaderboard() {
 
   return (
     <div className="leaderboard">
-      <div className="leaderboard__header">
-        <img
-          src="/qwizzeria-logo.png"
-          alt="Qwizzeria"
-          className="leaderboard__logo"
-          onError={(e) => { e.target.src = '/qwizzeria-logo.svg'; }}
-        />
-        <button className="leaderboard__back-btn" onClick={() => navigate('/')}>
-          Back to Home
-        </button>
-      </div>
-
       <h1 className="leaderboard__title">Leaderboard</h1>
 
       <div className="leaderboard__tabs">

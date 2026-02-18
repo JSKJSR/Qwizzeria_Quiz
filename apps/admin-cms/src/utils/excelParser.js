@@ -13,6 +13,8 @@ const COLUMN_MAP = {
   'tags': 'tags',
   'sub category': 'sub_category',
   'sub_category': 'sub_category',
+  'points': 'points',
+  'score': 'points',
 };
 
 function normalizeHeader(header) {
@@ -53,6 +55,9 @@ export function parseExcelFile(arrayBuffer) {
       if (value) {
         if (dbKey === 'tags') {
           q[dbKey] = value.split(',').map(t => t.trim()).filter(Boolean);
+        } else if (dbKey === 'points') {
+          const n = parseInt(value, 10);
+          if (!isNaN(n) && n > 0) q[dbKey] = n;
         } else {
           q[dbKey] = value;
         }
@@ -78,7 +83,7 @@ export function parseExcelFile(arrayBuffer) {
  * Generate a template Excel file as a Blob for download.
  */
 export function generateTemplate() {
-  const headers = ['Question', 'Answer', 'Category', 'Sub Category', 'Explanation', 'Media URL', 'Tags'];
+  const headers = ['Question', 'Answer', 'Category', 'Sub Category', 'Explanation', 'Media URL', 'Tags', 'Points'];
   const sampleRow = [
     'What is the capital of France?',
     'Paris',
@@ -87,6 +92,7 @@ export function generateTemplate() {
     'Paris has been the capital since the 10th century.',
     '',
     'geography, europe, capitals',
+    '10',
   ];
 
   const ws = XLSX.utils.aoa_to_sheet([headers, sampleRow]);

@@ -1,0 +1,127 @@
+.dash-home {
+  padding: 2rem;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.dash-home__welcome {
+  margin-bottom: 2rem;
+}
+
+.dash-home__greeting {
+  font-size: var(--font-size-xl, 2rem);
+  font-weight: 700;
+  margin-bottom: 0.25rem;
+}
+
+.dash-home__subtitle {
+  color: var(--text-secondary, #b0a0a5);
+  font-size: 0.95rem;
+}
+
+/* Quick action cards */
+.dash-home__actions {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1rem;
+  margin-bottom: 2.5rem;
+}
+
+.dash-home__action-card {
+  background: var(--bg-card, #1a1015);
+  border: 1px solid var(--border-color, #2a1520);
+  border-radius: var(--radius, 12px);
+  padding: 1.5rem;
+  text-decoration: none;
+  color: var(--text-primary, #f0f0f0);
+  transition: all 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.dash-home__action-card:hover {
+  border-color: var(--accent-primary, #be1332);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 20px rgba(190, 19, 50, 0.15);
+}
+
+.dash-home__action-icon {
+  font-size: 2rem;
+}
+
+.dash-home__action-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.dash-home__action-desc {
+  font-size: 0.85rem;
+  color: var(--text-secondary, #b0a0a5);
+}
+
+/* Resume section */
+.dash-home__section-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+
+.dash-home__resume-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.dash-home__resume-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--bg-card, #1a1015);
+  border: 1px solid var(--border-color, #2a1520);
+  border-radius: var(--radius-sm, 8px);
+  padding: 1rem 1.25rem;
+}
+
+.dash-home__resume-info {
+  flex: 1;
+}
+
+.dash-home__resume-pack {
+  font-weight: 600;
+  margin-bottom: 0.2rem;
+}
+
+.dash-home__resume-meta {
+  font-size: 0.8rem;
+  color: var(--text-secondary, #b0a0a5);
+}
+
+.dash-home__resume-btn {
+  padding: 0.5rem 1rem;
+  background: var(--accent-primary, #be1332);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-sm, 8px);
+  cursor: pointer;
+  font-size: 0.85rem;
+}
+
+.dash-home__resume-btn:hover {
+  opacity: 0.85;
+}
+
+.dash-home__empty {
+  color: var(--text-muted, #665555);
+  font-size: 0.9rem;
+}
+
+@media (max-width: 768px) {
+  .dash-home {
+    padding: 1.5rem;
+  }
+
+  .dash-home__greeting {
+    font-size: 1.5rem;
+  }
+}

@@ -6,7 +6,7 @@ import '../styles/History.css';
 
 export default function History() {
   const navigate = useNavigate();
-  const { user, loading: authLoading } = useAuth();
+  const { user } = useAuth();
 
   const [sessions, setSessions] = useState([]);
   const [totalCount, setTotalCount] = useState(0);
@@ -21,8 +21,7 @@ export default function History() {
   const pageSize = 20;
 
   useEffect(() => {
-    if (authLoading) return;
-    if (!user) { navigate('/'); return; }
+    if (!user) return;
 
     let cancelled = false;
     setLoading(true);
@@ -45,7 +44,7 @@ export default function History() {
       });
 
     return () => { cancelled = true; };
-  }, [user, authLoading, navigate, typeFilter, statusFilter, page]);
+  }, [user, typeFilter, statusFilter, page]);
 
   const totalPages = Math.ceil(totalCount / pageSize);
 
@@ -82,7 +81,7 @@ export default function History() {
     }
   }, [expandedId, detailCache]);
 
-  if (authLoading || loading) {
+  if (loading) {
     return (
       <div className="history">
         <div className="history__loading">
@@ -95,18 +94,6 @@ export default function History() {
 
   return (
     <div className="history">
-      <div className="history__header">
-        <img
-          src="/qwizzeria-logo.png"
-          alt="Qwizzeria"
-          className="history__logo"
-          onError={(e) => { e.target.src = '/qwizzeria-logo.svg'; }}
-        />
-        <button className="history__back-btn" onClick={() => navigate('/profile')}>
-          Back to Profile
-        </button>
-      </div>
-
       <h1 className="history__title">Quiz History</h1>
 
       <div className="history__filters">

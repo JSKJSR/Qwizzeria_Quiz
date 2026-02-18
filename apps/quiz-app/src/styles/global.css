@@ -31,6 +31,8 @@
 
   --radius: 12px;
   --radius-sm: 8px;
+
+  --sidebar-width: 260px;
 }
 
 *, *::before, *::after {

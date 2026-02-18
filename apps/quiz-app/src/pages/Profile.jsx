@@ -6,7 +6,7 @@ import '../styles/Profile.css';
 
 export default function Profile() {
   const navigate = useNavigate();
-  const { user, loading: authLoading } = useAuth();
+  const { user } = useAuth();
 
   const [, setProfile] = useState(null);
   const [stats, setStats] = useState(null);
@@ -16,8 +16,7 @@ export default function Profile() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (authLoading) return;
-    if (!user) { navigate('/'); return; }
+    if (!user) return;
 
     async function load() {
       try {
@@ -37,7 +36,7 @@ export default function Profile() {
       }
     }
     load();
-  }, [user, authLoading, navigate]);
+  }, [user]);
 
   const handleSaveName = async () => {
     if (!displayName.trim() || !user) return;
@@ -52,7 +51,7 @@ export default function Profile() {
     }
   };
 
-  if (authLoading || loading) {
+  if (loading) {
     return (
       <div className="profile">
         <div className="profile__loading">
@@ -65,18 +64,6 @@ export default function Profile() {
 
   return (
     <div className="profile">
-      <div className="profile__header">
-        <img
-          src="/qwizzeria-logo.png"
-          alt="Qwizzeria"
-          className="profile__logo"
-          onError={(e) => { e.target.src = '/qwizzeria-logo.svg'; }}
-        />
-        <button className="profile__back-btn" onClick={() => navigate('/')}>
-          Back to Home
-        </button>
-      </div>
-
       <h1 className="profile__title">My Profile</h1>
 
       {/* Display Name */}

@@ -49,19 +49,11 @@ export default function PackDetail() {
   if (error || !pack) {
     return (
       <div className="pack-detail">
-        <div className="pack-detail__header">
-          <img
-            src="/qwizzeria-logo.png"
-            alt="Qwizzeria"
-            className="pack-detail__logo"
-            onError={(e) => { e.target.src = '/qwizzeria-logo.svg'; }}
-          />
+        <div className="pack-detail__error">
+          <p>{error || 'Pack not found.'}</p>
           <button className="pack-detail__back-btn" onClick={() => navigate('/packs')}>
             Back to Packs
           </button>
-        </div>
-        <div className="pack-detail__error">
-          <p>{error || 'Pack not found.'}</p>
         </div>
       </div>
     );
@@ -71,18 +63,6 @@ export default function PackDetail() {
 
   return (
     <div className="pack-detail">
-      <div className="pack-detail__header">
-        <img
-          src="/qwizzeria-logo.png"
-          alt="Qwizzeria"
-          className="pack-detail__logo"
-          onError={(e) => { e.target.src = '/qwizzeria-logo.svg'; }}
-        />
-        <button className="pack-detail__back-btn" onClick={() => navigate('/packs')}>
-          Back to Packs
-        </button>
-      </div>
-
       {pack.cover_image_url ? (
         <img
           className="pack-detail__cover"

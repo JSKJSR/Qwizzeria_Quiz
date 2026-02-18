@@ -7,12 +7,11 @@ import '../styles/PackBrowse.css';
 export default function PackBrowse() {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const isPremiumUser = user?.app_metadata?.is_premium === true;
   const [packs, setPacks] = useState([]);
   const [categories, setCategories] = useState([]);
   const [categoryFilter, setCategoryFilter] = useState('');
   const [loading, setLoading] = useState(true);
-
-  const isPremiumUser = user?.app_metadata?.is_premium === true;
 
   useEffect(() => {
     fetchPackCategories().then(setCategories).catch(() => {});
@@ -34,18 +33,6 @@ export default function PackBrowse() {
 
   return (
     <div className="pack-browse">
-      <div className="pack-browse__header">
-        <img
-          src="/qwizzeria-logo.png"
-          alt="Qwizzeria"
-          className="pack-browse__logo"
-          onError={(e) => { e.target.src = '/qwizzeria-logo.svg'; }}
-        />
-        <button className="pack-browse__back-btn" onClick={() => navigate('/')}>
-          Back to Home
-        </button>
-      </div>
-
       <h1 className="pack-browse__title">Quiz Packs</h1>
 
       <div className="pack-browse__filters">

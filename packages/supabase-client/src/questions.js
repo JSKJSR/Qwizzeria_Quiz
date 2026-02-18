@@ -11,7 +11,7 @@ export async function fetchRandomPublicQuestions(count = 10) {
   // (Supabase doesn't support ORDER BY random() directly via PostgREST)
   const { data, error } = await supabase
     .from('questions_master')
-    .select('id, question_text, answer_text, answer_explanation, category, media_url')
+    .select('id, question_text, answer_text, answer_explanation, category, media_url, points')
     .eq('is_public', true)
     .eq('status', 'active')
     .limit(200);
@@ -38,7 +38,7 @@ export async function fetchGridQuestions({ categoriesCount = 3, perCategory = 3 
 
   const { data, error } = await supabase
     .from('questions_master')
-    .select('id, question_text, answer_text, answer_explanation, category, media_url')
+    .select('id, question_text, answer_text, answer_explanation, category, media_url, points')
     .eq('is_public', true)
     .eq('status', 'active')
     .limit(500);
@@ -79,7 +79,7 @@ export async function fetchGridQuestions({ categoriesCount = 3, perCategory = 3 
       questions: selected.map((q, i) => ({
         id: q.id,
         topic: categoryName,
-        points: pointValues[i] || (i + 1) * 10,
+        points: q.points != null ? q.points : (pointValues[i] || (i + 1) * 10),
         question: q.question_text,
         answer: q.answer_text,
         answerExplanation: q.answer_explanation,

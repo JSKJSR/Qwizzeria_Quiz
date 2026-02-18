@@ -113,6 +113,7 @@ export default function QuestionList() {
               <tr>
                 <th>Question</th>
                 <th>Category</th>
+                <th>Points</th>
                 <th>Status</th>
                 <th>Public</th>
                 <th>Updated</th>
@@ -130,6 +131,7 @@ export default function QuestionList() {
                     {q.question_text}
                   </td>
                   <td>{q.category || '—'}</td>
+                  <td>{q.points != null ? q.points : '—'}</td>
                   <td>
                     <span className={`badge badge--${q.status || 'active'}`}>
                       {q.status || 'active'}

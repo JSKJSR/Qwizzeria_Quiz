@@ -26,9 +26,12 @@ packages/
 
 ## Quiz App Routes (apps/quiz-app)
 
+All authenticated routes use `ProtectedRoute` + `DashboardLayout` (sidebar). Unauthenticated users see the Landing page.
+
 | Route                      | Page/Component      | Description                            |
 |----------------------------|---------------------|----------------------------------------|
-| `/`                        | Landing             | Hero, "Play Free Quiz", "Browse Packs", "Leaderboard", "My Profile" |
+| `/`                        | AuthRedirect        | Landing (unauthenticated) or redirect to /dashboard (authenticated) |
+| `/dashboard`               | DashboardHome       | Welcome, quick actions, resumable sessions |
 | `/play/free`               | FreeQuizPage        | 3x3 Jeopardy grid, random questions    |
 | `/play/resume/:sessionId`  | ResumePlay          | Resume an in-progress quiz session     |
 | `/packs`                   | PackBrowse          | Grid of public packs, category filter  |
@@ -37,6 +40,7 @@ packages/
 | `/profile`                 | Profile             | User stats, display name, resumable sessions |
 | `/history`                 | History             | Paginated session history with expandable details |
 | `/leaderboard`             | Leaderboard         | Global leaderboard with time filters   |
+| `/host`                    | HostQuizPage        | Host multiplayer quiz: pack select → setup → grid → score → results |
 
 ## Admin CMS Routes (apps/admin-cms)
 
@@ -57,10 +61,18 @@ packages/
 - **Auth**: AuthProvider wraps quiz-app; `useAuth()` hook for user/signOut
 - **Premium**: `user.app_metadata.is_premium === true` (set in Supabase dashboard, no payment integration)
 - **Admin access**: `user.app_metadata.role === 'admin'`
+- **Dashboard layout**: Sidebar (260px) + content area, mobile hamburger at ≤768px
+- **Auth routing**: AuthRedirect (landing or /dashboard), ProtectedRoute (guards all authenticated routes)
 - **Free quiz**: Local useReducer state machine in FreeQuiz.jsx (loading/grid/question/answer/results/error)
 - **Pack play formats**:
   - **Jeopardy** (PackPlayJeopardy): Groups questions by category into grid, 10/20/30 pts
   - **Sequential** (PackPlaySequential): Questions one-by-one in sort_order, 10 pts each
+- **Host quiz**: HostQuiz.jsx useReducer (packSelect/setup/grid/question/answer/results)
+  - Pack selection from DB packs, 2-8 participants, configurable timer
+  - Grid + scoreboard + answer view with point awarding per participant
+  - Timer: Web Audio API beeps, visual warning at 30s/10s
+  - Session persistence in localStorage (24h expiry)
+  - Full-screen overlay (`position: fixed; inset: 0; z-index: 200`)
 - **Session tracking**: createQuizSession → recordAttempt → completeQuizSession (non-blocking)
 - **Session lifecycle**: in_progress → completed (on finish) or abandoned (on quit)
 - **Resume**: Sessions store metadata (question_ids, format) in JSONB; ResumePlay restores state
@@ -101,3 +113,4 @@ packages/
 - Phase 3: Admin CMS (questions, bulk import)
 - Phase 4: Quiz Packs + Premium (pack CRUD, browse, detail, Jeopardy + Sequential play, premium gate)
 - Phase 5: Retention + Competition + Admin Intelligence (profile, history, resume, leaderboards, admin analytics)
+- Phase 6: Dashboard Layout + Host Quiz (sidebar layout, auth routing, host quiz with pack select, multiplayer, timer, results)

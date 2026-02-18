@@ -1,0 +1,122 @@
+.host-results {
+  padding: 2rem;
+  max-width: 700px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.host-results__title {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 2rem;
+}
+
+.host-results__podium {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 2.5rem;
+}
+
+.host-results__player {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 1.5rem;
+  background: var(--bg-card, #1a1015);
+  border: 1px solid var(--border-color, #2a1520);
+  border-radius: var(--radius, 12px);
+}
+
+.host-results__player--gold {
+  border-color: #ffd700;
+  box-shadow: 0 0 16px rgba(255, 215, 0, 0.15);
+  background: linear-gradient(135deg, var(--bg-card, #1a1015), rgba(255, 215, 0, 0.05));
+}
+
+.host-results__player--silver {
+  border-color: #c0c0c0;
+  box-shadow: 0 0 12px rgba(192, 192, 192, 0.1);
+}
+
+.host-results__player--bronze {
+  border-color: #cd7f32;
+  box-shadow: 0 0 10px rgba(205, 127, 50, 0.1);
+}
+
+.host-results__rank {
+  min-width: 40px;
+  text-align: center;
+}
+
+.host-results__medal {
+  font-size: 1.5rem;
+}
+
+.host-results__rank-number {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text-secondary, #b0a0a5);
+}
+
+.host-results__name {
+  flex: 1;
+  text-align: left;
+  font-weight: 600;
+  font-size: 1.1rem;
+}
+
+.host-results__score {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--accent-primary, #be1332);
+  font-variant-numeric: tabular-nums;
+}
+
+.host-results__actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+}
+
+.host-results__btn {
+  padding: 0.75rem 2rem;
+  border-radius: var(--radius-sm, 8px);
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+}
+
+.host-results__btn--primary {
+  background: var(--accent-primary, #be1332);
+  color: #fff;
+}
+
+.host-results__btn--primary:hover {
+  opacity: 0.85;
+}
+
+.host-results__btn--secondary {
+  background: transparent;
+  border: 1px solid var(--border-color, #2a1520);
+  color: var(--text-primary, #f0f0f0);
+}
+
+.host-results__btn--secondary:hover {
+  border-color: var(--accent-primary, #be1332);
+}
+
+@media (max-width: 768px) {
+  .host-results {
+    padding: 1.5rem;
+  }
+
+  .host-results__title {
+    font-size: 1.5rem;
+  }
+
+  .host-results__actions {
+    flex-direction: column;
+  }
+}
