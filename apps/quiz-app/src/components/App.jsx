@@ -33,12 +33,14 @@ export default function App() {
         {/* Unauthenticated: landing page; authenticated: redirect based on role */}
         <Route path="/" element={<AuthRedirect />} />
 
+        {/* Public route: free quiz playable without login */}
+        <Route path="/play/free" element={<FreeQuizPage />} />
+
         {/* All protected routes */}
         <Route element={<ProtectedRoute />}>
           {/* Quiz app routes with sidebar layout */}
           <Route element={<DashboardLayout />}>
             <Route path="/dashboard" element={<DashboardHome />} />
-            <Route path="/play/free" element={<FreeQuizPage />} />
             <Route path="/play/resume/:sessionId" element={<ResumePlay />} />
             <Route path="/packs" element={<PackBrowse />} />
             <Route path="/packs/:id" element={<PackDetail />} />
