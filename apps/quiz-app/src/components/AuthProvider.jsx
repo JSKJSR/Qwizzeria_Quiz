@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { getSupabase } from '@qwizzeria/supabase-client';
 import { onAuthStateChange, getSession, signOut as authSignOut, signInWithEmail, signUpWithEmail } from '@qwizzeria/supabase-client/src/auth.js';
+import { fetchUserRole, hasMinRole } from '@qwizzeria/supabase-client/src/users.js';
 import { AuthContext } from '../contexts/AuthContext';
 
 function isSupabaseConfigured() {
@@ -16,27 +17,48 @@ const SUPABASE_AVAILABLE = isSupabaseConfigured();
 
 export default function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
+  const [role, setRole] = useState('user');
   const [loading, setLoading] = useState(SUPABASE_AVAILABLE);
+
+  // Fetch role from user_profiles whenever user changes
+  const loadRole = useCallback(async (userId) => {
+    if (!userId) {
+      setRole('user');
+      return;
+    }
+    try {
+      const userRole = await fetchUserRole(userId);
+      setRole(userRole);
+    } catch (err) {
+      console.error('AuthProvider: Error fetching role:', err);
+      setRole('user');
+    }
+  }, []);
 
   useEffect(() => {
     if (!SUPABASE_AVAILABLE) return;
 
     console.log('AuthProvider: Initializing...');
     // Load current session (handles URL hash parsing for OAuth)
-    getSession().then((session) => {
+    getSession().then(async (session) => {
       console.log('AuthProvider: Initial session loaded:', session);
-      setUser(session?.user ?? null);
+      const currentUser = session?.user ?? null;
+      setUser(currentUser);
+      await loadRole(currentUser?.id);
       setLoading(false);
     }).catch((err) => {
       console.error('AuthProvider: Error loading session:', err);
       setUser(null);
+      setRole('user');
       setLoading(false);
     });
 
     // Listen for auth changes
-    const unsubscribe = onAuthStateChange((event, session) => {
+    const unsubscribe = onAuthStateChange(async (event, session) => {
       console.log('AuthProvider: Auth state change:', event, session);
-      setUser(session?.user ?? null);
+      const currentUser = session?.user ?? null;
+      setUser(currentUser);
+      await loadRole(currentUser?.id);
 
       // If we get a SIGNED_IN event, make sure loading is false
       if (event === 'SIGNED_IN') {
@@ -45,12 +67,14 @@ export default function AuthProvider({ children }) {
     });
 
     return unsubscribe;
-  }, []);
+  }, [loadRole]);
 
   const signIn = useCallback(async (email, password) => {
     const data = await signInWithEmail(email, password);
     setUser(data.user);
-    return data;
+    const userRole = await fetchUserRole(data.user?.id);
+    setRole(userRole || 'user');
+    return { ...data, role: userRole || 'user' };
   }, []);
 
   const signUp = useCallback(async (email, password) => {
@@ -61,11 +85,18 @@ export default function AuthProvider({ children }) {
   const signOut = useCallback(async () => {
     await authSignOut();
     setUser(null);
+    setRole('user');
   }, []);
 
+  const isPremium = hasMinRole(role, 'premium');
+  const isEditor = hasMinRole(role, 'editor');
+  const isAdmin = hasMinRole(role, 'admin');
+  const isSuperadmin = role === 'superadmin';
+
   return (
-    <AuthContext.Provider value={{ user, loading, signIn, signUp, signOut }}>
+    <AuthContext.Provider value={{ user, role, isPremium, isEditor, isAdmin, isSuperadmin, loading, signIn, signUp, signOut }}>
       {children}
     </AuthContext.Provider>
   );
 }
+

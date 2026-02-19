@@ -88,3 +88,81 @@ export async function fetchSessionDetail(sessionId) {
 
   return { session: sessionResult.data, attempts: attemptsResult.data || [] };
 }
+
+// ============================================================
+// RBAC Functions
+// ============================================================
+
+const ROLE_HIERARCHY = ['user', 'premium', 'editor', 'admin', 'superadmin'];
+
+/**
+ * Check if a role meets or exceeds a minimum required role.
+ */
+export function hasMinRole(userRole, minRole) {
+  return ROLE_HIERARCHY.indexOf(userRole) >= ROLE_HIERARCHY.indexOf(minRole);
+}
+
+/**
+ * Fetch only the role for a user (lightweight).
+ */
+export async function fetchUserRole(userId) {
+  const supabase = getSupabase();
+  const { data, error } = await supabase
+    .from('user_profiles')
+    .select('role')
+    .eq('id', userId)
+    .maybeSingle();
+
+  if (error) throw new Error(`Failed to fetch role: ${error.message}`);
+  return data?.role || 'user';
+}
+
+/**
+ * Fetch all users with profiles (superadmin only).
+ */
+export async function fetchAllUsers() {
+  const supabase = getSupabase();
+  const { data, error } = await supabase
+    .from('user_profiles')
+    .select('*')
+    .order('created_at', { ascending: false });
+
+  if (error) throw new Error(`Failed to fetch users: ${error.message}`);
+  return data || [];
+}
+
+/**
+ * Update a user's role (superadmin only).
+ */
+export async function updateUserRole(userId, role) {
+  if (!ROLE_HIERARCHY.includes(role)) {
+    throw new Error(`Invalid role: ${role}`);
+  }
+  const supabase = getSupabase();
+  const { data, error } = await supabase
+    .from('user_profiles')
+    .update({ role })
+    .eq('id', userId)
+    .select()
+    .single();
+
+  if (error) throw new Error(`Failed to update role: ${error.message}`);
+  return data;
+}
+
+/**
+ * Fetch all users with emails via admin RPC (admin/superadmin only).
+ * Returns { users: [...], total: number }
+ */
+export async function fetchAllUsersWithEmail({ search, role, page = 1, pageSize = 20 } = {}) {
+  const supabase = getSupabase();
+  const { data, error } = await supabase.rpc('get_all_users_admin', {
+    search_query: search || null,
+    role_filter: role || null,
+    result_limit: pageSize,
+    result_offset: (page - 1) * pageSize,
+  });
+
+  if (error) throw new Error(`Failed to fetch users: ${error.message}`);
+  return data || { users: [], total: 0 };
+}

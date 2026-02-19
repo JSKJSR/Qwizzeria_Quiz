@@ -3,7 +3,7 @@ import { useAuth } from '../hooks/useAuth';
 import Landing from '../pages/Landing';
 
 export default function AuthRedirect() {
-  const { user, loading } = useAuth();
+  const { user, isEditor, loading } = useAuth();
 
   if (loading) {
     return (
@@ -14,6 +14,10 @@ export default function AuthRedirect() {
   }
 
   if (user) {
+    // Admin/editor users go to admin panel, others to quiz dashboard
+    if (isEditor) {
+      return <Navigate to="/admin" replace />;
+    }
     return <Navigate to="/dashboard" replace />;
   }
 

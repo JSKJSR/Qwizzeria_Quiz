@@ -10,15 +10,13 @@ import '../styles/Leaderboard.css';
 export default function PackDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { user, loading: authLoading } = useAuth();
+  const { user, isPremium: isPremiumUser, loading: authLoading } = useAuth();
 
   const [pack, setPack] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [showLogin, setShowLogin] = useState(false);
   const [packLb, setPackLb] = useState([]);
-
-  const isPremiumUser = user?.app_metadata?.is_premium === true;
 
   useEffect(() => {
     let cancelled = false;
@@ -30,7 +28,7 @@ export default function PackDetail() {
     // Also fetch pack leaderboard (non-critical)
     fetchPackLeaderboard(id, 10)
       .then((data) => { if (!cancelled) setPackLb(data); })
-      .catch(() => {});
+      .catch(() => { });
 
     return () => { cancelled = true; };
   }, [id]);

@@ -9,15 +9,13 @@ import '../styles/PackPlay.css';
 export default function PackPlay() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, isPremium: isPremiumUser } = useAuth();
 
   const [pack, setPack] = useState(null);
   const [questions, setQuestions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [format, setFormat] = useState(null); // 'jeopardy' | 'sequential'
-
-  const isPremiumUser = user?.app_metadata?.is_premium === true;
 
   useEffect(() => {
     async function load() {

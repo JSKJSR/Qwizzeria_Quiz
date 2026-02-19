@@ -6,15 +6,14 @@ import '../styles/PackBrowse.css';
 
 export default function PackBrowse() {
   const navigate = useNavigate();
-  const { user } = useAuth();
-  const isPremiumUser = user?.app_metadata?.is_premium === true;
+  const { isPremium: isPremiumUser } = useAuth();
   const [packs, setPacks] = useState([]);
   const [categories, setCategories] = useState([]);
   const [categoryFilter, setCategoryFilter] = useState('');
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchPackCategories().then(setCategories).catch(() => {});
+    fetchPackCategories().then(setCategories).catch(() => { });
   }, []);
 
   useEffect(() => {

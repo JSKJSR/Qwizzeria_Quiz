@@ -58,9 +58,11 @@ All authenticated routes use `ProtectedRoute` + `DashboardLayout` (sidebar). Una
 
 ## Key Architecture
 
-- **Auth**: AuthProvider wraps quiz-app; `useAuth()` hook for user/signOut
-- **Premium**: `user.app_metadata.is_premium === true` (set in Supabase dashboard, no payment integration)
-- **Admin access**: `user.app_metadata.role === 'admin'`
+- **Auth**: AuthProvider wraps quiz-app; `useAuth()` hook for user/role/signOut
+- **Roles**: DB-backed roles in `user_profiles.role`: `user`, `premium`, `editor`, `admin`, `superadmin`
+- **Premium**: `useAuth().isPremium` — true for `premium`+ roles (DB-level, not app_metadata)
+- **Admin access**: `useAuth().isAdmin` — true for `admin`/`superadmin`; `useAuth().isEditor` for `editor`+
+- **Admin CMS access**: `editor` gets questions/packs; `admin`+ gets analytics, bulk import; `superadmin` gets user management
 - **Dashboard layout**: Sidebar (260px) + content area, mobile hamburger at ≤768px
 - **Auth routing**: AuthRedirect (landing or /dashboard), ProtectedRoute (guards all authenticated routes)
 - **Quiz grid layout**: Flat CSS Grid card layout (`repeat(auto-fill, minmax(220px, 1fr))`) used by all quiz modes — each card shows category name + points in red. Shared `TopicGrid` component for Free Quiz and Pack Play; separate `HostTopicGrid` for Host Quiz (same visual design).
@@ -91,22 +93,34 @@ All authenticated routes use `ProtectedRoute` + `DashboardLayout` (sidebar). Una
 - `pack_questions` — Junction: pack_id ↔ question_id with sort_order
 - `quiz_sessions` — Play sessions (user_id, is_free_quiz, quiz_pack_id, score, status, metadata JSONB)
 - `question_attempts` — Per-question results (session_id, question_id, is_correct, time_spent_ms)
-- `user_profiles` — User display names and avatars (id FK → auth.users)
+- `user_profiles` — User display names, avatars, and role (id FK → auth.users, role CHECK user/premium/editor/admin/superadmin)
+- `feature_access` — Gate 1: which features (free_quiz, pack_browse, pack_premium, host_quiz, admin_cms) a user can access
+- `content_permissions` — Gate 2: granular read/write/manage access to specific packs or categories
+
+## RBAC — Two-Gate Security Model
+
+- **Gate 1 (Feature Access):** `feature_access` table controls which features a user can enter. Admin/superadmin bypass.
+- **Gate 2 (Content Permissions):** `content_permissions` table controls read/write/manage access to specific packs/categories.
+- **Role precedence:** superadmin > admin > editor > premium > user. Admin+ bypasses both gates.
+- **Helper functions:** `is_admin()`, `is_superadmin()`, `get_role()`, `has_feature_access(feature_key)`, `has_content_permission(type, id, level)`
 
 ## RLS Policies (Key)
 
-- `quiz_packs`: Non-admin users can only SELECT where `is_public=true AND status='active'`. Admins have full CRUD.
-- `pack_questions`: Readable if parent pack is public+active, or user is admin.
-- `questions_master`: Public+active questions readable by all; admin has full CRUD.
+- `quiz_packs`: Public+active readable by everyone. Admin has full CRUD. Editors can read/write granted packs.
+- `pack_questions`: Readable if parent pack is public+active, or user is admin, or editor with grant.
+- `questions_master`: Public+active readable by all. Admin has full CRUD. Editors can read/write granted categories.
+- `user_profiles`: Users read own. Admins read all. Superadmin can update any (role assignment).
+- `feature_access`: Admin can read. Superadmin can insert/delete. Users can read own grants.
+- `content_permissions`: Admin can read. Superadmin can manage. Users can read own grants.
 
 ## Postgres RPC Functions
 
 - `get_user_stats(target_user_id)` — Aggregated user quiz stats
 - `get_global_leaderboard(time_filter, result_limit)` — Global leaderboard
 - `get_pack_leaderboard(target_pack_id, result_limit)` — Per-pack top scores
-- `get_admin_analytics()` — Platform-wide analytics (admin-only)
-- `get_pack_performance()` — Pack play metrics (admin-only)
-- `get_hardest_questions(result_limit)` — Lowest accuracy questions (admin-only)
+- `get_admin_analytics()` — Platform-wide analytics (admin-only, uses `is_admin()`)
+- `get_pack_performance()` — Pack play metrics (admin-only, uses `is_admin()`)
+- `get_hardest_questions(result_limit)` — Lowest accuracy questions (admin-only, uses `is_admin()`)
 - `increment_pack_play_count(pack_id)` — Increment play count (SECURITY DEFINER)
 - `update_pack_question_count(target_pack_id)` — Sync question count on pack
 
@@ -142,3 +156,4 @@ All authenticated routes use `ProtectedRoute` + `DashboardLayout` (sidebar). Una
 - Phase 4: Quiz Packs + Premium (pack CRUD, browse, detail, Jeopardy + Sequential play, premium gate)
 - Phase 5: Retention + Competition + Admin Intelligence (profile, history, resume, leaderboards, admin analytics)
 - Phase 6: Dashboard Layout + Host Quiz (sidebar layout, auth routing, host quiz with pack select, multiplayer, integrated scoreboard bar with self-contained timer, flat card grid layout for all quiz modes)
+- Phase 7: RBAC (DB-backed roles in user_profiles, Two-Gate security: feature_access + content_permissions, updated RLS policies to use is_admin()/get_role(), editor CMS access, premium as DB role)

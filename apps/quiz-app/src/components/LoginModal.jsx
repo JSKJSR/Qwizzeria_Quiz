@@ -25,11 +25,12 @@ export default function LoginModal({ onClose, onSuccess }) {
         await signUp(email, password);
         setMessage('Check your email for a confirmation link.');
       } else {
-        // signIn sets user in context before we navigate
-        await signIn(email, password);
+        // signIn sets user + role in context and returns the role
+        const result = await signIn(email, password);
         onSuccess?.();
         onClose();
-        navigate('/dashboard');
+        const EDITOR_ROLES = ['editor', 'admin', 'superadmin'];
+        navigate(EDITOR_ROLES.includes(result.role) ? '/admin' : '/dashboard');
       }
     } catch (err) {
       setError(err.message);

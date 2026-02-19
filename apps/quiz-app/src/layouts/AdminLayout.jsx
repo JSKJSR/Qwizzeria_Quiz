@@ -1,14 +1,11 @@
 import { NavLink, Outlet } from 'react-router-dom';
-import { getSupabase } from '@qwizzeria/supabase-client';
+import { useAuth } from '../hooks/useAuth';
 import { hasMinRole } from '@qwizzeria/supabase-client/src/users.js';
+import '../styles/AdminCms.css';
 
-export default function AdminLayout({ user, userRole }) {
-  const handleSignOut = () => {
-    getSupabase().auth.signOut();
-  };
-
-  const isSuperadmin = userRole === 'superadmin';
-  const isFullAdmin = hasMinRole(userRole || 'user', 'admin');
+export default function AdminLayout() {
+  const { user, role, signOut, isSuperadmin } = useAuth();
+  const isFullAdmin = hasMinRole(role || 'user', 'admin');
 
   return (
     <div className="admin-layout">
@@ -17,7 +14,7 @@ export default function AdminLayout({ user, userRole }) {
         <nav className="admin-sidebar__nav">
           {isFullAdmin && (
             <NavLink
-              to="/"
+              to="/admin"
               end
               className={({ isActive }) =>
                 `admin-sidebar__link${isActive ? ' admin-sidebar__link--active' : ''}`
@@ -27,7 +24,7 @@ export default function AdminLayout({ user, userRole }) {
             </NavLink>
           )}
           <NavLink
-            to="/questions"
+            to="/admin/questions"
             className={({ isActive }) =>
               `admin-sidebar__link${isActive ? ' admin-sidebar__link--active' : ''}`
             }
@@ -36,7 +33,7 @@ export default function AdminLayout({ user, userRole }) {
           </NavLink>
           {isFullAdmin && (
             <NavLink
-              to="/import"
+              to="/admin/import"
               className={({ isActive }) =>
                 `admin-sidebar__link${isActive ? ' admin-sidebar__link--active' : ''}`
               }
@@ -45,7 +42,7 @@ export default function AdminLayout({ user, userRole }) {
             </NavLink>
           )}
           <NavLink
-            to="/packs"
+            to="/admin/packs"
             className={({ isActive }) =>
               `admin-sidebar__link${isActive ? ' admin-sidebar__link--active' : ''}`
             }
@@ -54,7 +51,7 @@ export default function AdminLayout({ user, userRole }) {
           </NavLink>
           {isSuperadmin && (
             <NavLink
-              to="/users"
+              to="/admin/users"
               className={({ isActive }) =>
                 `admin-sidebar__link${isActive ? ' admin-sidebar__link--active' : ''}`
               }
@@ -62,15 +59,21 @@ export default function AdminLayout({ user, userRole }) {
               Users
             </NavLink>
           )}
+          <NavLink
+            to="/dashboard"
+            className="admin-sidebar__link admin-sidebar__link--back"
+          >
+            &larr; Quiz App
+          </NavLink>
         </nav>
         <div className="admin-sidebar__footer">
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-            <span>{user.email}</span>
-            <span className={`badge badge--${userRole || 'user'}`}>
-              {userRole || 'user'}
+            <span>{user?.email}</span>
+            <span className={`badge badge--${role || 'user'}`}>
+              {role || 'user'}
             </span>
           </div>
-          <button className="admin-sidebar__signout" onClick={handleSignOut}>
+          <button className="admin-sidebar__signout" onClick={signOut}>
             Sign Out
           </button>
         </div>
@@ -81,4 +84,3 @@ export default function AdminLayout({ user, userRole }) {
     </div>
   );
 }
-

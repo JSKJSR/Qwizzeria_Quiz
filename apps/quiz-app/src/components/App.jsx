@@ -2,7 +2,9 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import AuthProvider from './AuthProvider';
 import AuthRedirect from './AuthRedirect';
 import ProtectedRoute from './ProtectedRoute';
+import AdminRoute from './AdminRoute';
 import DashboardLayout from '../layouts/DashboardLayout';
+import AdminLayout from '../layouts/AdminLayout';
 import DashboardHome from '../pages/DashboardHome';
 import FreeQuizPage from '../pages/FreeQuizPage';
 import PackBrowse from '../pages/PackBrowse';
@@ -14,15 +16,26 @@ import Leaderboard from '../pages/Leaderboard';
 import ResumePlay from '../pages/ResumePlay';
 import HostQuizPage from '../pages/HostQuizPage';
 
+// Admin pages
+import AdminDashboard from '../pages/admin/Dashboard';
+import QuestionList from '../pages/admin/QuestionList';
+import QuestionForm from '../pages/admin/QuestionForm';
+import BulkImport from '../pages/admin/BulkImport';
+import AdminPackList from '../pages/admin/PackList';
+import PackForm from '../pages/admin/PackForm';
+import PackQuestionsManager from '../pages/admin/PackQuestionsManager';
+import UserList from '../pages/admin/UserList';
+
 export default function App() {
   return (
     <AuthProvider>
       <Routes>
-        {/* Unauthenticated: landing page; authenticated: redirect to dashboard */}
+        {/* Unauthenticated: landing page; authenticated: redirect based on role */}
         <Route path="/" element={<AuthRedirect />} />
 
-        {/* All protected routes with sidebar layout */}
+        {/* All protected routes */}
         <Route element={<ProtectedRoute />}>
+          {/* Quiz app routes with sidebar layout */}
           <Route element={<DashboardLayout />}>
             <Route path="/dashboard" element={<DashboardHome />} />
             <Route path="/play/free" element={<FreeQuizPage />} />
@@ -34,6 +47,22 @@ export default function App() {
             <Route path="/history" element={<History />} />
             <Route path="/leaderboard" element={<Leaderboard />} />
             <Route path="/host" element={<HostQuizPage />} />
+          </Route>
+
+          {/* Admin CMS routes (editor+ only) */}
+          <Route path="/admin" element={<AdminRoute />}>
+            <Route element={<AdminLayout />}>
+              <Route index element={<AdminDashboard />} />
+              <Route path="questions" element={<QuestionList />} />
+              <Route path="questions/new" element={<QuestionForm />} />
+              <Route path="questions/:id/edit" element={<QuestionForm />} />
+              <Route path="import" element={<BulkImport />} />
+              <Route path="packs" element={<AdminPackList />} />
+              <Route path="packs/new" element={<PackForm />} />
+              <Route path="packs/:id/edit" element={<PackForm />} />
+              <Route path="packs/:id/questions" element={<PackQuestionsManager />} />
+              <Route path="users" element={<UserList />} />
+            </Route>
           </Route>
         </Route>
 

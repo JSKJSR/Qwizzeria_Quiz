@@ -13,12 +13,12 @@ const NAV_ITEMS = [
   { to: '/leaderboard', icon: '\uD83C\uDFC6', label: 'Leaderboard' },
 ];
 
+const ADMIN_NAV_ITEM = { to: '/admin', icon: '\u2699', label: 'Admin Panel' };
+
 export default function DashboardLayout() {
-  const { user, signOut } = useAuth();
+  const { user, isPremium, isEditor, signOut } = useAuth();
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
-
-  const isPremium = user?.app_metadata?.is_premium === true;
 
   const handleCloseSidebar = useCallback(() => {
     setSidebarOpen(false);
@@ -77,6 +77,16 @@ export default function DashboardLayout() {
               {item.label}
             </NavLink>
           ))}
+          {isEditor && (
+            <NavLink
+              to={ADMIN_NAV_ITEM.to}
+              className={`dashboard__nav-link ${isActive(ADMIN_NAV_ITEM.to) ? 'dashboard__nav-link--active' : ''}`}
+              onClick={handleCloseSidebar}
+            >
+              <span className="dashboard__nav-icon">{ADMIN_NAV_ITEM.icon}</span>
+              {ADMIN_NAV_ITEM.label}
+            </NavLink>
+          )}
         </nav>
 
         <div className="dashboard__sidebar-footer">
