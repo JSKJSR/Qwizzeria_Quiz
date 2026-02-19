@@ -16,7 +16,7 @@ const NAV_ITEMS = [
 const ADMIN_NAV_ITEM = { to: '/admin', icon: '\u2699', label: 'Admin Panel' };
 
 export default function DashboardLayout() {
-  const { user, isPremium, isEditor, signOut } = useAuth();
+  const { user, role, isPremium, isEditor, signOut } = useAuth();
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
@@ -92,9 +92,15 @@ export default function DashboardLayout() {
         <div className="dashboard__sidebar-footer">
           <div className="dashboard__user-section">
             <span className="dashboard__user-email">{user?.email || 'User'}</span>
-            <span className={`dashboard__user-badge dashboard__user-badge--${isPremium ? 'premium' : 'free'}`}>
-              {isPremium ? 'Premium' : 'Free'}
-            </span>
+            {isEditor ? (
+              <span className={`dashboard__user-badge dashboard__user-badge--premium`}>
+                {role}
+              </span>
+            ) : (
+              <span className={`dashboard__user-badge dashboard__user-badge--${isPremium ? 'premium' : 'free'}`}>
+                {isPremium ? 'Premium' : 'Free'}
+              </span>
+            )}
             <div className="dashboard__footer-links">
               <NavLink to="/profile" className="dashboard__footer-link" onClick={handleCloseSidebar}>
                 Account

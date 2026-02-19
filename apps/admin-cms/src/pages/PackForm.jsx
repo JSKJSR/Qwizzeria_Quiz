@@ -19,6 +19,7 @@ export default function PackForm() {
     category: '',
     is_premium: false,
     is_public: false,
+    is_host: false,
     status: 'draft',
   });
   const [categories, setCategories] = useState([]);
@@ -42,6 +43,7 @@ export default function PackForm() {
           category: pack.category || '',
           is_premium: pack.is_premium || false,
           is_public: pack.is_public || false,
+          is_host: pack.is_host || false,
           status: pack.status || 'draft',
         });
       })
@@ -174,6 +176,14 @@ export default function PackForm() {
               onChange={(e) => handleChange('is_public', e.target.checked)}
             />
             Public
+          </label>
+          <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer' }}>
+            <input
+              type="checkbox"
+              checked={form.is_host}
+              onChange={(e) => handleChange('is_host', e.target.checked)}
+            />
+            Host
           </label>
         </div>
 

@@ -250,6 +250,7 @@ export async function browsePublicPacks({ category, isPremium } = {}) {
     .select('id, title, description, cover_image_url, category, is_premium, question_count, play_count')
     .eq('is_public', true)
     .eq('status', 'active')
+    .eq('is_host', false)
     .order('play_count', { ascending: false });
 
   if (category) {
@@ -280,6 +281,7 @@ export async function fetchPublicPackById(id) {
     .eq('id', id)
     .eq('is_public', true)
     .eq('status', 'active')
+    .eq('is_host', false)
     .single();
 
   if (error) {

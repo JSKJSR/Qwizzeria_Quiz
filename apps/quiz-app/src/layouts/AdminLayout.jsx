@@ -67,12 +67,12 @@ export default function AdminLayout() {
           </NavLink>
         </nav>
         <div className="admin-sidebar__footer">
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-            <span>{user?.email}</span>
-            <span className={`badge badge--${role || 'user'}`}>
-              {role || 'user'}
-            </span>
-          </div>
+          <span style={{ wordBreak: 'break-all', fontSize: 'var(--font-size-xs)', color: 'var(--text-muted)' }}>
+            {user?.email}
+          </span>
+          <span className={`badge badge--${role || 'user'}`} style={{ marginTop: '0.3rem' }}>
+            {role || 'user'}
+          </span>
           <button className="admin-sidebar__signout" onClick={signOut}>
             Sign Out
           </button>

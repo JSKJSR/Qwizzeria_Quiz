@@ -113,7 +113,7 @@ export default function PackList() {
                 <th>Title</th>
                 <th>Category</th>
                 <th>Questions</th>
-                <th>Premium</th>
+                <th>Type</th>
                 <th>Status</th>
                 <th>Plays</th>
                 <th>Updated</th>
@@ -132,7 +132,14 @@ export default function PackList() {
                   </td>
                   <td>{p.category || '—'}</td>
                   <td>{p.question_count}</td>
-                  <td>{p.is_premium ? 'Yes' : 'No'}</td>
+                  <td>
+                    <div style={{ display: 'flex', gap: '0.3rem', flexWrap: 'wrap' }}>
+                      {p.is_host && <span className="badge badge--admin">Host</span>}
+                      {p.is_premium && <span className="badge badge--premium">Premium</span>}
+                      {p.is_public && <span className="badge badge--active">Public</span>}
+                      {!p.is_host && !p.is_premium && !p.is_public && <span style={{ color: 'var(--text-muted)' }}>—</span>}
+                    </div>
+                  </td>
                   <td>
                     <span className={`badge badge--${p.status || 'draft'}`}>
                       {p.status || 'draft'}
