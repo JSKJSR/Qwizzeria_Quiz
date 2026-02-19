@@ -33,8 +33,10 @@ export default function App() {
         {/* Unauthenticated: landing page; authenticated: redirect based on role */}
         <Route path="/" element={<AuthRedirect />} />
 
-        {/* Public route: free quiz playable without login */}
+        {/* Public routes: accessible without login */}
         <Route path="/play/free" element={<FreeQuizPage />} />
+        <Route path="/packs" element={<PackBrowse />} />
+        <Route path="/leaderboard" element={<Leaderboard />} />
 
         {/* All protected routes */}
         <Route element={<ProtectedRoute />}>
@@ -42,12 +44,10 @@ export default function App() {
           <Route element={<DashboardLayout />}>
             <Route path="/dashboard" element={<DashboardHome />} />
             <Route path="/play/resume/:sessionId" element={<ResumePlay />} />
-            <Route path="/packs" element={<PackBrowse />} />
             <Route path="/packs/:id" element={<PackDetail />} />
             <Route path="/packs/:id/play" element={<PackPlay />} />
             <Route path="/profile" element={<Profile />} />
             <Route path="/history" element={<History />} />
-            <Route path="/leaderboard" element={<Leaderboard />} />
             <Route path="/host" element={<HostQuizPage />} />
           </Route>
 
