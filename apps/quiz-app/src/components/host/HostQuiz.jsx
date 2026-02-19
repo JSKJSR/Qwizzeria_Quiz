@@ -31,7 +31,6 @@ const initialState = {
   participants: [],
   selectedQuestion: null,
   completedQuestionIds: [],
-  timerConfig: { minutes: 0, seconds: 30 },
 };
 
 /**
@@ -83,7 +82,6 @@ function reducer(state, action) {
         ...state,
         phase: 'grid',
         participants: action.participants.map(name => ({ name, score: 0 })),
-        timerConfig: action.timerConfig,
         completedQuestionIds: [],
         selectedQuestion: null,
       };
@@ -181,8 +179,8 @@ export default function HostQuiz() {
     dispatch({ type: ACTIONS.SELECT_PACK, pack, questions });
   }, []);
 
-  const handleStartQuiz = useCallback((participants, timerConfig) => {
-    dispatch({ type: ACTIONS.START_QUIZ, participants, timerConfig });
+  const handleStartQuiz = useCallback((participants) => {
+    dispatch({ type: ACTIONS.START_QUIZ, participants });
   }, []);
 
   const handleChangePack = useCallback(() => {
@@ -225,10 +223,7 @@ export default function HostQuiz() {
     clearHostSession();
   }, []);
 
-  const { phase, pack, topics, participants, selectedQuestion, completedQuestionIds, timerConfig } = state;
-  const allTopicQuestions = topics.flatMap(t => t.questions);
-  const totalQuestions = allTopicQuestions.length;
-  const progress = totalQuestions > 0 ? (completedQuestionIds.length / totalQuestions) * 100 : 0;
+  const { phase, pack, topics, participants, selectedQuestion, completedQuestionIds } = state;
 
   // --- Pack Selection ---
   if (phase === 'packSelect') {
@@ -241,6 +236,7 @@ export default function HostQuiz() {
 
   // --- Participant Setup ---
   if (phase === 'setup') {
+    const totalQuestions = topics.flatMap(t => t.questions).length;
     return (
       <div className="host-quiz">
         <HostParticipantSetup
@@ -266,57 +262,39 @@ export default function HostQuiz() {
     );
   }
 
-  // --- Question View ---
-  if (phase === 'question' && selectedQuestion) {
-    return (
-      <div className="host-quiz host-quiz--fullscreen">
-        <HostScoreboard participants={participants} />
+  // --- Game screens: grid, question, answer all show scoreboard ---
+  return (
+    <div className="host-quiz host-quiz--fullscreen">
+      <HostScoreboard
+        participants={participants}
+        onEndQuiz={handleEndQuiz}
+        showEndQuiz={phase === 'grid'}
+      />
+
+      {phase === 'grid' && (
+        <HostTopicGrid
+          topics={topics}
+          completedQuestionIds={completedQuestionIds}
+          onSelectQuestion={handleSelectQuestion}
+        />
+      )}
+
+      {phase === 'question' && selectedQuestion && (
         <QuestionView
           question={selectedQuestion}
           onRevealAnswer={handleRevealAnswer}
           onBack={handleBackToGrid}
         />
-      </div>
-    );
-  }
+      )}
 
-  // --- Answer View ---
-  if (phase === 'answer' && selectedQuestion) {
-    return (
-      <div className="host-quiz host-quiz--fullscreen">
-        <HostScoreboard participants={participants} />
+      {phase === 'answer' && selectedQuestion && (
         <HostAnswerView
           question={selectedQuestion}
           participants={participants}
-          timerConfig={timerConfig}
           onAwardPoints={handleAwardPoints}
           onNoPoints={handleNoPoints}
         />
-      </div>
-    );
-  }
-
-  // --- Grid View ---
-  return (
-    <div className="host-quiz host-quiz--fullscreen">
-      <HostScoreboard participants={participants} />
-      <div className="host-quiz__grid-header">
-        <div className="host-quiz__pack-name">{pack?.title || 'Quiz'}</div>
-        <div className="host-quiz__progress">
-          {completedQuestionIds.length} / {totalQuestions} answered
-        </div>
-        <div className="host-quiz__progress-bar">
-          <div className="host-quiz__progress-fill" style={{ width: `${progress}%` }} />
-        </div>
-        <button className="host-quiz__end-btn" onClick={handleEndQuiz}>
-          End Quiz
-        </button>
-      </div>
-      <HostTopicGrid
-        topics={topics}
-        completedQuestionIds={completedQuestionIds}
-        onSelectQuestion={handleSelectQuestion}
-      />
+      )}
     </div>
   );
 }

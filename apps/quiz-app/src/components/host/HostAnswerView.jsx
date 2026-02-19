@@ -1,11 +1,7 @@
-import TimerControl from './TimerControl';
-
-export default function HostAnswerView({ question, participants, timerConfig, onAwardPoints, onNoPoints }) {
+export default function HostAnswerView({ question, participants, onAwardPoints, onNoPoints }) {
   const hasMedia = question.mediaType && question.mediaType !== 'none';
   const isVideo = question.mediaType === 'video';
   const isDirectVideo = isVideo && /\.(mp4|webm|ogg)(\?.*)?$/i.test(question.embedUrl);
-
-  const isTimed = timerConfig.minutes > 0 || timerConfig.seconds > 0;
 
   return (
     <div className="host-answer">
@@ -39,16 +35,6 @@ export default function HostAnswerView({ question, participants, timerConfig, on
             ) : (
               <img src={question.embedUrl} alt="Question visual" />
             )}
-          </div>
-        )}
-
-        {isTimed && (
-          <div className="host-answer__timer">
-            <TimerControl
-              initialMinutes={timerConfig.minutes}
-              initialSeconds={timerConfig.seconds}
-              autoStart={false}
-            />
           </div>
         )}
 

@@ -32,7 +32,7 @@ All authenticated routes use `ProtectedRoute` + `DashboardLayout` (sidebar). Una
 |----------------------------|---------------------|----------------------------------------|
 | `/`                        | AuthRedirect        | Landing (unauthenticated) or redirect to /dashboard (authenticated) |
 | `/dashboard`               | DashboardHome       | Welcome, quick actions, resumable sessions |
-| `/play/free`               | FreeQuizPage        | 3x3 Jeopardy grid, random questions    |
+| `/play/free`               | FreeQuizPage        | Flat card grid, random questions        |
 | `/play/resume/:sessionId`  | ResumePlay          | Resume an in-progress quiz session     |
 | `/packs`                   | PackBrowse          | Grid of public packs, category filter  |
 | `/packs/:id`               | PackDetail          | Pack info, premium gate, pack leaderboard, "Start Quiz" |
@@ -53,7 +53,7 @@ All authenticated routes use `ProtectedRoute` + `DashboardLayout` (sidebar). Una
 | `/import`                | BulkImport            | Excel bulk import               |
 | `/packs`                 | PackList              | Pack table with filters         |
 | `/packs/new`             | PackForm              | Create pack                     |
-| `/packs/:id/edit`        | PackForm              | Edit pack                       |
+| `/packs/:id/edit`        | PackForm              | Edit pack (status, is_public, is_premium) |
 | `/packs/:id/questions`   | PackQuestionsManager  | Add/remove/reorder questions    |
 
 ## Key Architecture
@@ -63,16 +63,20 @@ All authenticated routes use `ProtectedRoute` + `DashboardLayout` (sidebar). Una
 - **Admin access**: `user.app_metadata.role === 'admin'`
 - **Dashboard layout**: Sidebar (260px) + content area, mobile hamburger at ≤768px
 - **Auth routing**: AuthRedirect (landing or /dashboard), ProtectedRoute (guards all authenticated routes)
+- **Quiz grid layout**: Flat CSS Grid card layout (`repeat(auto-fill, minmax(220px, 1fr))`) used by all quiz modes — each card shows category name + points in red. Shared `TopicGrid` component for Free Quiz and Pack Play; separate `HostTopicGrid` for Host Quiz (same visual design).
 - **Free quiz**: Local useReducer state machine in FreeQuiz.jsx (loading/grid/question/answer/results/error)
 - **Pack play formats**:
-  - **Jeopardy** (PackPlayJeopardy): Groups questions by category into grid, 10/20/30 pts
+  - **Jeopardy** (PackPlayJeopardy): Groups questions by category into flat card grid, 10/20/30 pts
   - **Sequential** (PackPlaySequential): Questions one-by-one in sort_order, 10 pts each
 - **Host quiz**: HostQuiz.jsx useReducer (packSelect/setup/grid/question/answer/results)
-  - Pack selection from DB packs, 2-8 participants, configurable timer
-  - Grid + scoreboard + answer view with point awarding per participant
-  - Timer: Web Audio API beeps, visual warning at 30s/10s
+  - Pack selection from DB packs, 2-8 participants
+  - Integrated scoreboard top bar: logo + self-contained timer + participant scores + END QUIZ button
+  - Timer: Self-contained component with editable min/sec inputs, MM:SS display, play/pause/reset SVG buttons, Web Audio API beeps (3× 800Hz), color states (green running → yellow ≤30s → red ≤10s → red pulse expired)
+  - Flat card grid for question selection (same visual style as pack play)
+  - Answer view with participant point-awarding buttons
   - Session persistence in localStorage (24h expiry)
   - Full-screen overlay (`position: fixed; inset: 0; z-index: 200`)
+- **Pack visibility**: Packs default to `is_public=false, status='draft'`. Must set `is_public=true` AND `status='active'` (via Admin CMS) for users to see them.
 - **Session tracking**: createQuizSession → recordAttempt → completeQuizSession (non-blocking)
 - **Session lifecycle**: in_progress → completed (on finish) or abandoned (on quit)
 - **Resume**: Sessions store metadata (question_ids, format) in JSONB; ResumePlay restores state
@@ -82,12 +86,18 @@ All authenticated routes use `ProtectedRoute` + `DashboardLayout` (sidebar). Una
 
 ## Database Tables
 
-- `questions_master` — All quiz questions (question_text, answer_text, category, media_url, status, is_public)
-- `quiz_packs` — Curated question sets (title, category, is_premium, is_public, status, question_count, play_count)
+- `questions_master` — All quiz questions (question_text, answer_text, category, media_url, points, status, is_public)
+- `quiz_packs` — Curated question sets (title, category, is_premium, is_public, status, question_count, play_count). Defaults: `is_public=false`, `status='draft'`
 - `pack_questions` — Junction: pack_id ↔ question_id with sort_order
-- `quiz_sessions` — Play sessions (user_id, is_free_quiz, quiz_pack_id, score, status, metadata)
+- `quiz_sessions` — Play sessions (user_id, is_free_quiz, quiz_pack_id, score, status, metadata JSONB)
 - `question_attempts` — Per-question results (session_id, question_id, is_correct, time_spent_ms)
 - `user_profiles` — User display names and avatars (id FK → auth.users)
+
+## RLS Policies (Key)
+
+- `quiz_packs`: Non-admin users can only SELECT where `is_public=true AND status='active'`. Admins have full CRUD.
+- `pack_questions`: Readable if parent pack is public+active, or user is admin.
+- `questions_master`: Public+active questions readable by all; admin has full CRUD.
 
 ## Postgres RPC Functions
 
@@ -97,6 +107,8 @@ All authenticated routes use `ProtectedRoute` + `DashboardLayout` (sidebar). Una
 - `get_admin_analytics()` — Platform-wide analytics (admin-only)
 - `get_pack_performance()` — Pack play metrics (admin-only)
 - `get_hardest_questions(result_limit)` — Lowest accuracy questions (admin-only)
+- `increment_pack_play_count(pack_id)` — Increment play count (SECURITY DEFINER)
+- `update_pack_question_count(target_pack_id)` — Sync question count on pack
 
 ## Commands
 
@@ -104,6 +116,22 @@ All authenticated routes use `ProtectedRoute` + `DashboardLayout` (sidebar). Una
 - `npm run build` — Build all packages
 - `npm run lint` — Lint all packages
 - `cd apps/quiz-app && npx vitest run` — Run tests (10 tests)
+
+## Key Component Files
+
+- `apps/quiz-app/src/components/TopicGrid.jsx` — Flat card grid for Free Quiz + Pack Play (shared)
+- `apps/quiz-app/src/components/host/HostTopicGrid.jsx` — Flat card grid for Host Quiz
+- `apps/quiz-app/src/components/host/HostQuiz.jsx` — Host quiz orchestrator (useReducer state machine)
+- `apps/quiz-app/src/components/host/HostScoreboard.jsx` — Integrated top bar (logo + timer + scores + END QUIZ)
+- `apps/quiz-app/src/components/host/TimerControl.jsx` — Self-contained countdown timer
+- `apps/quiz-app/src/components/host/HostAnswerView.jsx` — Answer display + participant scoring
+- `apps/quiz-app/src/components/host/HostResultsView.jsx` — Final results with medals
+- `apps/quiz-app/src/components/host/HostPackSelect.jsx` — Browse & select packs from DB
+- `apps/quiz-app/src/components/host/HostParticipantSetup.jsx` — Player names (2-8)
+- `apps/quiz-app/src/components/ProtectedRoute.jsx` — Auth guard (Outlet pattern)
+- `apps/quiz-app/src/components/AuthRedirect.jsx` — Landing or redirect to /dashboard
+- `apps/quiz-app/src/layouts/DashboardLayout.jsx` — Sidebar + content layout
+- `apps/quiz-app/src/pages/DashboardHome.jsx` — Welcome, quick actions, resumable sessions
 
 ## Completed Phases
 
@@ -113,4 +141,4 @@ All authenticated routes use `ProtectedRoute` + `DashboardLayout` (sidebar). Una
 - Phase 3: Admin CMS (questions, bulk import)
 - Phase 4: Quiz Packs + Premium (pack CRUD, browse, detail, Jeopardy + Sequential play, premium gate)
 - Phase 5: Retention + Competition + Admin Intelligence (profile, history, resume, leaderboards, admin analytics)
-- Phase 6: Dashboard Layout + Host Quiz (sidebar layout, auth routing, host quiz with pack select, multiplayer, timer, results)
+- Phase 6: Dashboard Layout + Host Quiz (sidebar layout, auth routing, host quiz with pack select, multiplayer, integrated scoreboard bar with self-contained timer, flat card grid layout for all quiz modes)

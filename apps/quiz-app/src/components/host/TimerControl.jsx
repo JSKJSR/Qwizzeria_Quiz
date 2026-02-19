@@ -1,113 +1,166 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useRef, useCallback } from 'react';
 import '../../styles/TimerControl.css';
 
-export default function TimerControl({ initialMinutes = 0, initialSeconds = 30, onExpire, autoStart = false }) {
-  const totalInitialMs = (initialMinutes * 60 + initialSeconds) * 1000;
-  const [remainingMs, setRemainingMs] = useState(totalInitialMs);
-  const [running, setRunning] = useState(autoStart);
+export default function TimerControl() {
+  const [minutes, setMinutes] = useState(5);
+  const [seconds, setSeconds] = useState(0);
+  const [timeLeft, setTimeLeft] = useState(null); // null = use input values; number = countdown active/done
+  const [isRunning, setIsRunning] = useState(false);
   const intervalRef = useRef(null);
-  const startTimeRef = useRef(null);
-  const remainingAtStartRef = useRef(totalInitialMs);
-  const expiredRef = useRef(false);
+  const audioContextRef = useRef(null);
 
-  const totalSeconds = Math.max(0, Math.ceil(remainingMs / 1000));
-  const displayMin = Math.floor(totalSeconds / 60);
-  const displaySec = totalSeconds % 60;
+  // Effective display time: countdown value if started, otherwise derived from inputs
+  const displayTime = timeLeft !== null ? timeLeft : minutes * 60 + seconds;
+  const displayMinutes = Math.floor(displayTime / 60);
+  const displaySeconds = displayTime % 60;
+  const timeDisplay = `${String(displayMinutes).padStart(2, '0')}:${String(displaySeconds).padStart(2, '0')}`;
 
-  // Determine visual state
-  let timerClass = 'timer';
-  if (totalSeconds <= 0) {
-    timerClass += ' timer--expired';
-  } else if (totalSeconds <= 10) {
-    timerClass += ' timer--critical';
-  } else if (totalSeconds <= 30) {
-    timerClass += ' timer--warning';
-  }
-
-  const playBeeps = useCallback(() => {
+  const playAlarmSound = useCallback(() => {
     try {
-      const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-      const beep = (delay) => {
-        const osc = audioCtx.createOscillator();
-        const gain = audioCtx.createGain();
-        osc.connect(gain);
-        gain.connect(audioCtx.destination);
-        osc.frequency.value = 880;
-        gain.gain.value = 0.3;
-        osc.start(audioCtx.currentTime + delay);
-        osc.stop(audioCtx.currentTime + delay + 0.15);
-      };
-      beep(0);
-      beep(0.25);
-      beep(0.5);
-    } catch {
-      // Audio not supported
+      const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+      audioContextRef.current = audioContext;
+
+      for (let i = 0; i < 3; i++) {
+        const oscillator = audioContext.createOscillator();
+        const gainNode = audioContext.createGain();
+
+        oscillator.connect(gainNode);
+        gainNode.connect(audioContext.destination);
+
+        oscillator.frequency.value = 800;
+        gainNode.gain.setValueAtTime(0.3, audioContext.currentTime + i * 0.4);
+
+        oscillator.start(audioContext.currentTime + i * 0.4);
+        oscillator.stop(audioContext.currentTime + i * 0.4 + 0.2);
+      }
+    } catch (error) {
+      console.warn('Failed to play alarm sound:', error);
     }
   }, []);
 
-  useEffect(() => {
-    if (!running || remainingMs <= 0) {
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-        intervalRef.current = null;
-      }
-      return;
+  const stopInterval = useCallback(() => {
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+      intervalRef.current = null;
     }
+  }, []);
 
-    startTimeRef.current = Date.now();
-    remainingAtStartRef.current = remainingMs;
+  function handleStartPause() {
+    if (isRunning) {
+      // Pause
+      stopInterval();
+      setIsRunning(false);
+    } else {
+      // Start
+      const startTime = timeLeft !== null ? timeLeft : minutes * 60 + seconds;
+      if (startTime <= 0) return;
 
-    intervalRef.current = setInterval(() => {
-      const elapsed = Date.now() - startTimeRef.current;
-      const newRemaining = Math.max(0, remainingAtStartRef.current - elapsed);
-      setRemainingMs(newRemaining);
+      setTimeLeft(startTime);
+      setIsRunning(true);
 
-      if (newRemaining <= 0) {
-        clearInterval(intervalRef.current);
-        intervalRef.current = null;
-        setRunning(false);
-        if (!expiredRef.current) {
-          expiredRef.current = true;
-          playBeeps();
-          onExpire?.();
+      const startedAt = Date.now();
+      const startValue = startTime;
+
+      stopInterval();
+      intervalRef.current = setInterval(() => {
+        const elapsed = Math.floor((Date.now() - startedAt) / 1000);
+        const remaining = Math.max(0, startValue - elapsed);
+        setTimeLeft(remaining);
+
+        if (remaining <= 0) {
+          clearInterval(intervalRef.current);
+          intervalRef.current = null;
+          setIsRunning(false);
+          playAlarmSound();
         }
-      }
-    }, 100);
+      }, 200);
+    }
+  }
 
-    return () => {
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-        intervalRef.current = null;
-      }
-    };
-  }, [running, remainingMs, onExpire, playBeeps]);
+  function handleReset() {
+    stopInterval();
+    setIsRunning(false);
+    setTimeLeft(null); // Back to using input values
+  }
 
-  const handleToggle = useCallback(() => {
-    if (remainingMs <= 0) return;
-    setRunning(prev => !prev);
-  }, [remainingMs]);
+  function handleMinutesChange(e) {
+    const value = parseInt(e.target.value) || 0;
+    setMinutes(Math.max(0, Math.min(99, value)));
+  }
 
-  const handleReset = useCallback(() => {
-    setRunning(false);
-    setRemainingMs(totalInitialMs);
-    expiredRef.current = false;
-  }, [totalInitialMs]);
+  function handleSecondsChange(e) {
+    const value = parseInt(e.target.value) || 0;
+    setSeconds(Math.max(0, Math.min(59, value)));
+  }
+
+  const getColorClass = () => {
+    if (displayTime === 0 && timeLeft !== null) return 'timer--expired';
+    if (isRunning && displayTime <= 10) return 'timer--critical';
+    if (isRunning && displayTime <= 30) return 'timer--warning';
+    if (isRunning) return 'timer--running';
+    return '';
+  };
 
   return (
-    <div className={timerClass}>
-      <div className="timer__display">
-        {String(displayMin).padStart(2, '0')}:{String(displaySec).padStart(2, '0')}
+    <div className={`timer ${getColorClass()}`}>
+      <div className="timer__input-group">
+        <input
+          type="number"
+          className="timer__input"
+          value={minutes}
+          onChange={handleMinutesChange}
+          disabled={isRunning || timeLeft !== null}
+          min="0"
+          max="99"
+        />
+        <span className="timer__label">min</span>
       </div>
+
+      <div className="timer__input-group">
+        <input
+          type="number"
+          className="timer__input"
+          value={seconds}
+          onChange={handleSecondsChange}
+          disabled={isRunning || timeLeft !== null}
+          min="0"
+          max="59"
+        />
+        <span className="timer__label">sec</span>
+      </div>
+
+      <div className={`timer__display ${displayTime === 0 && timeLeft !== null ? 'timer__display--pulse' : ''}`}>
+        {timeDisplay}
+      </div>
+
       <div className="timer__controls">
         <button
-          className="timer__btn timer__btn--toggle"
-          onClick={handleToggle}
-          disabled={remainingMs <= 0}
+          className="timer__btn timer__btn--primary"
+          onClick={handleStartPause}
+          title={isRunning ? 'Pause' : 'Start'}
+          disabled={displayTime === 0 && timeLeft !== null}
         >
-          {running ? 'Pause' : 'Start'}
+          {isRunning ? (
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+              <rect x="6" y="4" width="4" height="16" />
+              <rect x="14" y="4" width="4" height="16" />
+            </svg>
+          ) : (
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M8 5v14l11-7z" />
+            </svg>
+          )}
         </button>
-        <button className="timer__btn timer__btn--reset" onClick={handleReset}>
-          Reset
+
+        <button
+          className="timer__btn timer__btn--secondary"
+          onClick={handleReset}
+          title="Reset"
+        >
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
+            <path d="M3 3v5h5" />
+          </svg>
         </button>
       </div>
     </div>

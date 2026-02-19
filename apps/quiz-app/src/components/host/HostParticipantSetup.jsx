@@ -5,8 +5,6 @@ const MAX_PLAYERS = 8;
 
 export default function HostParticipantSetup({ pack, questionCount, onStart, onChangePack }) {
   const [names, setNames] = useState(['', '']);
-  const [minutes, setMinutes] = useState(0);
-  const [seconds, setSeconds] = useState(30);
 
   const handleNameChange = useCallback((index, value) => {
     setNames(prev => prev.map((n, i) => i === index ? value : n));
@@ -28,11 +26,8 @@ export default function HostParticipantSetup({ pack, questionCount, onStart, onC
 
   const handleStart = useCallback(() => {
     if (!allNamesFilled) return;
-    onStart(
-      names.map(n => n.trim()),
-      { minutes, seconds }
-    );
-  }, [allNamesFilled, names, minutes, seconds, onStart]);
+    onStart(names.map(n => n.trim()));
+  }, [allNamesFilled, names, onStart]);
 
   return (
     <div className="host-setup">
@@ -78,36 +73,6 @@ export default function HostParticipantSetup({ pack, questionCount, onStart, onC
             + Add Player
           </button>
         )}
-      </div>
-
-      <div className="host-setup__timer">
-        <h2 className="host-setup__timer-title">Timer Settings</h2>
-        <p className="host-setup__timer-desc">Set to 0:00 for untimed mode</p>
-        <div className="host-setup__timer-inputs">
-          <label className="host-setup__timer-label">
-            <span>Minutes</span>
-            <input
-              type="number"
-              className="host-setup__timer-input"
-              min={0}
-              max={10}
-              value={minutes}
-              onChange={(e) => setMinutes(Math.max(0, Math.min(10, parseInt(e.target.value) || 0)))}
-            />
-          </label>
-          <span className="host-setup__timer-colon">:</span>
-          <label className="host-setup__timer-label">
-            <span>Seconds</span>
-            <input
-              type="number"
-              className="host-setup__timer-input"
-              min={0}
-              max={59}
-              value={seconds}
-              onChange={(e) => setSeconds(Math.max(0, Math.min(59, parseInt(e.target.value) || 0)))}
-            />
-          </label>
-        </div>
       </div>
 
       <button

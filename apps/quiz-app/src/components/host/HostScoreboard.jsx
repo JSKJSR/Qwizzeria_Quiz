@@ -1,26 +1,37 @@
 import '../../styles/HostScoreboard.css';
+import TimerControl from './TimerControl';
 
-export default function HostScoreboard({ participants }) {
-  if (!participants || participants.length === 0) return null;
-
-  const maxScore = Math.max(...participants.map(p => p.score));
+export default function HostScoreboard({ participants, onEndQuiz, showEndQuiz }) {
+  const maxScore = Math.max(...participants.map(p => p.score), 0);
+  const hasScores = maxScore > 0;
 
   return (
-    <div className="host-scoreboard">
-      {participants.map((p, i) => {
-        const isLeading = p.score > 0 && p.score === maxScore;
-        return (
+    <div className="scoreboard">
+      <img
+        src="/qwizzeria-logo.png"
+        alt="Qwizzeria"
+        className="scoreboard__logo"
+        onError={(e) => { e.target.src = '/qwizzeria-logo.svg'; }}
+      />
+      <TimerControl />
+      <div className="scoreboard__teams">
+        {participants.map((p, i) => (
           <div
             key={i}
-            className={`host-scoreboard__player ${isLeading ? 'host-scoreboard__player--leading' : ''}`}
+            className={`scoreboard__team ${hasScores && p.score === maxScore ? 'scoreboard__team--leader' : ''}`}
           >
-            <span className="host-scoreboard__name">{p.name}</span>
-            <span className="host-scoreboard__score">
+            <div className="scoreboard__name">{p.name}</div>
+            <div className="scoreboard__score">
               {String(p.score).padStart(3, '0')}
-            </span>
+            </div>
           </div>
-        );
-      })}
+        ))}
+      </div>
+      {showEndQuiz && (
+        <button className="scoreboard__end-btn" onClick={onEndQuiz}>
+          END QUIZ
+        </button>
+      )}
     </div>
   );
 }
