@@ -11,6 +11,7 @@ import BulkImport from './pages/BulkImport';
 import PackList from './pages/PackList';
 import PackForm from './pages/PackForm';
 import PackQuestionsManager from './pages/PackQuestionsManager';
+import UserList from './pages/UserList';
 
 function getSupabaseSafe() {
   try {
@@ -122,6 +123,7 @@ export default function App() {
         <Route path="packs/new" element={<PackForm />} />
         <Route path="packs/:id/edit" element={<PackForm />} />
         <Route path="packs/:id/questions" element={<PackQuestionsManager />} />
+        {userRole === 'superadmin' && <Route path="users" element={<UserList />} />}
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>

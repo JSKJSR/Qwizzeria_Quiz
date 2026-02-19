@@ -61,7 +61,7 @@ We use database functions for performance-critical logic:
 - **`get_global_leaderboard(time_filter, limit)`**: Calculates rankings for the platform.
 - **`get_admin_analytics()`**: Admin-only metrics (Total users, 7-day churn, avg sessions).
 - **`increment_pack_play_count(pack_id)`**: Securely increments metrics on quiz start.
-- **`get_all_users_admin(search, role)`**: Paginated user management for Superadmins.
+- **`get_all_users_admin(search, role)`**: Paginated user management for Superadmins. Joins `user_profiles` with `auth.users` to provide emails safely (SECURITY DEFINER).
 
 ---
 

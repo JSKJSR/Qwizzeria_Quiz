@@ -400,6 +400,12 @@ input, textarea, select {
   color: var(--text-muted);
 }
 
+.badge--user      { background: rgba(176, 160, 165, 0.15); color: var(--text-secondary); }
+.badge--premium   { background: rgba(232, 168, 37, 0.15); color: var(--accent-warning); }
+.badge--editor    { background: rgba(76, 175, 80, 0.15); color: var(--accent-success); }
+.badge--admin     { background: rgba(190, 19, 50, 0.15); color: var(--accent-primary); }
+.badge--superadmin { background: rgba(232, 92, 26, 0.15); color: var(--accent-secondary); }
+
 /* Alert / message */
 .alert {
   padding: 0.75rem 1rem;

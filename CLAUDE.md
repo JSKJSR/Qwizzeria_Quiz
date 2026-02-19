@@ -156,4 +156,12 @@ All authenticated routes use `ProtectedRoute` + `DashboardLayout` (sidebar). Una
 - Phase 4: Quiz Packs + Premium (pack CRUD, browse, detail, Jeopardy + Sequential play, premium gate)
 - Phase 5: Retention + Competition + Admin Intelligence (profile, history, resume, leaderboards, admin analytics)
 - Phase 6: Dashboard Layout + Host Quiz (sidebar layout, auth routing, host quiz with pack select, multiplayer, integrated scoreboard bar with self-contained timer, flat card grid layout for all quiz modes)
-- Phase 7: RBAC (DB-backed roles in user_profiles, Two-Gate security: feature_access + content_permissions, updated RLS policies to use is_admin()/get_role(), editor CMS access, premium as DB role)
+- Phase 7: RBAC (DB-backed roles in user_profiles, Two-Gate security: feature_access + content_permissions, updated RLS policies to use is_admin()/get_role(), editor CMS access, premium as DB role, User Management UI)
+
+## Full Documentation
+
+For detailed guides, see the `docs/` directory:
+- [Architecture Guide](docs/architecture.md)
+- [Database & Security](docs/database.md)
+- [Development Workflow](docs/development.md)
+- [README.md](README.md)

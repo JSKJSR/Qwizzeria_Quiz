@@ -10,7 +10,7 @@ Developed using **Turborepo** and npm workspaces, the codebase is split into ind
 
 ### `apps/`
 - **`quiz-app/`**: The primary product. Built with Vite and React 19, it handles landing, browsing, playing quizzes (in various formats), and user profiles.
-- **`admin-cms/`**: The management layer. Built with Vite and React, it provides authorized editors and admins with tools to manage the question bank and quiz packs.
+- **`admin-cms/`**: The management layer. Built with Vite and React, it provides authorized editors and admins with tools to manage the question bank and quiz packs. Includes a **User Management** interface for superadmins.
 
 ### `packages/`
 - **`supabase-client/`**: A centralized package wrapping the Supabase SDK. It manages:
@@ -39,7 +39,7 @@ Controls granular access levels for specific resources (Quiz Packs or Categories
 - `manage`: Can delete or grant permissions to others.
 
 ### Role Hierarchy
-1. **`superadmin`**: Bypasses all gates, full system control, and user role assignment.
+1. **`superadmin`**: Bypasses all gates, full system control, and **user role assignment via the User Management UI**.
 2. **`admin`**: Bypasses Gate 1 and has platform-wide management permissions.
 3. **`editor`**: Granted access to `admin_cms` and specific content folders/categories.
 4. **`premium`**: Granted access to `pack_premium` features.
@@ -68,7 +68,7 @@ Each quiz mode (Free Quiz, Pack Play, Host Quiz) is powered by a **state-machine
 
 - **Vite 6**: Rapid HMR and optimized production bundling.
 - **Supabase Real-time**: Enables high-speed synchronization for Host Mode without complex WebSocket boilerplate.
-- **Postgres RPCs**: Moving complex aggregation logic (leaderboards, analytics) to the database layer to minimize network payload.
+- **Postgres RPCs**: Moving complex aggregation logic (leaderboards, analytics, **user search**) to the database layer to minimize network payload.
 - **Flat CSS Grid**: Highly performant layout rendering for large topic grids.
 
 ---
