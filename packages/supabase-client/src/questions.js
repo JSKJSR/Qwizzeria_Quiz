@@ -219,6 +219,43 @@ export async function updateSessionMetadata(sessionId, metadata) {
   }
 }
 
+/**
+ * Save a completed host quiz session to the database.
+ */
+export async function saveHostQuizSession({ userId, packId, participants, completedQuestionIds }) {
+  const supabase = getSupabase();
+
+  const now = new Date().toISOString();
+  const bestScore = Math.max(...participants.map(p => p.score));
+
+  const { data, error } = await supabase
+    .from('quiz_sessions')
+    .insert({
+      user_id: userId,
+      is_free_quiz: false,
+      quiz_pack_id: packId,
+      score: bestScore,
+      total_questions: completedQuestionIds.length,
+      status: 'completed',
+      started_at: now,
+      completed_at: now,
+      metadata: {
+        is_host_quiz: true,
+        format: 'host',
+        participants,
+        completedQuestionIds,
+      },
+    })
+    .select('id')
+    .single();
+
+  if (error) {
+    throw new Error(`Failed to save host quiz session: ${error.message}`);
+  }
+
+  return data;
+}
+
 // ============================================================
 // Admin CRUD functions (require admin role via RLS)
 // ============================================================

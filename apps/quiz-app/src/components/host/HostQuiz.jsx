@@ -1,6 +1,8 @@
 import { useReducer, useCallback, useEffect, useRef } from 'react';
+import { useAuth } from '../../hooks/useAuth';
 import { detectMediaType } from '../../utils/mediaDetector';
 import { saveHostSession, loadHostSession, clearHostSession } from '../../utils/hostSessionPersistence';
+import { saveHostQuizSession } from '@qwizzeria/supabase-client/src/questions.js';
 import HostPackSelect from './HostPackSelect';
 import HostParticipantSetup from './HostParticipantSetup';
 import HostTopicGrid from './HostTopicGrid';
@@ -141,6 +143,7 @@ function reducer(state, action) {
 }
 
 export default function HostQuiz() {
+  const { user } = useAuth();
   const [state, dispatch] = useReducer(reducer, initialState);
   const saveTimerRef = useRef(null);
   const restoredRef = useRef(false);
@@ -210,9 +213,17 @@ export default function HostQuiz() {
   }, []);
 
   const handleEndQuiz = useCallback(() => {
+    if (user?.id && state.pack?.id) {
+      saveHostQuizSession({
+        userId: user.id,
+        packId: state.pack.id,
+        participants: state.participants,
+        completedQuestionIds: state.completedQuestionIds,
+      }).catch(err => console.warn('Failed to save host quiz session:', err));
+    }
     dispatch({ type: ACTIONS.END_QUIZ });
     clearHostSession();
-  }, []);
+  }, [user, state.pack, state.participants, state.completedQuestionIds]);
 
   const handlePlayAgain = useCallback(() => {
     dispatch({ type: ACTIONS.PLAY_AGAIN });

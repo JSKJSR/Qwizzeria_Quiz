@@ -68,6 +68,10 @@ export default function History() {
 
     setExpandedId(sessionId);
 
+    // Host sessions have all detail in metadata — no need to fetch
+    const session = sessions.find(s => s.id === sessionId);
+    if (session?.metadata?.is_host_quiz) return;
+
     if (!detailCache[sessionId]) {
       setDetailLoading(sessionId);
       try {
@@ -79,7 +83,7 @@ export default function History() {
         setDetailLoading(null);
       }
     }
-  }, [expandedId, detailCache]);
+  }, [expandedId, detailCache, sessions]);
 
   if (loading) {
     return (
@@ -101,6 +105,7 @@ export default function History() {
           <option value="all">All Types</option>
           <option value="free">Free Quiz</option>
           <option value="pack">Quiz Packs</option>
+          <option value="host">Host Quiz</option>
         </select>
         <select className="history__filter-select" value={statusFilter} onChange={handleStatusChange}>
           <option value="all">All Statuses</option>
@@ -121,6 +126,8 @@ export default function History() {
               const isExpanded = expandedId === session.id;
               const detail = detailCache[session.id];
               const isLoadingDetail = detailLoading === session.id;
+              const isHostQuiz = session.metadata?.is_host_quiz;
+              const hostParticipants = isHostQuiz ? session.metadata?.participants || [] : [];
 
               return (
                 <div key={session.id} className="history__item">
@@ -130,15 +137,19 @@ export default function History() {
                   >
                     <div className="history__item-info">
                       <div className="history__item-pack">
+                        {isHostQuiz && (
+                          <span className="history__type-badge history__type-badge--host">HOST</span>
+                        )}
                         {session.is_free_quiz ? 'Free Quiz' : session.quiz_packs?.title || 'Quiz Pack'}
                       </div>
                       <div className="history__item-date">
                         {new Date(session.started_at).toLocaleDateString()} &middot;{' '}
                         {session.total_questions} questions
+                        {isHostQuiz && ` · ${hostParticipants.length} participants`}
                       </div>
                     </div>
                     <span className="history__item-score">
-                      {session.score ?? 0} pts
+                      {isHostQuiz ? `Best: ${session.score ?? 0} pts` : `${session.score ?? 0} pts`}
                     </span>
                     <span className={`history__item-status history__item-status--${session.status || 'completed'}`}>
                       {session.status === 'in_progress' ? 'In Progress' : session.status === 'abandoned' ? 'Abandoned' : 'Completed'}
@@ -150,7 +161,36 @@ export default function History() {
 
                   {isExpanded && (
                     <div className="history__detail">
-                      {isLoadingDetail ? (
+                      {isHostQuiz ? (
+                        <>
+                          <p className="history__host-info">
+                            Participant Rankings
+                          </p>
+                          <table className="history__detail-table">
+                            <thead>
+                              <tr>
+                                <th>Rank</th>
+                                <th>Name</th>
+                                <th>Score</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {[...hostParticipants]
+                                .sort((a, b) => b.score - a.score)
+                                .map((p, i) => {
+                                  const medal = i === 0 ? '🥇 ' : i === 1 ? '🥈 ' : i === 2 ? '🥉 ' : '';
+                                  return (
+                                    <tr key={i}>
+                                      <td>{medal}{i + 1}</td>
+                                      <td>{p.name}</td>
+                                      <td>{p.score} pts</td>
+                                    </tr>
+                                  );
+                                })}
+                            </tbody>
+                          </table>
+                        </>
+                      ) : isLoadingDetail ? (
                         <p style={{ color: '#999', fontSize: '0.85rem', padding: '0.5rem' }}>Loading details...</p>
                       ) : detail?.attempts?.length > 0 ? (
                         <table className="history__detail-table">
@@ -190,7 +230,7 @@ export default function History() {
                         </p>
                       )}
 
-                      {session.status === 'in_progress' && (
+                      {!isHostQuiz && session.status === 'in_progress' && (
                         <button
                           className="history__resume-btn"
                           style={{

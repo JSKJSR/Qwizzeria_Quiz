@@ -53,7 +53,12 @@ export async function fetchUserHistory({ userId, type = 'all', status = 'all', p
     .eq('user_id', userId);
 
   if (type === 'free') query = query.eq('is_free_quiz', true);
-  if (type === 'pack') query = query.eq('is_free_quiz', false);
+  if (type === 'pack') {
+    query = query.eq('is_free_quiz', false).neq('metadata->>is_host_quiz', 'true');
+  }
+  if (type === 'host') {
+    query = query.eq('is_free_quiz', false).eq('metadata->>is_host_quiz', 'true');
+  }
   if (status !== 'all') query = query.eq('status', status);
 
   const from = (page - 1) * pageSize;

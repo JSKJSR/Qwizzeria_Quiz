@@ -138,6 +138,30 @@
   transform: rotate(90deg);
 }
 
+/* Host quiz badge */
+.history__type-badge {
+  display: inline-block;
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  padding: 0.15rem 0.4rem;
+  border-radius: 4px;
+  margin-right: 0.5rem;
+  vertical-align: middle;
+}
+
+.history__type-badge--host {
+  background: rgba(156, 39, 176, 0.2);
+  color: #ce93d8;
+}
+
+.history__host-info {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #ce93d8;
+  margin: 0.75rem 0 0.25rem;
+}
+
 /* Expanded detail */
 .history__detail {
   padding: 0 1.25rem 1rem;
