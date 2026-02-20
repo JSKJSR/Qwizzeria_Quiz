@@ -124,21 +124,26 @@ export default function PackPlaySequential({ pack, questions, user, resumeData }
     questionStartRef.current = Date.now();
 
     // Create session (non-critical)
-    createQuizSession({
-      userId: user?.id ?? null,
-      isFreeQuiz: false,
-      totalQuestions: enriched.length,
-      quizPackId: pack.id,
-    })
-      .then((session) => {
-        sessionIdRef.current = session.id;
-        // Save metadata for resume (non-blocking)
-        updateSessionMetadata(session.id, {
-          format: 'sequential',
-          question_ids: enriched.map(q => q.id),
-        }).catch(() => {});
+    if (user?.id) {
+      createQuizSession({
+        userId: user.id,
+        isFreeQuiz: false,
+        totalQuestions: enriched.length,
+        quizPackId: pack.id,
       })
-      .catch(() => { sessionIdRef.current = null; });
+        .then((session) => {
+          sessionIdRef.current = session.id;
+          // Save metadata for resume (non-blocking)
+          updateSessionMetadata(session.id, {
+            format: 'sequential',
+            question_ids: enriched.map(q => q.id),
+          }).catch(err => console.warn('PackPlaySequential: Failed to save metadata:', err));
+        })
+        .catch(err => {
+          console.error('PackPlaySequential: Failed to create session:', err);
+          sessionIdRef.current = null;
+        });
+    }
 
     // Increment play count (non-critical)
     incrementPackPlayCount(pack.id).catch(() => {});
@@ -146,7 +151,8 @@ export default function PackPlaySequential({ pack, questions, user, resumeData }
 
   const handleQuit = useCallback(() => {
     if (sessionIdRef.current) {
-      abandonQuizSession(sessionIdRef.current).catch(() => {});
+      abandonQuizSession(sessionIdRef.current)
+        .catch(err => console.warn('PackPlaySequential: Failed to abandon session:', err));
     }
     navigate(`/packs/${pack.id}`);
   }, [navigate, pack.id]);
@@ -171,13 +177,14 @@ export default function PackPlaySequential({ pack, questions, user, resumeData }
         isCorrect,
         timeSpentMs,
         skipped,
-      }).catch(() => {});
+      }).catch(err => console.warn('PackPlaySequential: Failed to record attempt:', err));
     }
   }, [state.questions, state.currentIndex]);
 
   useEffect(() => {
     if (state.phase === 'results' && sessionIdRef.current) {
-      completeQuizSession(sessionIdRef.current, state.score).catch(() => {});
+      completeQuizSession(sessionIdRef.current, state.score)
+        .catch(err => console.error('PackPlaySequential: Failed to complete session:', err));
     }
   }, [state.phase, state.score]);
 

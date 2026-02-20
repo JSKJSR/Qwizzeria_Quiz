@@ -147,21 +147,26 @@ export default function PackPlayJeopardy({ pack, questions, user, resumeData }) 
     dispatch({ type: ACTIONS.INIT, topics, allQuestions });
 
     // Create session (non-critical)
-    createQuizSession({
-      userId: user?.id ?? null,
-      isFreeQuiz: false,
-      totalQuestions: allQuestions.length,
-      quizPackId: pack.id,
-    })
-      .then((session) => {
-        sessionIdRef.current = session.id;
-        // Save metadata for resume (non-blocking)
-        updateSessionMetadata(session.id, {
-          format: 'jeopardy',
-          question_ids: allQuestions.map(q => q.id),
-        }).catch(() => {});
+    if (user?.id) {
+      createQuizSession({
+        userId: user.id,
+        isFreeQuiz: false,
+        totalQuestions: allQuestions.length,
+        quizPackId: pack.id,
       })
-      .catch(() => { sessionIdRef.current = null; });
+        .then((session) => {
+          sessionIdRef.current = session.id;
+          // Save metadata for resume (non-blocking)
+          updateSessionMetadata(session.id, {
+            format: 'jeopardy',
+            question_ids: allQuestions.map(q => q.id),
+          }).catch(err => console.warn('PackPlayJeopardy: Failed to save metadata:', err));
+        })
+        .catch(err => {
+          console.error('PackPlayJeopardy: Failed to create session:', err);
+          sessionIdRef.current = null;
+        });
+    }
 
     // Increment play count (non-critical)
     incrementPackPlayCount(pack.id).catch(() => {});
@@ -169,7 +174,8 @@ export default function PackPlayJeopardy({ pack, questions, user, resumeData }) 
 
   const handleQuit = useCallback(() => {
     if (sessionIdRef.current) {
-      abandonQuizSession(sessionIdRef.current).catch(() => {});
+      abandonQuizSession(sessionIdRef.current)
+        .catch(err => console.warn('PackPlayJeopardy: Failed to abandon session:', err));
     }
     navigate(`/packs/${pack.id}`);
   }, [navigate, pack.id]);
@@ -200,13 +206,14 @@ export default function PackPlayJeopardy({ pack, questions, user, resumeData }) 
         isCorrect,
         timeSpentMs,
         skipped,
-      }).catch(() => {});
+      }).catch(err => console.warn('PackPlayJeopardy: Failed to record attempt:', err));
     }
   }, [state.currentQuestion]);
 
   useEffect(() => {
     if (state.phase === 'results' && sessionIdRef.current) {
-      completeQuizSession(sessionIdRef.current, state.score).catch(() => {});
+      completeQuizSession(sessionIdRef.current, state.score)
+        .catch(err => console.error('PackPlayJeopardy: Failed to complete session:', err));
     }
   }, [state.phase, state.score]);
 
