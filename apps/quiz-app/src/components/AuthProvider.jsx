@@ -43,34 +43,36 @@ export default function AuthProvider({ children }) {
     // Detect OAuth redirect (hash contains access_token)
     const hasOAuthHash = window.location.hash.includes('access_token');
 
-    // Listen for auth changes (must be registered before getSession)
+    // Register auth listener first — handles OAuth SIGNED_IN event
     const unsubscribe = onAuthStateChange(async (event, session) => {
       console.log('AuthProvider: Auth state change:', event, session);
       const currentUser = session?.user ?? null;
       setUser(currentUser);
       await loadRole(currentUser?.id);
-
-      if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED' || event === 'INITIAL_SESSION') {
-        setLoading(false);
-      }
+      setLoading(false);
     });
 
-    // If OAuth redirect, let onAuthStateChange handle session from hash
-    // Otherwise, load existing session directly
-    if (!hasOAuthHash) {
-      getSession().then(async (session) => {
-        console.log('AuthProvider: Initial session loaded:', session);
+    // Always call getSession — it parses the OAuth hash fragment.
+    // When OAuth hash is present, don't set loading=false here;
+    // wait for onAuthStateChange SIGNED_IN to fire with the session.
+    getSession().then(async (session) => {
+      console.log('AuthProvider: Initial session loaded:', session);
+      if (!hasOAuthHash) {
         const currentUser = session?.user ?? null;
         setUser(currentUser);
         await loadRole(currentUser?.id);
         setLoading(false);
-      }).catch((err) => {
-        console.error('AuthProvider: Error loading session:', err);
+      }
+      // If OAuth hash: getSession triggers hash parsing,
+      // onAuthStateChange will fire SIGNED_IN with the real session
+    }).catch((err) => {
+      console.error('AuthProvider: Error loading session:', err);
+      if (!hasOAuthHash) {
         setUser(null);
         setRole('user');
         setLoading(false);
-      });
-    }
+      }
+    });
 
     return unsubscribe;
   }, [loadRole]);
