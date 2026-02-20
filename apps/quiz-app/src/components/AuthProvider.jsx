@@ -25,7 +25,7 @@ export default function AuthProvider({ children }) {
 
     let mounted = true;
 
-    async function handleSession(session) {
+    async function updateAuthState(session) {
       if (!mounted) return;
       const currentUser = session?.user ?? null;
       setUser(currentUser);
@@ -43,19 +43,57 @@ export default function AuthProvider({ children }) {
       }
 
       if (mounted) setLoading(false);
+    }
 
-      // Clean up OAuth hash fragment from URL
-      if (currentUser && window.location.hash.includes('access_token')) {
+    async function initialize() {
+      const supabase = getSupabase();
+
+      // Handle OAuth redirect: if URL has #access_token, manually set the session
+      const hash = window.location.hash;
+      if (hash && hash.includes('access_token')) {
+        try {
+          const params = new URLSearchParams(hash.substring(1));
+          const accessToken = params.get('access_token');
+          const refreshToken = params.get('refresh_token');
+
+          if (accessToken && refreshToken) {
+            const { data, error } = await supabase.auth.setSession({
+              access_token: accessToken,
+              refresh_token: refreshToken,
+            });
+
+            // Clean up hash from URL
+            window.history.replaceState(null, '', window.location.pathname);
+
+            if (!error && data.session) {
+              await updateAuthState(data.session);
+              return; // Session set, onAuthStateChange will handle future changes
+            }
+          }
+        } catch (err) {
+          console.error('AuthProvider: OAuth hash processing failed:', err);
+        }
+        // If hash processing failed, clean up and fall through
         window.history.replaceState(null, '', window.location.pathname);
+      }
+
+      // Normal flow: load existing session from storage
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        await updateAuthState(session);
+      } catch (err) {
+        console.error('AuthProvider: getSession failed:', err);
+        if (mounted) setLoading(false);
       }
     }
 
-    // onAuthStateChange fires INITIAL_SESSION on registration,
-    // which includes the session parsed from the OAuth hash fragment.
-    // It also fires SIGNED_IN, TOKEN_REFRESHED, SIGNED_OUT, etc.
+    // Listen for ongoing auth changes (sign in/out, token refresh)
     const unsubscribe = onAuthStateChange((_event, session) => {
-      handleSession(session);
+      updateAuthState(session);
     });
+
+    // Run initialization
+    initialize();
 
     return () => {
       mounted = false;
