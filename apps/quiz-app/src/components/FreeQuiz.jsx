@@ -120,21 +120,24 @@ export default function FreeQuiz({ resumeData } = {}) {
       dispatch({ type: ACTIONS.LOAD_SUCCESS, topics: enrichedTopics, allQuestions: enrichedAll });
 
       // Create session (non-critical)
-      try {
-        const session = await createQuizSession({
-          userId: user?.id ?? null,
-          isFreeQuiz: true,
-          totalQuestions: enrichedAll.length,
-        });
-        sessionIdRef.current = session.id;
+      if (user?.id) {
+        try {
+          const session = await createQuizSession({
+            userId: user.id,
+            isFreeQuiz: true,
+            totalQuestions: enrichedAll.length,
+          });
+          sessionIdRef.current = session.id;
 
-        // Save question IDs to session metadata for resume (non-blocking)
-        updateSessionMetadata(session.id, {
-          question_ids: enrichedAll.map(q => q.id),
-          format: 'jeopardy',
-        }).catch(() => {});
-      } catch {
-        sessionIdRef.current = null;
+          // Save question IDs to session metadata for resume (non-blocking)
+          updateSessionMetadata(session.id, {
+            question_ids: enrichedAll.map(q => q.id),
+            format: 'jeopardy',
+          }).catch(err => console.warn('FreeQuiz: Failed to save metadata:', err));
+        } catch (err) {
+          console.error('FreeQuiz: Failed to create session:', err);
+          sessionIdRef.current = null;
+        }
       }
     } catch (err) {
       dispatch({ type: ACTIONS.LOAD_ERROR, error: err.message });
@@ -180,20 +183,22 @@ export default function FreeQuiz({ resumeData } = {}) {
         isCorrect,
         timeSpentMs,
         skipped,
-      }).catch(() => {});
+      }).catch(err => console.warn('FreeQuiz: Failed to record attempt:', err));
     }
   }, [state.currentQuestion]);
 
   // Complete session when results are shown
   useEffect(() => {
     if (state.phase === 'results' && sessionIdRef.current) {
-      completeQuizSession(sessionIdRef.current, state.score).catch(() => {});
+      completeQuizSession(sessionIdRef.current, state.score)
+        .catch(err => console.error('FreeQuiz: Failed to complete session:', err));
     }
   }, [state.phase, state.score]);
 
   const handleQuit = useCallback(() => {
     if (sessionIdRef.current) {
-      abandonQuizSession(sessionIdRef.current).catch(() => {});
+      abandonQuizSession(sessionIdRef.current)
+        .catch(err => console.warn('FreeQuiz: Failed to abandon session:', err));
     }
     navigate('/');
   }, [navigate]);
