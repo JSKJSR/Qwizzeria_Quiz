@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import '../styles/QuestionView.css';
 
-export default function QuestionView({ question, onRevealAnswer, onBack }) {
+export default function QuestionView({ question, onRevealAnswer, onBack, onSkip }) {
   const [mediaVisible, setMediaVisible] = useState(false);
 
   useEffect(() => {
@@ -55,6 +55,11 @@ export default function QuestionView({ question, onRevealAnswer, onBack }) {
           <button className="question-view__back-btn" onClick={onBack}>
             Back to Grid
           </button>
+          {onSkip && (
+            <button className="question-view__skip-btn" onClick={onSkip}>
+              Next
+            </button>
+          )}
           <button className="question-view__reveal-btn" onClick={onRevealAnswer}>
             Reveal Answer
           </button>

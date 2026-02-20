@@ -136,3 +136,19 @@
   border-color: var(--text-secondary);
   color: var(--text-primary);
 }
+
+.question-view__skip-btn {
+  padding: 1rem 2rem;
+  background: transparent;
+  color: var(--text-muted, #665555);
+  font-size: var(--font-size-md);
+  font-weight: 600;
+  border-radius: var(--radius);
+  border: 2px dashed var(--border-color);
+  transition: all 0.2s;
+}
+
+.question-view__skip-btn:hover {
+  border-color: var(--accent-primary);
+  color: var(--text-secondary);
+}

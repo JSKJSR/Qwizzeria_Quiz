@@ -328,6 +328,7 @@ export default function HostQuiz() {
           question={selectedQuestion}
           onRevealAnswer={handleRevealAnswer}
           onBack={handleBackToGrid}
+          onSkip={handleSkipAnswer}
         />
       )}
 
