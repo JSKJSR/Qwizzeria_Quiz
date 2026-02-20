@@ -42,39 +42,69 @@ export default function AuthProvider({ children }) {
 
     // Detect OAuth redirect (hash contains access_token)
     const hasOAuthHash = window.location.hash.includes('access_token');
+    let resolved = false;
 
-    // Register auth listener first — handles OAuth SIGNED_IN event
+    // Register auth listener first
     const unsubscribe = onAuthStateChange(async (event, session) => {
       console.log('AuthProvider: Auth state change:', event, session);
       const currentUser = session?.user ?? null;
       setUser(currentUser);
       await loadRole(currentUser?.id);
-      setLoading(false);
+
+      // During OAuth redirect: only stop loading once we have a real session
+      // (skip INITIAL_SESSION with null user — hash hasn't been parsed yet)
+      if (hasOAuthHash) {
+        if (currentUser || event === 'SIGNED_IN') {
+          resolved = true;
+          setLoading(false);
+          // Clean up the hash fragment from the URL
+          if (window.location.hash) {
+            window.history.replaceState(null, '', window.location.pathname);
+          }
+        }
+      } else {
+        resolved = true;
+        setLoading(false);
+      }
     });
 
-    // Always call getSession — it parses the OAuth hash fragment.
-    // When OAuth hash is present, don't set loading=false here;
-    // wait for onAuthStateChange SIGNED_IN to fire with the session.
+    // getSession() triggers hash fragment parsing for OAuth redirects
     getSession().then(async (session) => {
-      console.log('AuthProvider: Initial session loaded:', session);
+      console.log('AuthProvider: getSession result:', !!session?.user);
+      // If onAuthStateChange already resolved, skip
+      if (resolved) return;
+
       if (!hasOAuthHash) {
         const currentUser = session?.user ?? null;
         setUser(currentUser);
         await loadRole(currentUser?.id);
         setLoading(false);
       }
-      // If OAuth hash: getSession triggers hash parsing,
-      // onAuthStateChange will fire SIGNED_IN with the real session
+      // With OAuth hash: onAuthStateChange SIGNED_IN will handle it
     }).catch((err) => {
       console.error('AuthProvider: Error loading session:', err);
-      if (!hasOAuthHash) {
+      if (!resolved) {
         setUser(null);
         setRole('user');
         setLoading(false);
       }
     });
 
-    return unsubscribe;
+    // Safety timeout for OAuth: if nothing resolves in 5s, stop loading
+    let timeout;
+    if (hasOAuthHash) {
+      timeout = setTimeout(() => {
+        if (!resolved) {
+          console.warn('AuthProvider: OAuth timeout — stopping loading');
+          setLoading(false);
+        }
+      }, 5000);
+    }
+
+    return () => {
+      unsubscribe();
+      if (timeout) clearTimeout(timeout);
+    };
   }, [loadRole]);
 
   const signIn = useCallback(async (email, password) => {
