@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { getSupabase } from '@qwizzeria/supabase-client';
-import { onAuthStateChange, getSession, signOut as authSignOut, signInWithEmail, signUpWithEmail } from '@qwizzeria/supabase-client/src/auth.js';
+import { onAuthStateChange, signOut as authSignOut, signInWithEmail, signUpWithEmail } from '@qwizzeria/supabase-client/src/auth.js';
 import { fetchUserRole, hasMinRole } from '@qwizzeria/supabase-client/src/users.js';
 import { AuthContext } from '../contexts/AuthContext';
 
@@ -20,92 +20,48 @@ export default function AuthProvider({ children }) {
   const [role, setRole] = useState('user');
   const [loading, setLoading] = useState(SUPABASE_AVAILABLE);
 
-  // Fetch role from user_profiles whenever user changes
-  const loadRole = useCallback(async (userId) => {
-    if (!userId) {
-      setRole('user');
-      return;
-    }
-    try {
-      const userRole = await fetchUserRole(userId);
-      setRole(userRole);
-    } catch (err) {
-      console.error('AuthProvider: Error fetching role:', err);
-      setRole('user');
-    }
-  }, []);
-
   useEffect(() => {
     if (!SUPABASE_AVAILABLE) return;
 
-    console.log('AuthProvider: Initializing...');
+    let mounted = true;
 
-    // Detect OAuth redirect (hash contains access_token)
-    const hasOAuthHash = window.location.hash.includes('access_token');
-    let resolved = false;
-
-    // Register auth listener first
-    const unsubscribe = onAuthStateChange(async (event, session) => {
-      console.log('AuthProvider: Auth state change:', event, session);
+    async function handleSession(session) {
+      if (!mounted) return;
       const currentUser = session?.user ?? null;
       setUser(currentUser);
-      await loadRole(currentUser?.id);
 
-      // During OAuth redirect: only stop loading once we have a real session
-      // (skip INITIAL_SESSION with null user — hash hasn't been parsed yet)
-      if (hasOAuthHash) {
-        if (currentUser || event === 'SIGNED_IN') {
-          resolved = true;
-          setLoading(false);
-          // Clean up the hash fragment from the URL
-          if (window.location.hash) {
-            window.history.replaceState(null, '', window.location.pathname);
-          }
+      if (currentUser?.id) {
+        try {
+          const userRole = await fetchUserRole(currentUser.id);
+          if (mounted) setRole(userRole);
+        } catch (err) {
+          console.error('AuthProvider: Error fetching role:', err);
+          if (mounted) setRole('user');
         }
       } else {
-        resolved = true;
-        setLoading(false);
-      }
-    });
-
-    // getSession() triggers hash fragment parsing for OAuth redirects
-    getSession().then(async (session) => {
-      console.log('AuthProvider: getSession result:', !!session?.user);
-      // If onAuthStateChange already resolved, skip
-      if (resolved) return;
-
-      if (!hasOAuthHash) {
-        const currentUser = session?.user ?? null;
-        setUser(currentUser);
-        await loadRole(currentUser?.id);
-        setLoading(false);
-      }
-      // With OAuth hash: onAuthStateChange SIGNED_IN will handle it
-    }).catch((err) => {
-      console.error('AuthProvider: Error loading session:', err);
-      if (!resolved) {
-        setUser(null);
         setRole('user');
-        setLoading(false);
       }
-    });
 
-    // Safety timeout for OAuth: if nothing resolves in 5s, stop loading
-    let timeout;
-    if (hasOAuthHash) {
-      timeout = setTimeout(() => {
-        if (!resolved) {
-          console.warn('AuthProvider: OAuth timeout — stopping loading');
-          setLoading(false);
-        }
-      }, 5000);
+      if (mounted) setLoading(false);
+
+      // Clean up OAuth hash fragment from URL
+      if (currentUser && window.location.hash.includes('access_token')) {
+        window.history.replaceState(null, '', window.location.pathname);
+      }
     }
 
+    // onAuthStateChange fires INITIAL_SESSION on registration,
+    // which includes the session parsed from the OAuth hash fragment.
+    // It also fires SIGNED_IN, TOKEN_REFRESHED, SIGNED_OUT, etc.
+    const unsubscribe = onAuthStateChange((_event, session) => {
+      handleSession(session);
+    });
+
     return () => {
+      mounted = false;
       unsubscribe();
-      if (timeout) clearTimeout(timeout);
     };
-  }, [loadRole]);
+  }, []);
 
   const signIn = useCallback(async (email, password) => {
     const data = await signInWithEmail(email, password);
