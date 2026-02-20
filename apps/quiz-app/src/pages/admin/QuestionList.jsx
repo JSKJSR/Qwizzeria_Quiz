@@ -5,6 +5,7 @@ import {
   fetchCategories,
   deleteQuestion,
 } from '@qwizzeria/supabase-client/src/questions.js';
+import { CATEGORIES } from '../../utils/categoryData';
 
 export default function QuestionList() {
   const navigate = useNavigate();
@@ -44,7 +45,16 @@ export default function QuestionList() {
   }, [loadQuestions]);
 
   useEffect(() => {
-    fetchCategories().then(setCategories).catch(() => {});
+    fetchCategories().then((dbCats) => {
+      // Merge predefined categories with any extra DB categories
+      const merged = [...CATEGORIES];
+      for (const c of dbCats) {
+        if (!merged.includes(c)) merged.push(c);
+      }
+      setCategories(merged);
+    }).catch(() => {
+      setCategories(CATEGORIES);
+    });
   }, []);
 
   const handleFilterChange = (key, value) => {

@@ -4,8 +4,8 @@ import {
   fetchQuestionById,
   createQuestion,
   updateQuestion,
-  fetchCategories,
 } from '@qwizzeria/supabase-client/src/questions.js';
+import { CATEGORY_MAP, CATEGORIES, isValidCategory, isValidSubCategory } from '../../utils/categoryData';
 
 const EMPTY_FORM = {
   question_text: '',
@@ -26,15 +26,10 @@ export default function QuestionForm() {
   const isEdit = Boolean(id);
 
   const [form, setForm] = useState(EMPTY_FORM);
-  const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(isEdit);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
-
-  useEffect(() => {
-    fetchCategories().then(setCategories).catch(() => {});
-  }, []);
 
   useEffect(() => {
     if (!isEdit) return;
@@ -115,6 +110,11 @@ export default function QuestionForm() {
     return <p style={{ color: 'var(--text-secondary)' }}>Loading question...</p>;
   }
 
+  // Build category options — include non-standard DB value if present
+  const categoryHasNonStandard = form.category && !isValidCategory(form.category);
+  const subCategoryOptions = CATEGORY_MAP[form.category] || [];
+  const subCategoryHasNonStandard = form.sub_category && !isValidSubCategory(form.sub_category, form.category);
+
   return (
     <div>
       <div className="page-header">
@@ -161,30 +161,58 @@ export default function QuestionForm() {
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
           <div className="form-group">
             <label htmlFor="category">Category</label>
-            <input
+            <select
               id="category"
-              type="text"
-              className="form-input"
-              list="category-list"
+              className="form-select"
               value={form.category}
-              onChange={(e) => handleChange('category', e.target.value)}
-            />
-            <datalist id="category-list">
-              {categories.map((c) => (
-                <option key={c} value={c} />
+              onChange={(e) => {
+                handleChange('category', e.target.value);
+                handleChange('sub_category', '');
+              }}
+              style={categoryHasNonStandard ? { borderColor: '#e8a825' } : undefined}
+            >
+              <option value="">Select category...</option>
+              {categoryHasNonStandard && (
+                <option value={form.category} style={{ color: '#e8a825' }}>
+                  {form.category} (non-standard)
+                </option>
+              )}
+              {CATEGORIES.map((c) => (
+                <option key={c} value={c}>{c}</option>
               ))}
-            </datalist>
+            </select>
+            {categoryHasNonStandard && (
+              <small style={{ color: '#e8a825', fontSize: '0.75rem' }}>
+                Non-standard category from DB. Select a standard one to fix.
+              </small>
+            )}
           </div>
 
           <div className="form-group">
             <label htmlFor="sub_category">Sub Category</label>
-            <input
+            <select
               id="sub_category"
-              type="text"
-              className="form-input"
+              className="form-select"
               value={form.sub_category}
               onChange={(e) => handleChange('sub_category', e.target.value)}
-            />
+              disabled={!form.category}
+              style={subCategoryHasNonStandard ? { borderColor: '#e8a825' } : undefined}
+            >
+              <option value="">Select sub-category...</option>
+              {subCategoryHasNonStandard && (
+                <option value={form.sub_category} style={{ color: '#e8a825' }}>
+                  {form.sub_category} (non-standard)
+                </option>
+              )}
+              {subCategoryOptions.map((sc) => (
+                <option key={sc} value={sc}>{sc}</option>
+              ))}
+            </select>
+            {subCategoryHasNonStandard && (
+              <small style={{ color: '#e8a825', fontSize: '0.75rem' }}>
+                Non-standard sub-category from DB. Select a standard one to fix.
+              </small>
+            )}
           </div>
         </div>
 

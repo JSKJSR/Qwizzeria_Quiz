@@ -5,6 +5,7 @@ import { parseExcelFile, generateTemplate } from '../../utils/adminExcelParser';
 export default function BulkImport() {
   const [parsed, setParsed] = useState(null);
   const [errors, setErrors] = useState([]);
+  const [warnings, setWarnings] = useState([]);
   const [importing, setImporting] = useState(false);
   const [result, setResult] = useState(null);
   const [dragActive, setDragActive] = useState(false);
@@ -13,6 +14,7 @@ export default function BulkImport() {
   const processFile = useCallback(async (file) => {
     setParsed(null);
     setErrors([]);
+    setWarnings([]);
     setResult(null);
 
     if (!file) return;
@@ -30,9 +32,10 @@ export default function BulkImport() {
 
     try {
       const arrayBuffer = await file.arrayBuffer();
-      const { questions, errors: parseErrors } = parseExcelFile(arrayBuffer);
+      const { questions, errors: parseErrors, warnings: parseWarnings } = parseExcelFile(arrayBuffer);
       setParsed(questions);
       setErrors(parseErrors);
+      setWarnings(parseWarnings || []);
     } catch (err) {
       setErrors([`Failed to parse file: ${err.message}`]);
     }
@@ -64,9 +67,17 @@ export default function BulkImport() {
     setResult(null);
 
     try {
-      const data = await bulkCreateQuestions(parsed);
+      // Strip internal warning flags before sending to DB
+      const cleanQuestions = parsed.map((q) => {
+        const clean = { ...q };
+        delete clean._categoryWarning;
+        delete clean._subCategoryWarning;
+        return clean;
+      });
+      const data = await bulkCreateQuestions(cleanQuestions);
       setResult({ success: data.length, failed: 0 });
       setParsed(null);
+      setWarnings([]);
     } catch (err) {
       setResult({ success: 0, failed: parsed.length, error: err.message });
     } finally {
@@ -121,6 +132,15 @@ export default function BulkImport() {
         </div>
       )}
 
+      {warnings.length > 0 && (
+        <div className="alert alert--warning" style={{ marginTop: '1rem', background: 'rgba(232, 168, 37, 0.1)', border: '1px solid rgba(232, 168, 37, 0.3)', color: '#e8a825', borderRadius: '8px', padding: '0.75rem 1rem', fontSize: '0.85rem' }}>
+          <strong>Category warnings ({warnings.length}):</strong>
+          {warnings.map((w, i) => (
+            <div key={i}>{w}</div>
+          ))}
+        </div>
+      )}
+
       {result && (
         <div
           className={`alert ${result.error ? 'alert--error' : 'alert--success'}`}
@@ -155,6 +175,7 @@ export default function BulkImport() {
                   <th>Question</th>
                   <th>Answer</th>
                   <th>Category</th>
+                  <th>Sub Category</th>
                   <th>Tags</th>
                 </tr>
               </thead>
@@ -164,7 +185,22 @@ export default function BulkImport() {
                     <td>{i + 1}</td>
                     <td className="truncate">{q.question_text}</td>
                     <td className="truncate">{q.answer_text}</td>
-                    <td>{q.category || '—'}</td>
+                    <td>
+                      {q.category || '—'}
+                      {q._categoryWarning && (
+                        <span style={{ color: '#e8a825', marginLeft: '0.35rem', fontSize: '0.75rem', fontWeight: 600 }} title="Non-standard category">
+                          !!
+                        </span>
+                      )}
+                    </td>
+                    <td>
+                      {q.sub_category || '—'}
+                      {q._subCategoryWarning && (
+                        <span style={{ color: '#e8a825', marginLeft: '0.35rem', fontSize: '0.75rem', fontWeight: 600 }} title="Non-standard sub-category">
+                          !!
+                        </span>
+                      )}
+                    </td>
                     <td>{Array.isArray(q.tags) ? q.tags.join(', ') : '—'}</td>
                   </tr>
                 ))}

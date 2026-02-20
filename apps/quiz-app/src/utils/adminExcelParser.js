@@ -1,4 +1,5 @@
 import * as XLSX from 'xlsx';
+import { isValidCategory, isValidSubCategory, CATEGORIES } from './categoryData';
 
 const COLUMN_MAP = {
   'question': 'question_text',
@@ -23,7 +24,9 @@ function normalizeHeader(header) {
 
 /**
  * Parse an Excel file buffer into an array of question objects.
- * Returns { questions, errors } where errors lists rows with missing required fields.
+ * Returns { questions, errors, warnings } where:
+ * - errors lists rows with missing required fields (these rows are skipped)
+ * - warnings lists rows with non-standard categories/sub-categories (these rows are still imported)
  */
 export function parseExcelFile(arrayBuffer) {
   const workbook = XLSX.read(arrayBuffer, { type: 'array' });
@@ -32,7 +35,7 @@ export function parseExcelFile(arrayBuffer) {
   const rows = XLSX.utils.sheet_to_json(sheet, { defval: '' });
 
   if (rows.length === 0) {
-    return { questions: [], errors: ['No data found in the spreadsheet.'] };
+    return { questions: [], errors: ['No data found in the spreadsheet.'], warnings: [] };
   }
 
   // Map headers
@@ -47,6 +50,7 @@ export function parseExcelFile(arrayBuffer) {
 
   const questions = [];
   const errors = [];
+  const warnings = [];
 
   rows.forEach((row, index) => {
     const q = {};
@@ -69,6 +73,18 @@ export function parseExcelFile(arrayBuffer) {
       return;
     }
 
+    // Validate category
+    if (q.category && !isValidCategory(q.category)) {
+      warnings.push(`Row ${index + 2}: Unknown category "${q.category}". Valid: ${CATEGORIES.join(', ')}`);
+      q._categoryWarning = true;
+    }
+
+    // Validate sub-category
+    if (q.sub_category && !isValidSubCategory(q.sub_category, q.category)) {
+      warnings.push(`Row ${index + 2}: Unknown sub-category "${q.sub_category}" for category "${q.category || '(none)'}".`);
+      q._subCategoryWarning = true;
+    }
+
     // Defaults
     q.status = q.status || 'active';
     q.is_public = true;
@@ -76,7 +92,7 @@ export function parseExcelFile(arrayBuffer) {
     questions.push(q);
   });
 
-  return { questions, errors };
+  return { questions, errors, warnings };
 }
 
 /**
@@ -87,8 +103,8 @@ export function generateTemplate() {
   const sampleRow = [
     'What is the capital of France?',
     'Paris',
-    'Geography',
-    'Europe',
+    'World',
+    'Cities',
     'Paris has been the capital since the 10th century.',
     '',
     'geography, europe, capitals',
