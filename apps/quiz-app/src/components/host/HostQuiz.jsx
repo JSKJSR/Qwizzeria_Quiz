@@ -19,6 +19,8 @@ const ACTIONS = {
   REVEAL_ANSWER: 'REVEAL_ANSWER',
   AWARD_POINTS: 'AWARD_POINTS',
   NO_POINTS: 'NO_POINTS',
+  SKIP_QUESTION: 'SKIP_QUESTION',
+  ADJUST_SCORE: 'ADJUST_SCORE',
   END_QUIZ: 'END_QUIZ',
   PLAY_AGAIN: 'PLAY_AGAIN',
   RESET_QUIZ: 'RESET_QUIZ',
@@ -33,6 +35,7 @@ const initialState = {
   participants: [],
   selectedQuestion: null,
   completedQuestionIds: [],
+  skippedQuestions: [],
 };
 
 /**
@@ -85,6 +88,7 @@ function reducer(state, action) {
         phase: 'grid',
         participants: action.participants.map(name => ({ name, score: 0 })),
         completedQuestionIds: [],
+        skippedQuestions: [],
         selectedQuestion: null,
       };
 
@@ -117,6 +121,23 @@ function reducer(state, action) {
         selectedQuestion: null,
       };
 
+    case ACTIONS.SKIP_QUESTION:
+      return {
+        ...state,
+        phase: 'grid',
+        completedQuestionIds: [...state.completedQuestionIds, state.selectedQuestion.id],
+        skippedQuestions: [...state.skippedQuestions, state.selectedQuestion],
+        selectedQuestion: null,
+      };
+
+    case ACTIONS.ADJUST_SCORE: {
+      const { participantIndex: adjIdx, delta } = action;
+      const adjParticipants = state.participants.map((p, i) =>
+        i === adjIdx ? { ...p, score: p.score + delta } : p
+      );
+      return { ...state, participants: adjParticipants };
+    }
+
     case ACTIONS.END_QUIZ:
       return { ...state, phase: 'results' };
 
@@ -126,6 +147,7 @@ function reducer(state, action) {
         phase: 'grid',
         participants: state.participants.map(p => ({ ...p, score: 0 })),
         completedQuestionIds: [],
+        skippedQuestions: [],
         selectedQuestion: null,
       };
 
@@ -212,6 +234,14 @@ export default function HostQuiz() {
     dispatch({ type: ACTIONS.NO_POINTS });
   }, []);
 
+  const handleSkipAnswer = useCallback(() => {
+    dispatch({ type: ACTIONS.SKIP_QUESTION });
+  }, []);
+
+  const handleAdjustScore = useCallback((participantIndex, delta) => {
+    dispatch({ type: ACTIONS.ADJUST_SCORE, participantIndex, delta });
+  }, []);
+
   const handleEndQuiz = useCallback(() => {
     if (user?.id && state.pack?.id) {
       saveHostQuizSession({
@@ -234,7 +264,7 @@ export default function HostQuiz() {
     clearHostSession();
   }, []);
 
-  const { phase, pack, topics, participants, selectedQuestion, completedQuestionIds } = state;
+  const { phase, pack, topics, participants, selectedQuestion, completedQuestionIds, skippedQuestions } = state;
 
   // --- Pack Selection ---
   if (phase === 'packSelect') {
@@ -266,6 +296,7 @@ export default function HostQuiz() {
       <div className="host-quiz host-quiz--fullscreen">
         <HostResultsView
           participants={participants}
+          skippedQuestions={skippedQuestions}
           onPlayAgain={handlePlayAgain}
           onNewQuiz={handleNewQuiz}
         />
@@ -279,6 +310,7 @@ export default function HostQuiz() {
       <HostScoreboard
         participants={participants}
         onEndQuiz={handleEndQuiz}
+        onAdjustScore={handleAdjustScore}
         showEndQuiz={phase === 'grid'}
       />
 
@@ -286,6 +318,7 @@ export default function HostQuiz() {
         <HostTopicGrid
           topics={topics}
           completedQuestionIds={completedQuestionIds}
+          skippedQuestionIds={skippedQuestions.map(q => q.id)}
           onSelectQuestion={handleSelectQuestion}
         />
       )}
@@ -304,6 +337,7 @@ export default function HostQuiz() {
           participants={participants}
           onAwardPoints={handleAwardPoints}
           onNoPoints={handleNoPoints}
+          onSkipAnswer={handleSkipAnswer}
         />
       )}
     </div>

@@ -79,6 +79,66 @@
   color: #fff;
 }
 
+.scoreboard__adjust-wrapper {
+  position: relative;
+}
+
+.scoreboard__adjust-btn {
+  padding: 0.15rem 0.4rem;
+  background: transparent;
+  border: 1px solid var(--border-color, #2a1520);
+  border-radius: 4px;
+  color: var(--text-secondary, #b0a0a5);
+  cursor: pointer;
+  font-size: 0.7rem;
+  font-weight: 700;
+  line-height: 1;
+  transition: all 0.15s ease;
+}
+
+.scoreboard__adjust-btn:hover {
+  border-color: var(--accent-primary, #be1332);
+  color: var(--text-primary, #f0f0f0);
+}
+
+.scoreboard__adjust-popover {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  margin-top: 4px;
+  display: flex;
+  gap: 3px;
+  padding: 0.35rem;
+  background: var(--bg-secondary, #0d0d0d);
+  border: 1px solid var(--border-color, #2a1520);
+  border-radius: var(--radius-sm, 8px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
+  z-index: 10;
+  white-space: nowrap;
+}
+
+.scoreboard__adjust-option {
+  padding: 0.3rem 0.5rem;
+  background: var(--bg-card, #1a1015);
+  border: 1px solid var(--border-color, #2a1520);
+  border-radius: 4px;
+  color: #4caf50;
+  cursor: pointer;
+  font-size: 0.7rem;
+  font-weight: 600;
+  transition: all 0.15s ease;
+}
+
+.scoreboard__adjust-option--neg {
+  color: #ff6b6b;
+}
+
+.scoreboard__adjust-option:hover {
+  border-color: var(--accent-primary, #be1332);
+  background: rgba(190, 19, 50, 0.1);
+}
+
 @media (max-width: 768px) {
   .scoreboard {
     flex-wrap: wrap;

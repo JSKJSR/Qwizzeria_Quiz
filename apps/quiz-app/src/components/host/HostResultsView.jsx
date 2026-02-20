@@ -1,9 +1,11 @@
+import { useState } from 'react';
 import '../../styles/HostResultsView.css';
 
 const MEDAL_ICONS = ['&#129351;', '&#129352;', '&#129353;']; // gold, silver, bronze
 
-export default function HostResultsView({ participants, onPlayAgain, onNewQuiz }) {
+export default function HostResultsView({ participants, skippedQuestions = [], onPlayAgain, onNewQuiz }) {
   const sorted = [...participants].sort((a, b) => b.score - a.score);
+  const [skippedExpanded, setSkippedExpanded] = useState(true);
 
   return (
     <div className="host-results">
@@ -36,6 +38,34 @@ export default function HostResultsView({ participants, onPlayAgain, onNewQuiz }
           );
         })}
       </div>
+
+      {skippedQuestions.length > 0 && (
+        <div className="host-results__skipped">
+          <button
+            className="host-results__skipped-toggle"
+            onClick={() => setSkippedExpanded(prev => !prev)}
+          >
+            <span>Skipped Answers ({skippedQuestions.length})</span>
+            <span className={`host-results__skipped-arrow ${skippedExpanded ? 'host-results__skipped-arrow--open' : ''}`}>
+              &#9660;
+            </span>
+          </button>
+          {skippedExpanded && (
+            <div className="host-results__skipped-list">
+              {skippedQuestions.map((q, i) => (
+                <div key={q.id || i} className="host-results__skipped-card">
+                  <div className="host-results__skipped-category">{q.topic}</div>
+                  <div className="host-results__skipped-question">{q.question}</div>
+                  <div className="host-results__skipped-answer">{q.answer}</div>
+                  {q.answerExplanation && (
+                    <div className="host-results__skipped-explanation">{q.answerExplanation}</div>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
 
       <div className="host-results__actions">
         <button className="host-results__btn host-results__btn--primary" onClick={onPlayAgain}>

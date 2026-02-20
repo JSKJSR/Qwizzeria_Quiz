@@ -1,4 +1,4 @@
-export default function HostAnswerView({ question, participants, onAwardPoints, onNoPoints }) {
+export default function HostAnswerView({ question, participants, onAwardPoints, onNoPoints, onSkipAnswer }) {
   const hasMedia = question.mediaType && question.mediaType !== 'none';
   const isVideo = question.mediaType === 'video';
   const isDirectVideo = isVideo && /\.(mp4|webm|ogg)(\?.*)?$/i.test(question.embedUrl);
@@ -52,9 +52,14 @@ export default function HostAnswerView({ question, participants, onAwardPoints, 
               </button>
             ))}
           </div>
-          <button className="host-answer__no-points-btn" onClick={onNoPoints}>
-            No Points
-          </button>
+          <div className="host-answer__bottom-actions">
+            <button className="host-answer__no-points-btn" onClick={onNoPoints}>
+              No Points
+            </button>
+            <button className="host-answer__skip-btn" onClick={onSkipAnswer}>
+              Skip &mdash; Don&apos;t Reveal
+            </button>
+          </div>
         </div>
       </div>
     </div>
