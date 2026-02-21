@@ -63,7 +63,7 @@
 }
 
 .landing__logo {
-  height: 120px;
+  height: clamp(100px, 18vw, 180px);
   width: auto;
   margin-bottom: 2rem;
   animation: fadeIn 0.6s ease;
@@ -213,7 +213,7 @@
   }
 
   .landing__logo {
-    height: 90px;
+    height: clamp(90px, 20vw, 140px);
   }
 
   .landing__cta-primary {
@@ -247,7 +247,7 @@
 
 @media (max-width: 480px) {
   .landing__logo {
-    height: 70px;
+    height: 80px;
   }
 
   .landing__cta-primary {

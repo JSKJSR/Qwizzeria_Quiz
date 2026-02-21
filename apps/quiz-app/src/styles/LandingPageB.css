@@ -21,7 +21,7 @@
 }
 
 .landing-b__logo {
-  height: 44px;
+  height: clamp(44px, 6vw, 64px);
   width: auto;
   object-fit: contain;
 }
