@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import { browsePublicPacks, fetchPackCategories } from '@qwizzeria/supabase-client/src/packs.js';
+import SEO from '../components/SEO';
 import '../styles/PackBrowse.css';
 
 export default function PackBrowse() {
@@ -32,6 +33,11 @@ export default function PackBrowse() {
 
   return (
     <div className="pack-browse">
+      <SEO
+        title="Quiz Packs"
+        description="Browse curated quiz packs by category. Play Jeopardy-style grids or sequential quizzes with friends."
+        path="/packs"
+      />
       <h1 className="pack-browse__title">Quiz Packs</h1>
 
       <div className="pack-browse__filters">

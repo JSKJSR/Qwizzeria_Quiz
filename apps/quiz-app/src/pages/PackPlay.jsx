@@ -4,6 +4,7 @@ import { useAuth } from '../hooks/useAuth';
 import { fetchPublicPackById, fetchPackPlayQuestions } from '@qwizzeria/supabase-client/src/packs.js';
 import PackPlayJeopardy from '../components/PackPlayJeopardy';
 import PackPlaySequential from '../components/PackPlaySequential';
+import SEO from '../components/SEO';
 import '../styles/PackPlay.css';
 
 export default function PackPlay() {
@@ -106,6 +107,7 @@ export default function PackPlay() {
   // Format selection screen
   return (
     <div className="pack-play">
+      <SEO title="Play Quiz" path={`/packs/${id}/play`} noIndex />
       <div className="pack-play__header">
         <img
           src="/qwizzeria-logo.png"

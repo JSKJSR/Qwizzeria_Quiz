@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import LoginModal from './LoginModal';
+import SEO from './SEO';
 import '../styles/LandingPage.css';
 
 export default function LandingPage() {
@@ -9,7 +10,12 @@ export default function LandingPage() {
   const [showLogin, setShowLogin] = useState(false);
 
   return (
-    <div className="landing">
+    <main className="landing">
+      <SEO
+        title="Qwizzeria — Turn Any Gathering Into a Smart Game Night"
+        description="Play beautifully designed quizzes, compete with friends, and host unforgettable quiz sessions in under 60 seconds."
+        path="/"
+      />
       {/* Auth area */}
       <div className="landing__auth">
         {loading ? null : user ? (
@@ -43,6 +49,7 @@ export default function LandingPage() {
         </p>
 
         {/* Primary CTA */}
+        <nav aria-label="Quick actions">
         <Link to="/play/free" className="landing__cta-primary">
           <span className="landing__cta-icon">&#9654;</span>
           Play a Free Quiz
@@ -65,6 +72,7 @@ export default function LandingPage() {
             </Link>
           )}
         </div>
+        </nav>
       </header>
 
       {/* Footer */}
@@ -85,6 +93,6 @@ export default function LandingPage() {
           onSuccess={() => setShowLogin(false)}
         />
       )}
-    </div>
+    </main>
   );
 }

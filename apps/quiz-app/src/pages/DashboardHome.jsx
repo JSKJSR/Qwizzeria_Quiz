@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import { fetchUserHistory } from '@qwizzeria/supabase-client/src/users.js';
+import SEO from '../components/SEO';
 import '../styles/DashboardHome.css';
 
 export default function DashboardHome() {
@@ -26,6 +27,7 @@ export default function DashboardHome() {
 
   return (
     <div className="dash-home">
+      <SEO title="Dashboard" path="/dashboard" noIndex />
       <div className="dash-home__welcome">
         <h1 className="dash-home__greeting">Welcome, {displayName}</h1>
         <p className="dash-home__subtitle">Ready for your next quiz challenge?</p>

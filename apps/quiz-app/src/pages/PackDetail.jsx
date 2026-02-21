@@ -4,6 +4,7 @@ import { useAuth } from '../hooks/useAuth';
 import { fetchPublicPackById } from '@qwizzeria/supabase-client/src/packs.js';
 import { fetchPackLeaderboard } from '@qwizzeria/supabase-client/src/leaderboard.js';
 import LoginModal from '../components/LoginModal';
+import SEO from '../components/SEO';
 import '../styles/PackDetail.css';
 import '../styles/Leaderboard.css';
 
@@ -61,6 +62,12 @@ export default function PackDetail() {
 
   return (
     <div className="pack-detail">
+      <SEO
+        title={pack.title}
+        description={pack.description || `Play the ${pack.title} quiz pack on Qwizzeria.`}
+        path={`/packs/${id}`}
+        noIndex
+      />
       {pack.cover_image_url ? (
         <img
           className="pack-detail__cover"

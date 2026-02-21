@@ -1,5 +1,15 @@
 import FreeQuiz from '../components/FreeQuiz';
+import SEO from '../components/SEO';
 
 export default function FreeQuizPage() {
-  return <FreeQuiz />;
+  return (
+    <>
+      <SEO
+        title="Free Quiz"
+        description="Play a free Jeopardy-style quiz with random questions. Test your knowledge across multiple categories."
+        path="/play/free"
+      />
+      <FreeQuiz />
+    </>
+  );
 }

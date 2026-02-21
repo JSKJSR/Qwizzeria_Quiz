@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import { fetchUserProfile, upsertUserProfile, fetchUserStats, fetchUserHistory } from '@qwizzeria/supabase-client/src/users.js';
+import SEO from '../components/SEO';
 import '../styles/Profile.css';
 
 export default function Profile() {
@@ -64,6 +65,7 @@ export default function Profile() {
 
   return (
     <div className="profile">
+      <SEO title="Profile" path="/profile" noIndex />
       <h1 className="profile__title">My Profile</h1>
 
       {/* Display Name */}

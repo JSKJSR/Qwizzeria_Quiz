@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../hooks/useAuth';
 import { fetchGlobalLeaderboard } from '@qwizzeria/supabase-client/src/leaderboard.js';
+import SEO from '../components/SEO';
 import '../styles/Leaderboard.css';
 
 const TIME_FILTERS = [
@@ -50,6 +51,11 @@ export default function Leaderboard() {
 
   return (
     <div className="leaderboard">
+      <SEO
+        title="Leaderboard"
+        description="See the top quiz players on Qwizzeria. Compete for the highest scores across all quizzes."
+        path="/leaderboard"
+      />
       <h1 className="leaderboard__title">Leaderboard</h1>
 
       <div className="leaderboard__tabs">

@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /
+Disallow: /dashboard
+Disallow: /profile
+Disallow: /history
+Disallow: /host
+Disallow: /play/resume/
+Disallow: /admin/
+Sitemap: https://qwizzeria.com/sitemap.xml

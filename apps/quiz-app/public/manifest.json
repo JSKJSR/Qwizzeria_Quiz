@@ -1,0 +1,16 @@
+{
+  "name": "Qwizzeria",
+  "short_name": "Qwizzeria",
+  "description": "Turn any gathering into a smart game night. Play quizzes, compete with friends, and host unforgettable quiz sessions.",
+  "start_url": "/",
+  "display": "standalone",
+  "theme_color": "#be1332",
+  "background_color": "#1a1a2e",
+  "icons": [
+    {
+      "src": "/qwizzeria-logo.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

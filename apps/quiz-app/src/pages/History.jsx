@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import { fetchUserHistory, fetchSessionDetail } from '@qwizzeria/supabase-client/src/users.js';
+import SEO from '../components/SEO';
 import '../styles/History.css';
 
 export default function History() {
@@ -98,6 +99,7 @@ export default function History() {
 
   return (
     <div className="history">
+      <SEO title="History" path="/history" noIndex />
       <h1 className="history__title">Quiz History</h1>
 
       <div className="history__filters">
