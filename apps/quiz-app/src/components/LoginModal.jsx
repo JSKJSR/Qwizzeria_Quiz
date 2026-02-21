@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
-import { signInWithGoogle } from '@qwizzeria/supabase-client/src/auth.js';
 import '../styles/LoginModal.css';
 
 export default function LoginModal({ onClose, onSuccess, initialMode }) {
@@ -39,15 +38,6 @@ export default function LoginModal({ onClose, onSuccess, initialMode }) {
     }
   };
 
-  const handleGoogle = async () => {
-    setError(null);
-    try {
-      await signInWithGoogle();
-    } catch (err) {
-      setError(err.message);
-    }
-  };
-
   return (
     <div className="login-modal__overlay" onClick={onClose}>
       <div className="login-modal" onClick={(e) => e.stopPropagation()}>
@@ -63,14 +53,6 @@ export default function LoginModal({ onClose, onSuccess, initialMode }) {
             Create a free account to start hosting games instantly.
           </p>
         )}
-
-        <button className="login-modal__google-btn" onClick={handleGoogle} type="button">
-          Continue with Google
-        </button>
-
-        <div className="login-modal__divider">
-          <span>or</span>
-        </div>
 
         <form onSubmit={handleSubmit} className="login-modal__form">
           <label className="login-modal__label">
