@@ -4,10 +4,10 @@ import { useAuth } from '../hooks/useAuth';
 import { signInWithGoogle } from '@qwizzeria/supabase-client/src/auth.js';
 import '../styles/LoginModal.css';
 
-export default function LoginModal({ onClose, onSuccess }) {
+export default function LoginModal({ onClose, onSuccess, initialMode }) {
   const navigate = useNavigate();
   const { signIn, signUp } = useAuth();
-  const [mode, setMode] = useState('login'); // 'login' or 'signup'
+  const [mode, setMode] = useState(initialMode || 'login'); // 'login' or 'signup'
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState(null);
@@ -56,8 +56,13 @@ export default function LoginModal({ onClose, onSuccess }) {
         </button>
 
         <h2 className="login-modal__title">
-          {mode === 'login' ? 'Sign In' : 'Create Account'}
+          {mode === 'login' ? 'Sign In' : 'Unlock 50+ Quiz Packs'}
         </h2>
+        {mode === 'signup' && (
+          <p className="login-modal__subtitle">
+            Create a free account to start hosting games instantly.
+          </p>
+        )}
 
         <button className="login-modal__google-btn" onClick={handleGoogle} type="button">
           Continue with Google
@@ -97,9 +102,15 @@ export default function LoginModal({ onClose, onSuccess }) {
           {message && <div className="login-modal__message">{message}</div>}
 
           <button type="submit" className="login-modal__submit" disabled={loading}>
-            {loading ? 'Please wait...' : mode === 'login' ? 'Sign In' : 'Sign Up'}
+            {loading ? 'Please wait...' : mode === 'login' ? 'Sign In' : 'Create Free Account'}
           </button>
         </form>
+
+        {mode === 'signup' && (
+          <p className="login-modal__microcopy">
+            Free &middot; No credit card &middot; Takes 60 seconds
+          </p>
+        )}
 
         <p className="login-modal__toggle">
           {mode === 'login' ? (
