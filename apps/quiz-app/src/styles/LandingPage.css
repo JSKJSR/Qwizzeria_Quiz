@@ -34,6 +34,13 @@
   color: var(--text-primary);
 }
 
+.landing__auth-hint {
+  margin: 0.35rem 0 0;
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  text-align: right;
+}
+
 .landing__user-info {
   display: flex;
   align-items: center;

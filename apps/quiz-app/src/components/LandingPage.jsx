@@ -26,9 +26,12 @@ export default function LandingPage() {
             </button>
           </div>
         ) : (
-          <button className="landing__auth-btn" onClick={() => setShowLogin(true)}>
-            Sign In
-          </button>
+          <>
+            <button className="landing__auth-btn" onClick={() => setShowLogin(true)}>
+              Sign In
+            </button>
+            <p className="landing__auth-hint">Sign in to play quiz packs</p>
+          </>
         )}
       </div>
 
