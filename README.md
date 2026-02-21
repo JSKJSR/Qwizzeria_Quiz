@@ -100,3 +100,16 @@ Qwizzeria follows a **vibrant, dark-mode-first** aesthetic:
 ---
 
 © 2026 Qwizzeria Team. Built with ❤️ and high-performance React.
+
+What business decisions are hardest today because of data gaps?
+Where does your data governance or KPI framework break down today?
+What does success look like for this role in the first 6 months?
+What blocks your analysts the most today — data quality, speed, or stakeholder alignment?
+
+This role sits exactly where I deliver the most value: business strategy, analytics, and leadership. I bring structure to data and clarity to decision-making.
+
+I’ve led governance initiatives where the main goal was making data trustworthy at scale — defining ownership, documentation, and standards so reporting wasn’t constantly questioned
+
+At Pictet, I helped move data from being ‘project by project’ to a structured governance model leadership could trust. That changed how executives used reporting for risk and compliance decisions.
+
+I brought structure to how data moved across platforms and vendors so leadership could trust event reporting, not firefight data issues during competitions.

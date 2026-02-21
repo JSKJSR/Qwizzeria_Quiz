@@ -12,8 +12,8 @@ export default function LandingPage() {
   return (
     <main className="landing">
       <SEO
-        title="Qwizzeria — Turn Any Gathering Into a Smart Game Night"
-        description="Play beautifully designed quizzes, compete with friends, and host unforgettable quiz sessions in under 60 seconds."
+        title="Qwizzeria — Where Intelligence Meets Entertainment"
+        description="Qwizzeria is Switzerland’s premium knowledge entertainment brand that turns intelligence into experience."
         path="/"
       />
       {/* Auth area */}
@@ -44,7 +44,7 @@ export default function LandingPage() {
           Turn Any Gathering Into a Smart Game Night
         </h1>
         <p className="landing__subheadline">
-          Play beautifully designed quizzes. Learn something new. Compete with friends.
+          Qwizzeria is Switzerland’s premium knowledge entertainment brand that turns intelligence into experience.
           Host unforgettable quiz sessions in under 60 seconds.
         </p>
 
