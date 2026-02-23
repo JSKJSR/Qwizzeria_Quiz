@@ -45,55 +45,62 @@ export default function AuthProvider({ children }) {
       if (mounted) setLoading(false);
     }
 
-    async function initialize() {
-      const supabase = getSupabase();
-
-      // Handle OAuth redirect: if URL has #access_token, manually set the session
+    async function handleOAuthRedirect() {
       const hash = window.location.hash;
-      if (hash && hash.includes('access_token')) {
-        try {
-          const params = new URLSearchParams(hash.substring(1));
-          const accessToken = params.get('access_token');
-          const refreshToken = params.get('refresh_token');
+      if (!hash || !hash.includes('access_token')) return false;
 
-          if (accessToken && refreshToken) {
-            const { data, error } = await supabase.auth.setSession({
-              access_token: accessToken,
-              refresh_token: refreshToken,
-            });
-
-            // Clean up hash from URL
-            window.history.replaceState(null, '', window.location.pathname);
-
-            if (!error && data.session) {
-              await updateAuthState(data.session);
-              return; // Session set, onAuthStateChange will handle future changes
-            }
-          }
-        } catch (err) {
-          console.error('AuthProvider: OAuth hash processing failed:', err);
-        }
-        // If hash processing failed, clean up and fall through
-        window.history.replaceState(null, '', window.location.pathname);
-      }
-
-      // Normal flow: load existing session from storage
       try {
-        const { data: { session } } = await supabase.auth.getSession();
-        await updateAuthState(session);
+        const supabase = getSupabase();
+        const params = new URLSearchParams(hash.substring(1));
+        const accessToken = params.get('access_token');
+        const refreshToken = params.get('refresh_token');
+
+        if (accessToken && refreshToken) {
+          const { data, error } = await supabase.auth.setSession({
+            access_token: accessToken,
+            refresh_token: refreshToken,
+          });
+
+          // Clean up hash from URL
+          window.history.replaceState(null, '', window.location.pathname);
+
+          if (!error && data.session) {
+            await updateAuthState(data.session);
+            return true;
+          }
+        }
       } catch (err) {
-        console.error('AuthProvider: getSession failed:', err);
-        if (mounted) setLoading(false);
+        console.error('AuthProvider: OAuth hash processing failed:', err);
       }
+      // Clean up hash on failure
+      window.history.replaceState(null, '', window.location.pathname);
+      return false;
     }
 
-    // Listen for ongoing auth changes (sign in/out, token refresh)
-    const unsubscribe = onAuthStateChange((_event, session) => {
+    // onAuthStateChange fires INITIAL_SESSION on startup — this is the
+    // most reliable way to recover a persisted session on hard refresh.
+    // We use it as the primary session recovery mechanism.
+    let initialized = false;
+
+    const unsubscribe = onAuthStateChange((event, session) => {
+      if (event === 'INITIAL_SESSION') {
+        initialized = true;
+      }
       updateAuthState(session);
     });
 
-    // Run initialization
-    initialize();
+    // Handle OAuth redirect separately (hash-based flow)
+    handleOAuthRedirect().then((handled) => {
+      if (handled) return;
+      // Safety fallback: if INITIAL_SESSION hasn't fired after 3s,
+      // force-resolve loading to avoid indefinite spinner
+      setTimeout(() => {
+        if (!initialized && mounted) {
+          console.warn('AuthProvider: INITIAL_SESSION timeout, forcing load complete');
+          setLoading(false);
+        }
+      }, 3000);
+    });
 
     return () => {
       mounted = false;

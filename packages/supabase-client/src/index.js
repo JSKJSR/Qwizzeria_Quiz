@@ -17,6 +17,12 @@ export function initSupabase(supabaseUrl, supabaseAnonKey) {
     auth: {
       autoRefreshToken: true,
       persistSession: true,
+      storage: {
+        getItem: (key) => globalThis.localStorage?.getItem(key) ?? null,
+        setItem: (key, value) => globalThis.localStorage?.setItem(key, value),
+        removeItem: (key) => globalThis.localStorage?.removeItem(key),
+      },
+      detectSessionInUrl: true,
     },
   });
 
