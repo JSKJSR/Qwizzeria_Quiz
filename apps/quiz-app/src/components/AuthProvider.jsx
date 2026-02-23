@@ -13,15 +13,16 @@ function isSupabaseConfigured() {
   }
 }
 
-const SUPABASE_AVAILABLE = isSupabaseConfigured();
-
 export default function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [role, setRole] = useState('user');
-  const [loading, setLoading] = useState(SUPABASE_AVAILABLE);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!SUPABASE_AVAILABLE) return;
+    if (!isSupabaseConfigured()) {
+      setLoading(false);
+      return;
+    }
 
     let mounted = true;
 
