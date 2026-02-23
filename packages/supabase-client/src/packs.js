@@ -240,6 +240,33 @@ export async function fetchPackCategories() {
 // ============================================================
 
 /**
+ * Browse host packs (is_host=true) for the Host Quiz flow.
+ * Requires admin/editor/superadmin role (RLS enforced at DB level).
+ */
+export async function browseHostPacks({ category } = {}) {
+  const supabase = getSupabase();
+
+  let query = supabase
+    .from('quiz_packs')
+    .select('id, title, description, cover_image_url, category, is_premium, question_count, play_count')
+    .eq('is_host', true)
+    .eq('status', 'active')
+    .order('title', { ascending: true });
+
+  if (category) {
+    query = query.eq('category', category);
+  }
+
+  const { data, error } = await query;
+
+  if (error) {
+    throw new Error(`Failed to browse host packs: ${error.message}`);
+  }
+
+  return data || [];
+}
+
+/**
  * Browse public active packs, optionally filtered by category/premium.
  */
 export async function browsePublicPacks({ category, isPremium } = {}) {

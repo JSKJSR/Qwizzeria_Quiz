@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { browsePublicPacks, fetchPackCategories, fetchPackPlayQuestions } from '@qwizzeria/supabase-client/src/packs.js';
+import { browseHostPacks, fetchPackCategories, fetchPackPlayQuestions } from '@qwizzeria/supabase-client/src/packs.js';
 
 export default function HostPackSelect({ onSelectPack }) {
   const [packs, setPacks] = useState([]);
@@ -17,7 +17,7 @@ export default function HostPackSelect({ onSelectPack }) {
     let cancelled = false;
     setLoading(true);
 
-    browsePublicPacks({ category: categoryFilter || undefined })
+    browseHostPacks({ category: categoryFilter || undefined })
       .then((data) => {
         if (!cancelled) {
           setPacks(data);

@@ -1,10 +1,10 @@
 import { useState, useCallback } from 'react';
 
-const MIN_PLAYERS = 2;
+const MIN_PLAYERS = 1;
 const MAX_PLAYERS = 8;
 
 export default function HostParticipantSetup({ pack, questionCount, onStart, onChangePack }) {
-  const [names, setNames] = useState(['', '']);
+  const [names, setNames] = useState(['']);
 
   const handleNameChange = useCallback((index, value) => {
     setNames(prev => prev.map((n, i) => i === index ? value : n));
@@ -70,7 +70,7 @@ export default function HostParticipantSetup({ pack, questionCount, onStart, onC
 
         {names.length < MAX_PLAYERS && (
           <button className="host-setup__add-btn" onClick={handleAddPlayer}>
-            + Add more
+            + Add more (up to {MAX_PLAYERS})
           </button>
         )}
       </div>
