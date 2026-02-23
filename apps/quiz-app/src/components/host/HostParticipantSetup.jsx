@@ -42,18 +42,18 @@ export default function HostParticipantSetup({ pack, questionCount, onStart, onC
         </button>
       </div>
 
-      <h1 className="host-setup__title">Player Setup</h1>
+      <h1 className="host-setup__title">Player / Team Setup</h1>
 
       <div className="host-setup__players">
         {names.map((name, i) => (
           <div key={i} className="host-setup__player-row">
-            <span className="host-setup__player-label">Player {i + 1}</span>
+            <span className="host-setup__player-label">Player / Team {i + 1}</span>
             <input
               className="host-setup__player-input"
               type="text"
               value={name}
               onChange={(e) => handleNameChange(i, e.target.value)}
-              placeholder={`Player ${i + 1} name`}
+              placeholder={`Player / Team ${i + 1} name`}
               maxLength={30}
             />
             {names.length > MIN_PLAYERS && (
@@ -70,7 +70,7 @@ export default function HostParticipantSetup({ pack, questionCount, onStart, onC
 
         {names.length < MAX_PLAYERS && (
           <button className="host-setup__add-btn" onClick={handleAddPlayer}>
-            + Add Player
+            + Add more
           </button>
         )}
       </div>
