@@ -34,11 +34,6 @@ export default function DashboardHome() {
       </div>
 
       <div className="dash-home__actions">
-        <Link to="/play/free" className="dash-home__action-card">
-          <span className="dash-home__action-icon">&#9654;</span>
-          <span className="dash-home__action-title">Play Free Quiz</span>
-          <span className="dash-home__action-desc">Quick 3x3 Jeopardy grid with random questions</span>
-        </Link>
         <Link to="/host" className="dash-home__action-card">
           <span className="dash-home__action-icon">&#127918;</span>
           <span className="dash-home__action-title">Host a Quiz</span>
@@ -46,7 +41,7 @@ export default function DashboardHome() {
         </Link>
         <Link to="/packs" className="dash-home__action-card">
           <span className="dash-home__action-icon">&#11088;</span>
-          <span className="dash-home__action-title">Browse Packs</span>
+          <span className="dash-home__action-title">Browse Quiz Packs</span>
           <span className="dash-home__action-desc">Curated quiz packs by category and difficulty</span>
         </Link>
       </div>
@@ -59,7 +54,7 @@ export default function DashboardHome() {
               <div key={session.id} className="dash-home__resume-card">
                 <div className="dash-home__resume-info">
                   <div className="dash-home__resume-pack">
-                    {session.is_free_quiz ? 'Free Quiz' : session.quiz_packs?.title || 'Quiz Pack'}
+                    {session.is_free_quiz ? 'Surprise Me!' : session.quiz_packs?.title || 'Quiz Pack'}
                   </div>
                   <div className="dash-home__resume-meta">
                     Score: {session.score || 0} / {session.total_questions * 10} &middot;{' '}

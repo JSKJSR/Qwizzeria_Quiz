@@ -5,7 +5,7 @@ export default function FreeQuizPage() {
   return (
     <>
       <SEO
-        title="Free Quiz"
+        title="Surprise Me!"
         description="Play a free Jeopardy-style quiz with random questions. Test your knowledge across multiple categories."
         path="/play/free"
       />

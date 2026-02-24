@@ -5,7 +5,7 @@ import '../styles/DashboardLayout.css';
 
 const NAV_ITEMS = [
   { to: '/dashboard', icon: '\u2302', label: 'Home' },
-  { to: '/play/free', icon: '\u25B6', label: 'Play Quiz' },
+  { to: '/play/free', icon: '\u25B6', label: 'Surprise Me!' },
   { to: '/host', icon: '\uD83C\uDFAE', label: 'Host Quiz' },
   { to: '/packs', icon: '\u2B50', label: 'Browse Packs' },
   { to: '/profile', icon: '\uD83D\uDC64', label: 'Profile' },
