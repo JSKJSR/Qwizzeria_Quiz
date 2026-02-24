@@ -24,6 +24,7 @@ const ACTIONS = {
   AWARD_POINTS: 'AWARD_POINTS',
   NO_POINTS: 'NO_POINTS',
   SKIP_QUESTION: 'SKIP_QUESTION',
+  ADJUST_SCORE: 'ADJUST_SCORE',
   END_MATCH: 'END_MATCH',
 };
 
@@ -116,6 +117,14 @@ function reducer(state, action) {
         skippedQuestions: [...state.skippedQuestions, state.selectedQuestion],
         selectedQuestion: null,
       };
+
+    case ACTIONS.ADJUST_SCORE: {
+      const { participantIndex: adjIdx, delta } = action;
+      const adjParticipants = state.participants.map((p, i) =>
+        i === adjIdx ? { ...p, score: p.score + delta } : p
+      );
+      return { ...state, participants: adjParticipants };
+    }
 
     case ACTIONS.END_MATCH:
       return { ...state, phase: 'completed' };
@@ -262,6 +271,10 @@ export default function TournamentMatchPage() {
 
   const handleSkipAnswer = useCallback(() => {
     dispatch({ type: ACTIONS.SKIP_QUESTION });
+  }, []);
+
+  const handleAdjustScore = useCallback((participantIndex, delta) => {
+    dispatch({ type: ACTIONS.ADJUST_SCORE, participantIndex, delta });
   }, []);
 
   // Persist and end match
@@ -444,7 +457,7 @@ export default function TournamentMatchPage() {
       <HostScoreboard
         participants={participants}
         onEndQuiz={handleEndMatch}
-        onAdjustScore={null}
+        onAdjustScore={handleAdjustScore}
         showEndQuiz={phase === 'grid'}
         endButtonLabel="END MATCH"
         matchLabel={matchLabel}

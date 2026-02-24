@@ -49,6 +49,7 @@ const ACTIONS = {
   MATCH_AWARD_POINTS: 'MATCH_AWARD_POINTS',
   MATCH_NO_POINTS: 'MATCH_NO_POINTS',
   MATCH_SKIP_QUESTION: 'MATCH_SKIP_QUESTION',
+  MATCH_ADJUST_SCORE: 'MATCH_ADJUST_SCORE',
   END_MATCH: 'END_MATCH',
   DECLARE_WINNER: 'DECLARE_WINNER',
   SET_TOURNAMENT_ID: 'SET_TOURNAMENT_ID',
@@ -325,6 +326,14 @@ function reducer(state, action) {
         matchSkippedQuestions: [...state.matchSkippedQuestions, state.selectedQuestion],
         selectedQuestion: null,
       };
+
+    case ACTIONS.MATCH_ADJUST_SCORE: {
+      const { participantIndex: adjIdx, delta } = action;
+      const adjMatchParticipants = state.matchParticipants.map((p, i) =>
+        i === adjIdx ? { ...p, score: p.score + delta } : p
+      );
+      return { ...state, matchParticipants: adjMatchParticipants };
+    }
 
     case ACTIONS.END_MATCH: {
       const { winnerTeamIndex } = action;
@@ -647,8 +656,7 @@ export default function HostQuiz() {
   }, []);
 
   const handleMatchAdjustScore = useCallback((participantIndex, delta) => {
-    // Adjust match participant scores directly
-    dispatch({ type: ACTIONS.MATCH_AWARD_POINTS, participantIndex, delta });
+    dispatch({ type: ACTIONS.MATCH_ADJUST_SCORE, participantIndex, delta });
   }, []);
 
   const matchParticipantsRef = useRef(state.matchParticipants);
