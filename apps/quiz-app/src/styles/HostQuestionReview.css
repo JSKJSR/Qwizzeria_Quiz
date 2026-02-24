@@ -1,0 +1,94 @@
+.host-review {
+  padding: 1.5rem;
+  max-width: 900px;
+  margin: 0 auto;
+  flex: 1;
+  overflow-y: auto;
+}
+
+.host-review__title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 0.25rem;
+}
+
+.host-review__summary {
+  font-size: 0.9rem;
+  color: var(--text-secondary, #b0a0a5);
+  margin-bottom: 1.5rem;
+}
+
+.host-review__list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  margin-bottom: 2rem;
+}
+
+.host-review__category-name {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--accent-primary, #be1332);
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.host-review__card {
+  padding: 0.75rem 1rem;
+  background: var(--bg-card, #1a1015);
+  border: 1px solid var(--border-color, #2a1520);
+  border-radius: var(--radius-sm, 8px);
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.host-review__card--skipped {
+  border-style: dashed;
+  border-color: rgba(190, 19, 50, 0.4);
+}
+
+.host-review__card--unanswered {
+  opacity: 0.4;
+}
+
+.host-review__question-text {
+  flex: 1;
+  font-size: 0.95rem;
+  color: var(--text-primary, #f0f0f0);
+  line-height: 1.4;
+}
+
+.host-review__badge {
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  white-space: nowrap;
+}
+
+.host-review__badge--skipped {
+  background: rgba(190, 19, 50, 0.15);
+  color: var(--accent-primary, #be1332);
+}
+
+.host-review__badge--unanswered {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-muted, #665555);
+}
+
+.host-review__actions {
+  display: flex;
+  justify-content: center;
+  padding-bottom: 2rem;
+}
+
+@media (max-width: 768px) {
+  .host-review {
+    padding: 1rem;
+  }
+}

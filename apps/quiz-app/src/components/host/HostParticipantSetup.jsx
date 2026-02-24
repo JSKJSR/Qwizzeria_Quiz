@@ -3,7 +3,7 @@ import { useState, useCallback } from 'react';
 const MIN_PLAYERS = 1;
 const MAX_PLAYERS = 16;
 const MIN_TOURNAMENT_PLAYERS = 2;
-const DEFAULT_QUESTIONS_PER_MATCH = 5;
+const DEFAULT_QUESTIONS_PER_MATCH = 6;
 
 export default function HostParticipantSetup({ pack, questionCount, onStart, onChangePack }) {
   const [names, setNames] = useState(['']);

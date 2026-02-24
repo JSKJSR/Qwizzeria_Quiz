@@ -24,6 +24,7 @@ import HostTopicGrid from './HostTopicGrid';
 import HostScoreboard from './HostScoreboard';
 import HostAnswerView from './HostAnswerView';
 import HostResultsView from './HostResultsView';
+import HostQuestionReview from './HostQuestionReview';
 import TournamentBracket from './TournamentBracket';
 import QuestionView from '../QuestionView';
 import '../../styles/HostQuiz.css';
@@ -38,6 +39,7 @@ const ACTIONS = {
   SKIP_QUESTION: 'SKIP_QUESTION',
   ADJUST_SCORE: 'ADJUST_SCORE',
   END_QUIZ: 'END_QUIZ',
+  CONFIRM_END_QUIZ: 'CONFIRM_END_QUIZ',
   PLAY_AGAIN: 'PLAY_AGAIN',
   RESET_QUIZ: 'RESET_QUIZ',
   RESTORE_SESSION: 'RESTORE_SESSION',
@@ -57,7 +59,7 @@ const ACTIONS = {
 };
 
 const initialState = {
-  phase: 'packSelect', // packSelect | setup | grid | question | answer | results | bracket | matchGrid | matchQuestion | matchAnswer | tournamentResults
+  phase: 'packSelect', // packSelect | setup | grid | question | answer | review | results | bracket | matchGrid | matchQuestion | matchAnswer | tournamentResults
   pack: null,
   topics: [],
   allQuestions: [],
@@ -198,6 +200,9 @@ function reducer(state, action) {
     }
 
     case ACTIONS.END_QUIZ:
+      return { ...state, phase: 'review' };
+
+    case ACTIONS.CONFIRM_END_QUIZ:
       return { ...state, phase: 'results' };
 
     case ACTIONS.PLAY_AGAIN:
@@ -494,7 +499,7 @@ export default function HostQuiz() {
     restoredRef.current = true;
 
     const saved = loadHostSession();
-    if (saved && saved.phase !== 'packSelect' && saved.phase !== 'results' && saved.phase !== 'tournamentResults') {
+    if (saved && saved.phase !== 'packSelect' && saved.phase !== 'review' && saved.phase !== 'results' && saved.phase !== 'tournamentResults') {
       // Tournament mode: redirect to bracket page (DB is source of truth)
       if (saved.mode === 'tournament' && saved.tournamentId) {
         const resume = window.confirm('You have an active tournament. Return to the bracket?');
@@ -517,7 +522,7 @@ export default function HostQuiz() {
 
   // Debounced session persistence
   useEffect(() => {
-    if (state.phase === 'packSelect' || state.phase === 'results' || state.phase === 'tournamentResults') return;
+    if (state.phase === 'packSelect' || state.phase === 'review' || state.phase === 'results' || state.phase === 'tournamentResults') return;
 
     if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
     saveTimerRef.current = setTimeout(() => {
@@ -605,6 +610,10 @@ export default function HostQuiz() {
   }, []);
 
   const handleEndQuiz = useCallback(() => {
+    dispatch({ type: ACTIONS.END_QUIZ });
+  }, []);
+
+  const handleConfirmEndQuiz = useCallback(() => {
     if (user?.id && state.pack?.id) {
       saveHostQuizSession({
         userId: user.id,
@@ -613,7 +622,7 @@ export default function HostQuiz() {
         completedQuestionIds: state.completedQuestionIds,
       }).catch(err => console.warn('Failed to save host quiz session:', err));
     }
-    dispatch({ type: ACTIONS.END_QUIZ });
+    dispatch({ type: ACTIONS.CONFIRM_END_QUIZ });
     clearHostSession();
   }, [user, state.pack, state.participants, state.completedQuestionIds]);
 
@@ -756,6 +765,26 @@ export default function HostQuiz() {
           questionCount={totalQuestions}
           onStart={handleStartQuiz}
           onChangePack={handleChangePack}
+        />
+      </div>
+    );
+  }
+
+  // --- Question Review (before results) ---
+  if (phase === 'review') {
+    return (
+      <div className="host-quiz host-quiz--fullscreen">
+        <HostScoreboard
+          participants={participants}
+          onEndQuiz={handleEndQuiz}
+          onAdjustScore={handleAdjustScore}
+          showEndQuiz={false}
+        />
+        <HostQuestionReview
+          topics={topics}
+          completedQuestionIds={completedQuestionIds}
+          skippedQuestions={skippedQuestions}
+          onConfirmEnd={handleConfirmEndQuiz}
         />
       </div>
     );
