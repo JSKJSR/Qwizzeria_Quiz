@@ -15,6 +15,8 @@ import History from '../pages/History';
 import Leaderboard from '../pages/Leaderboard';
 import ResumePlay from '../pages/ResumePlay';
 import HostQuizPage from '../pages/HostQuizPage';
+import TournamentBracketPage from '../pages/TournamentBracketPage';
+import TournamentMatchPage from '../pages/TournamentMatchPage';
 
 // Admin pages
 import AdminDashboard from '../pages/admin/Dashboard';
@@ -50,6 +52,10 @@ export default function App() {
             <Route path="/history" element={<History />} />
             <Route path="/host" element={<HostQuizPage />} />
           </Route>
+
+          {/* Tournament routes (full-screen, no sidebar) */}
+          <Route path="/host/tournament/:tournamentId" element={<TournamentBracketPage />} />
+          <Route path="/host/tournament/:tournamentId/match/:matchId" element={<TournamentMatchPage />} />
 
           {/* Admin CMS routes (editor+ only) */}
           <Route path="/admin" element={<AdminRoute />}>

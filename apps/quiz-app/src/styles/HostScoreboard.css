@@ -14,6 +14,16 @@
   flex-shrink: 0;
 }
 
+.scoreboard__match-label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--accent-primary, #be1332);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
 .scoreboard__teams {
   display: flex;
   justify-content: center;

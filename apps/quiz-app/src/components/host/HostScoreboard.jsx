@@ -10,7 +10,7 @@ const ADJUST_OPTIONS = [
   { label: '+10', delta: 10 },
 ];
 
-export default function HostScoreboard({ participants, onEndQuiz, onAdjustScore, showEndQuiz }) {
+export default function HostScoreboard({ participants, onEndQuiz, onAdjustScore, showEndQuiz, endButtonLabel = 'END QUIZ', matchLabel }) {
   const maxScore = Math.max(...participants.map(p => p.score), 0);
   const hasScores = maxScore > 0;
   const [openPopover, setOpenPopover] = useState(null);
@@ -41,6 +41,9 @@ export default function HostScoreboard({ participants, onEndQuiz, onAdjustScore,
         onError={(e) => { e.target.src = '/qwizzeria-logo.svg'; }}
       />
       <TimerControl />
+      {matchLabel && (
+        <div className="scoreboard__match-label">{matchLabel}</div>
+      )}
       <div className="scoreboard__teams">
         {participants.map((p, i) => (
           <div
@@ -80,7 +83,7 @@ export default function HostScoreboard({ participants, onEndQuiz, onAdjustScore,
       </div>
       {showEndQuiz && (
         <button className="scoreboard__end-btn" onClick={onEndQuiz}>
-          END QUIZ
+          {endButtonLabel}
         </button>
       )}
     </div>
