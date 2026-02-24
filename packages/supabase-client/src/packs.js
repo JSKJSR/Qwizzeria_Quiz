@@ -332,19 +332,30 @@ export async function browsePublicPacks({ category, isPremium, userRole } = {}) 
 }
 
 /**
- * Fetch a single public pack's metadata.
+ * Fetch a single pack's metadata (role-aware).
+ * @param {string} id - Pack UUID
+ * @param {object} [opts]
+ * @param {string} [opts.userRole] - Caller's role (user/premium/editor/admin/superadmin)
  */
-export async function fetchPublicPackById(id) {
+export async function fetchPublicPackById(id, { userRole } = {}) {
   const supabase = getSupabase();
 
-  const { data, error } = await supabase
+  let query = supabase
     .from('quiz_packs')
-    .select('id, title, description, cover_image_url, category, is_premium, question_count, play_count, pack_questions(count)')
+    .select('id, title, description, cover_image_url, category, is_premium, is_host, question_count, play_count, pack_questions(count)')
     .eq('id', id)
-    .eq('is_public', true)
-    .eq('status', 'active')
-    .eq('is_host', false)
-    .single();
+    .eq('status', 'active');
+
+  // Admin/editor/superadmin: no extra filters — RLS + status=active is sufficient
+  if (['admin', 'superadmin', 'editor'].includes(userRole)) {
+    // See any active pack
+  } else if (userRole === 'premium') {
+    query = query.eq('is_host', false);
+  } else {
+    query = query.eq('is_public', true).eq('is_host', false).eq('is_premium', false);
+  }
+
+  const { data, error } = await query.single();
 
   if (error) {
     throw new Error(`Failed to fetch pack: ${error.message}`);

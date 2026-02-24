@@ -11,7 +11,7 @@ import '../styles/Leaderboard.css';
 export default function PackDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { user, isPremium: isPremiumUser, loading: authLoading } = useAuth();
+  const { user, role, isPremium: isPremiumUser, loading: authLoading } = useAuth();
 
   const [pack, setPack] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -21,7 +21,7 @@ export default function PackDetail() {
 
   useEffect(() => {
     let cancelled = false;
-    fetchPublicPackById(id)
+    fetchPublicPackById(id, { userRole: role })
       .then((data) => { if (!cancelled) setPack(data); })
       .catch((err) => { if (!cancelled) setError(err.message); })
       .finally(() => { if (!cancelled) setLoading(false); });
@@ -32,7 +32,7 @@ export default function PackDetail() {
       .catch(() => { });
 
     return () => { cancelled = true; };
-  }, [id]);
+  }, [id, role]);
 
   if (loading || authLoading) {
     return (
