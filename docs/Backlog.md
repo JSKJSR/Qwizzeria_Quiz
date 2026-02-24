@@ -1,4 +1,4 @@
-FEATURE: reveal all questions at the end of quiz before end quiz.
+
 Feature: We want a feature that when a quiz is hosted, there is a read only url generated which only shows the questions and nothing else, there will be a provision to have a QR code attched with this URL
 Feature: in tournament mode, allow each bracket to choose a quiz pack,
 - Qwizzeria logo as watermark.
@@ -11,7 +11,6 @@ Questions migration:
 ## Fix: In tournament mode, host is unable to award points from the dashboard.
 ## Feature: Limit the grid on a host quiz to 100 questions, a quiz pack can have 200+ questions
   Summary Table
-
     ┌───────────────────┬─────────────┬─────────────────────────────────────────────────┐
     │                   │  Standard   │             Tournament (per match)              │
     ├───────────────────┼─────────────┼─────────────────────────────────────────────────┤
@@ -22,4 +21,24 @@ Questions migration:
     │ Team limit        │ 2–8 players │ 2–16 teams                                      │
     ├───────────────────┼─────────────┼─────────────────────────────────────────────────┤
     │ Question reuse    │ N/A         │ Auto-reshuffles if pool runs out                │
-    └───────────────────┴─────────────┴─────────────────────────────────────────────────┘##
+    └───────────────────┴─────────────┴─────────────────────────────────────────────────┘
+
+## FEATURE: reveal all questions at the end of quiz before end quiz.
+
+
+Tools I actually use daily:
+
+• Google Trends for niche research
+• Namelix for page names
+• ChatGPT for content + bios
+• Nano Banana for logos
+• ViralFindr for proven content
+• Canva AI for post creation
+• CapCut for video content
+• Later(.com) for scheduling
+
+Total cost: $100-200/month for everything.
+
+Your Stats
+
+h
