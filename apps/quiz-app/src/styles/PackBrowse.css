@@ -130,6 +130,11 @@
   color: #ffd700;
 }
 
+.pack-browse__badge--host {
+  background: rgba(76, 175, 80, 0.15);
+  color: #4caf50;
+}
+
 .pack-browse__badge--category {
   background: rgba(232, 92, 26, 0.15);
   color: var(--accent-secondary, #e85c1a);

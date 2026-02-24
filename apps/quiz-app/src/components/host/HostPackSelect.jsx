@@ -1,7 +1,9 @@
 import { useState, useEffect, useCallback } from 'react';
 import { browseHostPacks, fetchPackCategories, fetchPackPlayQuestions } from '@qwizzeria/supabase-client/src/packs.js';
+import { useAuth } from '../../hooks/useAuth';
 
 export default function HostPackSelect({ onSelectPack }) {
+  const { role } = useAuth();
   const [packs, setPacks] = useState([]);
   const [categories, setCategories] = useState([]);
   const [categoryFilter, setCategoryFilter] = useState('');
@@ -17,7 +19,7 @@ export default function HostPackSelect({ onSelectPack }) {
     let cancelled = false;
     setLoading(true);
 
-    browseHostPacks({ category: categoryFilter || undefined })
+    browseHostPacks({ category: categoryFilter || undefined, userRole: role })
       .then((data) => {
         if (!cancelled) {
           setPacks(data);
@@ -35,7 +37,7 @@ export default function HostPackSelect({ onSelectPack }) {
       });
 
     return () => { cancelled = true; };
-  }, [categoryFilter]);
+  }, [categoryFilter, role]);
 
   const handleSelectPack = useCallback(async (pack) => {
     if (loadingPack) return;

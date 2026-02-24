@@ -243,15 +243,20 @@ export async function fetchPackCategories() {
  * Browse host packs (is_host=true) for the Host Quiz flow.
  * Requires admin/editor/superadmin role (RLS enforced at DB level).
  */
-export async function browseHostPacks({ category } = {}) {
+export async function browseHostPacks({ category, userRole } = {}) {
   const supabase = getSupabase();
 
   let query = supabase
     .from('quiz_packs')
-    .select('id, title, description, cover_image_url, category, is_premium, question_count, play_count')
-    .eq('is_host', true)
+    .select('id, title, description, cover_image_url, category, is_premium, is_host, question_count, play_count')
     .eq('status', 'active')
     .order('title', { ascending: true });
+
+  // Admin/editor/superadmin: show all active packs (host + public + premium)
+  // Other roles: show only host packs (RLS will filter appropriately)
+  if (!['admin', 'superadmin', 'editor'].includes(userRole)) {
+    query = query.eq('is_host', true);
+  }
 
   if (category) {
     query = query.eq('category', category);
@@ -267,18 +272,42 @@ export async function browseHostPacks({ category } = {}) {
 }
 
 /**
- * Browse public active packs, optionally filtered by category/premium.
+ * Browse packs visible to the current user, optionally filtered by category.
+ *
+ * Visibility is role-aware (RLS enforces DB-level access, but the query
+ * must not over-filter with hard-coded column checks for elevated roles):
+ *
+ *   Role          Premium  Host  Public
+ *   superadmin    Yes      Yes   Yes
+ *   admin         Yes      Yes   Yes
+ *   editor        Yes      Yes   Yes
+ *   premium       Yes      No    Yes
+ *   user          No       No    Yes
+ *
+ * @param {object} [opts]
+ * @param {string} [opts.category]
+ * @param {boolean} [opts.isPremium]
+ * @param {string} [opts.userRole] - Caller's role (user/premium/editor/admin/superadmin)
  */
-export async function browsePublicPacks({ category, isPremium } = {}) {
+export async function browsePublicPacks({ category, isPremium, userRole } = {}) {
   const supabase = getSupabase();
 
   let query = supabase
     .from('quiz_packs')
-    .select('id, title, description, cover_image_url, category, is_premium, question_count, play_count')
-    .eq('is_public', true)
+    .select('id, title, description, cover_image_url, category, is_premium, is_host, question_count, play_count')
     .eq('status', 'active')
-    .eq('is_host', false)
     .order('play_count', { ascending: false });
+
+  // Admin/editor/superadmin: no extra filters — RLS + status=active is sufficient
+  if (['admin', 'superadmin', 'editor'].includes(userRole)) {
+    // See all active packs (public, premium, host)
+  } else if (userRole === 'premium') {
+    // Premium users see public + premium packs, but NOT host packs
+    query = query.eq('is_host', false);
+  } else {
+    // Regular users: only public, non-host, non-premium
+    query = query.eq('is_public', true).eq('is_host', false).eq('is_premium', false);
+  }
 
   if (category) {
     query = query.eq('category', category);

@@ -8,7 +8,7 @@ import '../styles/PackBrowse.css';
 
 export default function PackBrowse() {
   const navigate = useNavigate();
-  const { user, isPremium: isPremiumUser } = useAuth();
+  const { user, role, isPremium: isPremiumUser } = useAuth();
   const [packs, setPacks] = useState([]);
   const [categories, setCategories] = useState([]);
   const [categoryFilter, setCategoryFilter] = useState('');
@@ -22,12 +22,12 @@ export default function PackBrowse() {
 
   useEffect(() => {
     let cancelled = false;
-    browsePublicPacks({ category: categoryFilter || undefined })
+    browsePublicPacks({ category: categoryFilter || undefined, userRole: role })
       .then((data) => { if (!cancelled) setPacks(data); })
       .catch(() => { if (!cancelled) setPacks([]); })
       .finally(() => { if (!cancelled) setLoading(false); });
     return () => { cancelled = true; };
-  }, [categoryFilter]);
+  }, [categoryFilter, role]);
 
   const handleCardClick = (pack) => {
     if (pack.is_premium && !isPremiumUser) return;
@@ -94,6 +94,11 @@ export default function PackBrowse() {
                 )}
                 <div className="pack-browse__card-body">
                   <div className="pack-browse__card-badges">
+                    {pack.is_host && (
+                      <span className="pack-browse__badge pack-browse__badge--host">
+                        Host
+                      </span>
+                    )}
                     {pack.is_premium && (
                       <span className="pack-browse__badge pack-browse__badge--premium">
                         {isLocked ? '🔒 ' : ''}Premium
