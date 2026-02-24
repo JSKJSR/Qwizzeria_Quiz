@@ -248,7 +248,7 @@ export async function browseHostPacks({ category, userRole } = {}) {
 
   let query = supabase
     .from('quiz_packs')
-    .select('id, title, description, cover_image_url, category, is_premium, is_host, question_count, play_count')
+    .select('id, title, description, cover_image_url, category, is_premium, is_host, question_count, play_count, pack_questions(count)')
     .eq('status', 'active')
     .order('title', { ascending: true });
 
@@ -268,7 +268,10 @@ export async function browseHostPacks({ category, userRole } = {}) {
     throw new Error(`Failed to browse host packs: ${error.message}`);
   }
 
-  return data || [];
+  return (data || []).map(({ pack_questions, ...rest }) => ({
+    ...rest,
+    question_count: pack_questions?.[0]?.count ?? rest.question_count,
+  }));
 }
 
 /**
@@ -294,7 +297,7 @@ export async function browsePublicPacks({ category, isPremium, userRole } = {}) 
 
   let query = supabase
     .from('quiz_packs')
-    .select('id, title, description, cover_image_url, category, is_premium, is_host, question_count, play_count')
+    .select('id, title, description, cover_image_url, category, is_premium, is_host, question_count, play_count, pack_questions(count)')
     .eq('status', 'active')
     .order('play_count', { ascending: false });
 
@@ -322,7 +325,10 @@ export async function browsePublicPacks({ category, isPremium, userRole } = {}) 
     throw new Error(`Failed to browse packs: ${error.message}`);
   }
 
-  return data || [];
+  return (data || []).map(({ pack_questions, ...rest }) => ({
+    ...rest,
+    question_count: pack_questions?.[0]?.count ?? rest.question_count,
+  }));
 }
 
 /**
@@ -333,7 +339,7 @@ export async function fetchPublicPackById(id) {
 
   const { data, error } = await supabase
     .from('quiz_packs')
-    .select('id, title, description, cover_image_url, category, is_premium, question_count, play_count')
+    .select('id, title, description, cover_image_url, category, is_premium, question_count, play_count, pack_questions(count)')
     .eq('id', id)
     .eq('is_public', true)
     .eq('status', 'active')
@@ -344,7 +350,11 @@ export async function fetchPublicPackById(id) {
     throw new Error(`Failed to fetch pack: ${error.message}`);
   }
 
-  return data;
+  const { pack_questions, ...rest } = data;
+  return {
+    ...rest,
+    question_count: pack_questions?.[0]?.count ?? rest.question_count,
+  };
 }
 
 /**
