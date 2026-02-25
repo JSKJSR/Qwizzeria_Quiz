@@ -7,69 +7,83 @@
   margin: 0 auto;
 }
 
-.profile__header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 2rem;
-  padding-bottom: 1rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-}
-
-.profile__logo {
-  height: 36px;
-}
-
-.profile__back-btn {
-  background: none;
-  border: none;
-  color: #aaa;
-  font-size: 0.9rem;
-  cursor: pointer;
-}
-
-.profile__back-btn:hover {
-  color: #fff;
-}
-
 .profile__title {
   font-size: 1.5rem;
   margin-bottom: 1.5rem;
 }
 
-/* Name editing */
-.profile__name-section {
-  margin-bottom: 2rem;
+/* Sections */
+.profile__section {
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 1.5rem 0;
 }
 
-.profile__name-label {
-  font-size: 0.85rem;
-  color: #999;
-  margin-bottom: 0.5rem;
-  display: block;
+.profile__section--danger {
+  border-top-color: rgba(220, 38, 38, 0.3);
 }
 
-.profile__name-row {
+.profile__section-header {
   display: flex;
-  gap: 0.75rem;
   align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 1.25rem;
 }
 
-.profile__name-input {
-  flex: 1;
+.profile__section-header h2 {
+  font-size: 1.1rem;
+  margin: 0;
+}
+
+.profile__section-header svg {
+  color: #999;
+  flex-shrink: 0;
+}
+
+/* Form fields */
+.profile__field {
+  margin-bottom: 1rem;
+}
+
+.profile__field-label {
+  display: block;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #999;
+  margin-bottom: 0.4rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.profile__input {
+  width: 100%;
   padding: 0.6rem 1rem;
   background: rgba(255, 255, 255, 0.06);
   border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: 8px;
   color: #fff;
   font-size: 1rem;
+  box-sizing: border-box;
 }
 
-.profile__name-input:focus {
+.profile__input:focus {
   outline: none;
   border-color: var(--accent-primary, #be1332);
 }
 
+.profile__input--readonly {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.profile__input--danger {
+  border-color: rgba(220, 38, 38, 0.5);
+}
+
+.profile__input--danger:focus {
+  border-color: #dc2626;
+}
+
+/* Save button (full-width) */
 .profile__save-btn {
   padding: 0.6rem 1.25rem;
   background: var(--accent-primary, #be1332);
@@ -78,6 +92,13 @@
   border-radius: 8px;
   cursor: pointer;
   font-size: 0.9rem;
+}
+
+.profile__save-btn--full {
+  width: 100%;
+  margin-top: 0.5rem;
+  padding: 0.7rem;
+  font-weight: 600;
 }
 
 .profile__save-btn:hover {
@@ -89,12 +110,26 @@
   cursor: not-allowed;
 }
 
+/* Feedback messages */
+.profile__feedback {
+  font-size: 0.85rem;
+  margin-top: 0.5rem;
+}
+
+.profile__feedback--success {
+  color: #22c55e;
+}
+
+.profile__feedback--error {
+  color: #ef4444;
+}
+
 /* Stats grid */
 .profile__stats {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
   gap: 1rem;
-  margin-bottom: 2rem;
+  margin-bottom: 1.25rem;
 }
 
 .profile__stat-card {
@@ -121,7 +156,6 @@
 .profile__actions {
   display: flex;
   gap: 1rem;
-  margin-bottom: 2rem;
   flex-wrap: wrap;
 }
 
@@ -140,56 +174,78 @@
   border-color: var(--accent-primary, #be1332);
 }
 
-/* Resume section */
-.profile__resume-title {
-  font-size: 1.1rem;
+/* Danger / Delete */
+.profile__danger-text {
+  font-size: 0.85rem;
+  color: #999;
   margin-bottom: 1rem;
+  line-height: 1.5;
 }
 
-.profile__resume-list {
+.profile__delete-btn {
+  width: 100%;
+  padding: 0.7rem;
+  background: transparent;
+  color: #dc2626;
+  border: 1px solid rgba(220, 38, 38, 0.5);
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 600;
+  transition: background 0.2s, border-color 0.2s;
+}
+
+.profile__delete-btn:hover {
+  background: rgba(220, 38, 38, 0.1);
+  border-color: #dc2626;
+}
+
+.profile__delete-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.profile__delete-btn--confirm {
+  background: #dc2626;
+  color: #fff;
+  border-color: #dc2626;
+}
+
+.profile__delete-btn--confirm:hover {
+  background: #b91c1c;
+}
+
+.profile__delete-btn--cancel {
+  color: #999;
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+.profile__delete-btn--cancel:hover {
+  background: rgba(255, 255, 255, 0.06);
+  color: #fff;
+}
+
+.profile__delete-confirm {
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
 }
 
-.profile__resume-card {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  background: var(--bg-card, #1a1015);
-  border-radius: 10px;
-  padding: 1rem 1.25rem;
-  border: 1px solid rgba(255, 255, 255, 0.06);
+.profile__delete-confirm-text {
+  font-size: 0.9rem;
+  color: #ccc;
 }
 
-.profile__resume-info {
+.profile__delete-actions {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.profile__delete-actions .profile__delete-btn {
   flex: 1;
 }
 
-.profile__resume-pack {
-  font-weight: 600;
-  margin-bottom: 0.25rem;
-}
-
-.profile__resume-meta {
-  font-size: 0.8rem;
-  color: #999;
-}
-
-.profile__resume-btn {
-  padding: 0.5rem 1rem;
-  background: var(--accent-primary, #be1332);
-  color: #fff;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: 0.85rem;
-}
-
-.profile__resume-btn:hover {
-  opacity: 0.85;
-}
-
+/* Empty / Loading */
 .profile__empty {
   color: #777;
   font-size: 0.9rem;

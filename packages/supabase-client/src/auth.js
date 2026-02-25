@@ -83,6 +83,31 @@ export async function getCurrentUser() {
 }
 
 /**
+ * Update the current user's password.
+ */
+export async function updatePassword(newPassword) {
+  const supabase = getSupabase();
+  const { data, error } = await supabase.auth.updateUser({ password: newPassword });
+
+  if (error) {
+    throw new Error(error.message);
+  }
+  return data;
+}
+
+/**
+ * Delete the current user's account via the delete_own_account RPC.
+ */
+export async function deleteOwnAccount() {
+  const supabase = getSupabase();
+  const { error } = await supabase.rpc('delete_own_account');
+
+  if (error) {
+    throw new Error(error.message);
+  }
+}
+
+/**
  * Subscribe to auth state changes.
  * Returns an unsubscribe function.
  */

@@ -41,4 +41,5 @@ Total cost: $100-200/month for everything.
 
 Your Stats
 
-h
+Try AI Studio
+Convert any document into a quiz instantly
