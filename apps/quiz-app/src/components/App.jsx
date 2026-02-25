@@ -15,6 +15,7 @@ import History from '../pages/History';
 import Leaderboard from '../pages/Leaderboard';
 import ResumePlay from '../pages/ResumePlay';
 import HostQuizPage from '../pages/HostQuizPage';
+import Guide from '../pages/Guide';
 import TournamentBracketPage from '../pages/TournamentBracketPage';
 import TournamentMatchPage from '../pages/TournamentMatchPage';
 
@@ -51,6 +52,7 @@ export default function App() {
             <Route path="/profile" element={<Profile />} />
             <Route path="/history" element={<History />} />
             <Route path="/host" element={<HostQuizPage />} />
+            <Route path="/guide" element={<Guide />} />
           </Route>
 
           {/* Tournament routes (full-screen, no sidebar) */}

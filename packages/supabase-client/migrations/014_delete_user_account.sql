@@ -23,3 +23,4 @@ BEGIN
   DELETE FROM auth.users WHERE id = uid;
 END;
 $$;
+1

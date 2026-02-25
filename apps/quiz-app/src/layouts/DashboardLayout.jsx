@@ -11,6 +11,7 @@ const NAV_ITEMS = [
   { to: '/packs', icon: '\u2B50', label: 'Browse Packs' },
   { to: '/history', icon: '\uD83D\uDCCB', label: 'History' },
   { to: '/leaderboard', icon: '\uD83C\uDFC6', label: 'Leaderboard' },
+  { to: '/guide', icon: '\u2753', label: 'How to Play' },
 ];
 
 const ADMIN_NAV_ITEM = { to: '/admin', icon: '\u2699', label: 'Admin Panel' };
