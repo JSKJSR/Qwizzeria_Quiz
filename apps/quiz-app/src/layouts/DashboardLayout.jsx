@@ -5,10 +5,10 @@ import '../styles/DashboardLayout.css';
 
 const NAV_ITEMS = [
   { to: '/dashboard', icon: '\u2302', label: 'Home' },
+  { to: '/profile', icon: '\uD83D\uDC64', label: 'Profile' },
   { to: '/play/free', icon: '\u25B6', label: 'Surprise Me!' },
   { to: '/host', icon: '\uD83C\uDFAE', label: 'Host Quiz' },
   { to: '/packs', icon: '\u2B50', label: 'Browse Packs' },
-  { to: '/profile', icon: '\uD83D\uDC64', label: 'Profile' },
   { to: '/history', icon: '\uD83D\uDCCB', label: 'History' },
   { to: '/leaderboard', icon: '\uD83C\uDFC6', label: 'Leaderboard' },
 ];
