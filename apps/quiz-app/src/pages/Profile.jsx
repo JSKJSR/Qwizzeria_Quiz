@@ -16,6 +16,8 @@ export default function Profile() {
   const [saving, setSaving] = useState(false);
   const [saveMsg, setSaveMsg] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [retryKey, setRetryKey] = useState(0);
 
   // Password state
   const [newPassword, setNewPassword] = useState('');
@@ -32,6 +34,7 @@ export default function Profile() {
     if (!user) return;
 
     async function load() {
+      setError(null);
       try {
         const [profileData, statsData] = await Promise.all([
           fetchUserProfile(user.id).catch(() => null),
@@ -41,13 +44,13 @@ export default function Profile() {
         setDisplayName(profileData?.display_name || '');
         setStats(statsData);
       } catch {
-        // Non-critical
+        setError('Failed to load profile. Please try again.');
       } finally {
         setLoading(false);
       }
     }
     load();
-  }, [user]);
+  }, [user, retryKey]);
 
   const handleSaveName = async () => {
     if (!displayName.trim() || !user) return;
@@ -108,6 +111,18 @@ export default function Profile() {
         <div className="profile__loading">
           <div className="profile__spinner" />
           <p>Loading profile...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="profile">
+        <h1 className="profile__title">Settings</h1>
+        <div className="profile__error">
+          <p>{error}</p>
+          <button className="profile__retry-btn" onClick={() => { setLoading(true); setRetryKey(k => k + 1); }}>Try Again</button>
         </div>
       </div>
     );

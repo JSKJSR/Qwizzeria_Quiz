@@ -178,6 +178,19 @@
   gap: 1rem;
 }
 
+.pack-browse__error { text-align: center; padding: 3rem; color: #999; }
+.pack-browse__retry-btn {
+  margin-top: 1rem;
+  padding: 0.6rem 1.2rem;
+  background: var(--accent-primary, #be1332);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+.pack-browse__retry-btn:hover { opacity: 0.85; }
+
 .pack-browse__spinner {
   width: 40px;
   height: 40px;

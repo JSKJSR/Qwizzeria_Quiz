@@ -1,0 +1,6 @@
+{
+  "buildCommand": "npm run build",
+  "outputDirectory": "apps/quiz-app/dist",
+  "installCommand": "npm ci",
+  "framework": "vite"
+}

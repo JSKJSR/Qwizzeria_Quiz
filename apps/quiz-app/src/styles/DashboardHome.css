@@ -255,6 +255,27 @@
   opacity: 0.85;
 }
 
+.dash-home__error {
+  text-align: center;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  background: rgba(190, 19, 50, 0.08);
+  border: 1px solid rgba(190, 19, 50, 0.2);
+  border-radius: 8px;
+  color: #999;
+}
+.dash-home__retry-btn {
+  margin-top: 0.75rem;
+  padding: 0.6rem 1.2rem;
+  background: var(--accent-primary, #be1332);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+.dash-home__retry-btn:hover { opacity: 0.85; }
+
 .dash-home__empty {
   color: var(--text-muted, #665555);
   font-size: 0.9rem;

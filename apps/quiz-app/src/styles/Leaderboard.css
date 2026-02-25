@@ -144,6 +144,20 @@
 }
 
 /* Pack leaderboard (mini version on PackDetail) */
+.leaderboard__error { text-align: center; padding: 3rem; color: #999; }
+.leaderboard__retry-btn {
+  margin-top: 1rem;
+  padding: 0.6rem 1.2rem;
+  background: var(--accent-primary, #be1332);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+.leaderboard__retry-btn:hover { opacity: 0.85; }
+
+/* Pack leaderboard (mini version on PackDetail) */
 .pack-leaderboard {
   margin-top: 2rem;
 }

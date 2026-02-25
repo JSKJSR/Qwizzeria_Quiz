@@ -16,6 +16,7 @@ export default function DashboardHome() {
   const [resumable, setResumable] = useState([]);
   const [stats, setStats] = useState(null);
   const [weeklyRank, setWeeklyRank] = useState(null);
+  const [error, setError] = useState(null);
   const [collapsed, setCollapsed] = useState(() => {
     try { return localStorage.getItem(COLLAPSE_KEY) === 'true'; } catch { return false; }
   });
@@ -38,7 +39,7 @@ export default function DashboardHome() {
         const idx = leaderboard.findIndex(e => e.user_id === user.id);
         setWeeklyRank(idx >= 0 ? idx + 1 : null);
       }
-    }).catch(() => { /* ignore */ });
+    }).catch(() => { if (!cancelled) setError('Failed to load dashboard data.'); });
 
     return () => { cancelled = true; };
   }, [user]);
@@ -77,6 +78,13 @@ export default function DashboardHome() {
         <h1 className="dash-home__greeting">Welcome back, {displayName}</h1>
         <p className="dash-home__subtitle">Ready for your next quiz challenge?</p>
       </div>
+
+      {error && (
+        <div className="dash-home__error">
+          <p>{error}</p>
+          <button className="dash-home__retry-btn" onClick={() => window.location.reload()}>Try Again</button>
+        </div>
+      )}
 
       <div className="dash-home__actions">
         <Link to="/host" className="dash-home__action-card">

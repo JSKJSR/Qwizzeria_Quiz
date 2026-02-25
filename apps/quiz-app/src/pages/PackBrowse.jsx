@@ -13,6 +13,8 @@ export default function PackBrowse() {
   const [categories, setCategories] = useState([]);
   const [categoryFilter, setCategoryFilter] = useState('');
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [retryKey, setRetryKey] = useState(0);
   const [showLogin, setShowLogin] = useState(false);
   const [pendingPackId, setPendingPackId] = useState(null);
 
@@ -23,11 +25,11 @@ export default function PackBrowse() {
   useEffect(() => {
     let cancelled = false;
     browsePublicPacks({ category: categoryFilter || undefined, userRole: role })
-      .then((data) => { if (!cancelled) setPacks(data); })
-      .catch(() => { if (!cancelled) setPacks([]); })
+      .then((data) => { if (!cancelled) { setError(null); setPacks(data); } })
+      .catch(() => { if (!cancelled) { setPacks([]); setError('Failed to load quiz packs. Please try again.'); } })
       .finally(() => { if (!cancelled) setLoading(false); });
     return () => { cancelled = true; };
-  }, [categoryFilter, role]);
+  }, [categoryFilter, role, retryKey]);
 
   const handleCardClick = (pack) => {
     if (pack.is_premium && !isPremiumUser) return;
@@ -61,7 +63,12 @@ export default function PackBrowse() {
         </select>
       </div>
 
-      {loading ? (
+      {error ? (
+        <div className="pack-browse__error">
+          <p>{error}</p>
+          <button className="pack-browse__retry-btn" onClick={() => { setLoading(true); setRetryKey(k => k + 1); }}>Try Again</button>
+        </div>
+      ) : loading ? (
         <div className="pack-browse__loading">
           <div className="pack-browse__spinner" />
           <p>Loading packs...</p>

@@ -16,6 +16,8 @@ export default function Leaderboard() {
   const [timeFilter, setTimeFilter] = useState('all_time');
   const [entries, setEntries] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [retryKey, setRetryKey] = useState(0);
 
   useEffect(() => {
     let cancelled = false;
@@ -23,19 +25,21 @@ export default function Leaderboard() {
     fetchGlobalLeaderboard(timeFilter, 50)
       .then((data) => {
         if (!cancelled) {
+          setError(null);
           setEntries(data || []);
           setLoading(false);
         }
       })
       .catch(() => {
         if (!cancelled) {
+          setError('Failed to load leaderboard. Please try again.');
           setEntries([]);
           setLoading(false);
         }
       });
 
     return () => { cancelled = true; };
-  }, [timeFilter]);
+  }, [timeFilter, retryKey]);
 
   const handleFilterChange = useCallback((key) => {
     setLoading(true);
@@ -70,7 +74,12 @@ export default function Leaderboard() {
         ))}
       </div>
 
-      {loading ? (
+      {error ? (
+        <div className="leaderboard__error">
+          <p>{error}</p>
+          <button className="leaderboard__retry-btn" onClick={() => { setLoading(true); setRetryKey(k => k + 1); }}>Try Again</button>
+        </div>
+      ) : loading ? (
         <div className="leaderboard__loading">
           <div className="leaderboard__spinner" />
           <p>Loading leaderboard...</p>

@@ -15,6 +15,7 @@ export default function History() {
   const [typeFilter, setTypeFilter] = useState('all');
   const [statusFilter, setStatusFilter] = useState('all');
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [expandedId, setExpandedId] = useState(null);
   const [detailCache, setDetailCache] = useState({});
   const [detailLoading, setDetailLoading] = useState(null);
@@ -30,12 +31,14 @@ export default function History() {
     fetchUserHistory({ userId: user.id, type: typeFilter, status: statusFilter, page, pageSize })
       .then(({ data, count }) => {
         if (!cancelled) {
+          setError(null);
           setSessions(data);
           setTotalCount(count);
         }
       })
       .catch(() => {
         if (!cancelled) {
+          setError('Failed to load quiz history. Please try again.');
           setSessions([]);
           setTotalCount(0);
         }
@@ -92,6 +95,18 @@ export default function History() {
         <div className="history__loading">
           <div className="history__spinner" />
           <p>Loading history...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="history">
+        <h1 className="history__title">Quiz History</h1>
+        <div className="history__error">
+          <p>{error}</p>
+          <button className="history__retry-btn" onClick={() => { setError(null); setLoading(true); setPage(1); }}>Try Again</button>
         </div>
       </div>
     );
