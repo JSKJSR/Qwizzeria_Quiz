@@ -27,7 +27,9 @@
 }
 
 .dashboard__sidebar-logo {
-  height: 48px;
+  height: 72px;
+  width: auto;
+  object-fit: contain;
 }
 
 .dashboard__sidebar-tagline {
