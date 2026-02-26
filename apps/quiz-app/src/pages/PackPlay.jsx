@@ -10,7 +10,7 @@ import '../styles/PackPlay.css';
 export default function PackPlay() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { user, isPremium: isPremiumUser } = useAuth();
+  const { user, role, isPremium: isPremiumUser } = useAuth();
 
   const [pack, setPack] = useState(null);
   const [questions, setQuestions] = useState([]);
@@ -23,7 +23,7 @@ export default function PackPlay() {
       setLoading(true);
       try {
         const [packData, qs] = await Promise.all([
-          fetchPublicPackById(id),
+          fetchPublicPackById(id, { userRole: role }),
           fetchPackPlayQuestions(id),
         ]);
 
@@ -42,7 +42,7 @@ export default function PackPlay() {
       }
     }
     load();
-  }, [id, isPremiumUser, navigate]);
+  }, [id, role, isPremiumUser, navigate]);
 
   if (loading) {
     return (
