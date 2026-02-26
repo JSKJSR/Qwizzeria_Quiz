@@ -88,9 +88,11 @@ export default function Leaderboard() {
           ))}
         </div>
       ) : entries.length === 0 ? (
-        <p className="leaderboard__empty">
-          No leaderboard data yet. Play some quizzes to appear here!
-        </p>
+        <div className="branded-empty">
+          <img src="/qwizzeria-logo.png" alt="" className="branded-empty__logo" onError={(e) => { e.target.src = '/qwizzeria-logo.svg'; }} />
+          <p className="branded-empty__message">No leaderboard data yet.</p>
+          <p className="branded-empty__hint">Play some quizzes to climb the ranks!</p>
+        </div>
       ) : (
         <table className="leaderboard__table">
           <thead>

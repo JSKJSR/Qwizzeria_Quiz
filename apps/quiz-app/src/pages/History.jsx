@@ -135,9 +135,11 @@ export default function History() {
       </div>
 
       {sessions.length === 0 ? (
-        <p className="history__empty">
-          No quiz sessions found. Play a quiz to see your history here!
-        </p>
+        <div className="branded-empty">
+          <img src="/qwizzeria-logo.png" alt="" className="branded-empty__logo" onError={(e) => { e.target.src = '/qwizzeria-logo.svg'; }} />
+          <p className="branded-empty__message">No quiz sessions found.</p>
+          <p className="branded-empty__hint">Your Qwizzeria journey starts here — play a quiz!</p>
+        </div>
       ) : (
         <>
           <div className="history__list">

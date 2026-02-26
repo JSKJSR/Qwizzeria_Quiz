@@ -68,8 +68,10 @@ export default function PackBrowse() {
           ))}
         </div>
       ) : packs.length === 0 ? (
-        <div className="pack-browse__empty">
-          <p>No quiz packs available yet. Check back soon!</p>
+        <div className="branded-empty">
+          <img src="/qwizzeria-logo.png" alt="" className="branded-empty__logo" onError={(e) => { e.target.src = '/qwizzeria-logo.svg'; }} />
+          <p className="branded-empty__message">No quiz packs available yet.</p>
+          <p className="branded-empty__hint">Check back soon — new packs are always brewing!</p>
         </div>
       ) : (
         <div className="pack-browse__grid">

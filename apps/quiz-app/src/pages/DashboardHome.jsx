@@ -75,6 +75,12 @@ export default function DashboardHome() {
     <div className="dash-home">
       <SEO title="Dashboard" path="/dashboard" noIndex />
       <div className="dash-home__welcome">
+        <img
+          src="/qwizzeria-logo.png"
+          alt="Qwizzeria"
+          className="dash-home__welcome-logo"
+          onError={(e) => { e.target.src = '/qwizzeria-logo.svg'; }}
+        />
         <h1 className="dash-home__greeting">Welcome back, {displayName}</h1>
         <p className="dash-home__subtitle">Ready for your next quiz challenge?</p>
       </div>

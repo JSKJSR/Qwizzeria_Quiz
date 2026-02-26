@@ -85,6 +85,7 @@ export default function DashboardLayout() {
             className="dashboard__sidebar-logo"
             onError={(e) => { e.target.src = '/qwizzeria-logo.svg'; }}
           />
+          <span className="dashboard__sidebar-tagline">I learn, therefore I am</span>
         </div>
 
         <nav className="dashboard__nav">

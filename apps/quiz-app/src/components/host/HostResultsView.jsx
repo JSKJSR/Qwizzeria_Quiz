@@ -75,6 +75,11 @@ export default function HostResultsView({ participants, skippedQuestions = [], o
           New Quiz
         </button>
       </div>
+
+      <div className="results-watermark">
+        <img src="/qwizzeria-logo.png" alt="" className="results-watermark__logo" onError={(e) => { e.target.src = '/qwizzeria-logo.svg'; }} />
+        <span className="results-watermark__tagline">I learn, therefore I am</span>
+      </div>
     </div>
   );
 }

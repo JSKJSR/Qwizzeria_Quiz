@@ -6,6 +6,16 @@
 
 .dash-home__welcome {
   margin-bottom: 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.25rem;
+}
+
+.dash-home__welcome-logo {
+  height: 72px;
+  width: auto;
+  margin-bottom: 0.5rem;
 }
 
 .dash-home__greeting {

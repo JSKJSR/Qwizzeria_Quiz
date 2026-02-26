@@ -21,10 +21,20 @@
 .dashboard__sidebar-header {
   padding: 1.25rem 1.5rem;
   border-bottom: 1px solid var(--border-color, #2a1520);
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
 }
 
 .dashboard__sidebar-logo {
-  height: 32px;
+  height: 48px;
+}
+
+.dashboard__sidebar-tagline {
+  font-size: 0.65rem;
+  font-style: italic;
+  color: var(--text-muted, #998888);
+  letter-spacing: 0.03em;
 }
 
 /* Navigation */
@@ -182,7 +192,7 @@
 }
 
 .dashboard__mobile-logo {
-  height: 28px;
+  height: 36px;
 }
 
 /* Mobile overlay */
