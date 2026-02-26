@@ -2,21 +2,18 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import { browsePublicPacks, fetchPackCategories } from '@qwizzeria/supabase-client/src/packs.js';
-import LoginModal from '../components/LoginModal';
 import SEO from '../components/SEO';
 import '../styles/PackBrowse.css';
 
 export default function PackBrowse() {
   const navigate = useNavigate();
-  const { user, role, isPremium: isPremiumUser } = useAuth();
+  const { role, isPremium: isPremiumUser } = useAuth();
   const [packs, setPacks] = useState([]);
   const [categories, setCategories] = useState([]);
   const [categoryFilter, setCategoryFilter] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [retryKey, setRetryKey] = useState(0);
-  const [showLogin, setShowLogin] = useState(false);
-  const [pendingPackId, setPendingPackId] = useState(null);
 
   useEffect(() => {
     fetchPackCategories().then(setCategories).catch(() => { });
@@ -33,11 +30,6 @@ export default function PackBrowse() {
 
   const handleCardClick = (pack) => {
     if (pack.is_premium && !isPremiumUser) return;
-    if (!user) {
-      setPendingPackId(pack.id);
-      setShowLogin(true);
-      return;
-    }
     navigate(`/packs/${pack.id}`);
   };
 
@@ -136,18 +128,6 @@ export default function PackBrowse() {
             );
           })}
         </div>
-      )}
-      {showLogin && (
-        <LoginModal
-          onClose={() => { setShowLogin(false); setPendingPackId(null); }}
-          onSuccess={() => {
-            setShowLogin(false);
-            if (pendingPackId) {
-              navigate(`/packs/${pendingPackId}`);
-              setPendingPackId(null);
-            }
-          }}
-        />
       )}
     </div>
   );

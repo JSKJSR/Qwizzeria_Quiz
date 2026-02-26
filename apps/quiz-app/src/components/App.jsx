@@ -38,14 +38,14 @@ export default function App() {
 
         {/* Public routes: accessible without login */}
         <Route path="/play/free" element={<FreeQuizPage />} />
-        <Route path="/packs" element={<PackBrowse />} />
-        <Route path="/leaderboard" element={<Leaderboard />} />
 
         {/* All protected routes */}
         <Route element={<ProtectedRoute />}>
           {/* Quiz app routes with sidebar layout */}
           <Route element={<DashboardLayout />}>
             <Route path="/dashboard" element={<DashboardHome />} />
+            <Route path="/packs" element={<PackBrowse />} />
+            <Route path="/leaderboard" element={<Leaderboard />} />
             <Route path="/play/resume/:sessionId" element={<ResumePlay />} />
             <Route path="/packs/:id" element={<PackDetail />} />
             <Route path="/packs/:id/play" element={<PackPlay />} />
