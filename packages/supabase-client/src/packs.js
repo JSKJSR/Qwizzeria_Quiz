@@ -12,7 +12,7 @@ export async function fetchAllPacks({ category, status, search, page = 1, pageSi
 
   let query = supabase
     .from('quiz_packs')
-    .select('*', { count: 'exact' });
+    .select('*, pack_questions(count)', { count: 'exact' });
 
   if (category) {
     query = query.eq('category', category);
@@ -35,7 +35,12 @@ export async function fetchAllPacks({ category, status, search, page = 1, pageSi
     throw new Error(`Failed to fetch packs: ${error.message}`);
   }
 
-  return { data: data || [], count: count || 0, page, pageSize };
+  const packs = (data || []).map(({ pack_questions, ...rest }) => ({
+    ...rest,
+    question_count: pack_questions?.[0]?.count ?? rest.question_count,
+  }));
+
+  return { data: packs, count: count || 0, page, pageSize };
 }
 
 /**
