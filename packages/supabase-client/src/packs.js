@@ -241,6 +241,30 @@ export async function fetchPackCategories() {
 }
 
 // ============================================================
+// Public showcase (landing page)
+// ============================================================
+
+/**
+ * Fetch all active packs for the landing page carousel (display only).
+ * No role-based filtering — this is a read-only preview.
+ */
+export async function fetchShowcasePacks() {
+  const supabase = getSupabase();
+
+  const { data, error } = await supabase
+    .from('quiz_packs')
+    .select('id, title, cover_image_url, category, question_count')
+    .eq('status', 'active')
+    .order('play_count', { ascending: false });
+
+  if (error) {
+    throw new Error(`Failed to fetch showcase packs: ${error.message}`);
+  }
+
+  return data || [];
+}
+
+// ============================================================
 // User-facing functions
 // ============================================================
 

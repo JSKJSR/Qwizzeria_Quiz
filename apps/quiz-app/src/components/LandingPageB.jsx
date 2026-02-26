@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
-import { browsePublicPacks } from '@qwizzeria/supabase-client/src/packs.js';
+import { fetchShowcasePacks } from '@qwizzeria/supabase-client/src/packs.js';
 import LoginModal from './LoginModal';
 import SEO from './SEO';
 import '../styles/LandingPageB.css';
@@ -16,7 +16,7 @@ export default function LandingPageB() {
   const trackRef = useRef(null);
 
   useEffect(() => {
-    browsePublicPacks().then(setPacks).catch(() => {});
+    fetchShowcasePacks().then(setPacks).catch(() => {});
   }, []);
 
   const scrollCarousel = useCallback((dir) => {
