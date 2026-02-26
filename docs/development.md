@@ -62,6 +62,13 @@ npm run test
 cd apps/quiz-app && npx vitest run
 ```
 
+### Current Coverage (53 tests, 5 files)
+- `mediaDetector.test.js` — Media URL detection (7 tests)
+- `tournamentBracket.test.js` — Bracket generation, seeding, advancement (36 tests)
+- `hostSessionPersistence.test.js` — localStorage save/load/clear (7 tests)
+- `AuthContext.test.js` — Auth provider initialization (1 test)
+- `supabaseClient.test.js` — Supabase client configuration (2 tests)
+
 ### Coverage Goals
 - Core state machines (`useReducer`).
 - RBAC helper functions.
@@ -73,14 +80,17 @@ cd apps/quiz-app && npx vitest run
 
 ### Database Migrations
 Migrations are stored in `packages/supabase-client/migrations`. 
-**Note**: At this time, migrations must be run manually via the Supabase SQL Editor in the following order:
-1. `001_initial_schema.sql`
-2. `002_...`
-...
-6. `006_rbac.sql`
+**Note**: Migrations must be run manually via the Supabase SQL Editor in order:
+1. `001_initial_schema.sql` through `015_showcase_packs_policy.sql`
 
 ### CI/CD
-The project is optimized for deployment on platforms like Vercel or Netlify via the Turborepo build pipeline.
+The project includes a GitHub Actions pipeline (`.github/workflows/ci.yml`) that runs on every push/PR to `main`:
+1. `npm ci` — Install dependencies
+2. `npm run lint` — Lint all packages
+3. `npm run build` — Build all packages
+4. `npm run test` — Run test suite (53 tests)
+
+Production deployment is configured for **Vercel** via `vercel.json` (output: `apps/quiz-app/dist`). Set `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` as environment variables in the Vercel dashboard.
 
 ---
 

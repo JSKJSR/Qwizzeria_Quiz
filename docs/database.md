@@ -69,9 +69,19 @@ We use database functions for performance-critical logic:
 
 Every table has **Row-Level Security (RLS)** enabled:
 
-- **Public Access**: Tables like `quiz_packs` and `questions_master` allow `SELECT` only where `is_public = true` and `status = 'active'`.
+- **Pack Visibility**: `quiz_packs` allows `SELECT` for all active packs (`status = 'active'`) to everyone, including anonymous users. This enables the landing page showcase carousel. Admin/superadmin can see all packs (including drafts). **Playback is gated at the app layer** by role checks (premium, host, public filters in `browsePublicPacks` / `fetchPublicPackById`).
+- **Question Access**: `questions_master` allows `SELECT` only where `is_public = true` and `status = 'active'`. Question content remains protected even though pack metadata is public.
 - **Admin Bypass**: Policies use helper functions like `is_admin()` and `is_superadmin()` to allow full access to authorized accounts.
 - **Editor Grants**: Users with the `editor` role can only `UPDATE` resources where an explicit row exists in `content_permissions`.
+
+### Pack Access Matrix (App-Layer Enforcement)
+
+| Role | Public Packs | Premium Packs | Host Packs |
+|------|-------------|---------------|------------|
+| anonymous | See metadata only | See metadata only | See metadata only |
+| user | Play | See only | See only |
+| premium | Play | Play | See only |
+| editor/admin/superadmin | Play | Play | Play |
 
 ---
 

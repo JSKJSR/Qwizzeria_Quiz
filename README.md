@@ -13,6 +13,7 @@ Qwizzeria is a high-performance, premium quiz platform built with a modern tech 
 ## 🚀 Key Features
 
 ### 🎮 Player Experience
+- **Landing Page Showcase**: Browse all available quiz packs with cover images in a scrollable carousel — no login required.
 - **Jeopardy & Sequential Formats**: Choose how you want to play curated quiz packs.
 - **Multisided Multiplayer**: Host live quiz sessions with a dedicated teacher/host view and participant scoring.
 - **Resume Anywhere**: In-progress sessions are synced, allowing users to pick up where they left off.
@@ -50,7 +51,8 @@ packages/
 - **Frontend**: React 19, Vite, Vanilla CSS (Design-driven).
 - **Backend**: Supabase (Auth, Postgres, Real-time).
 - **Orchestration**: Turborepo, npm workspaces.
-- **Testing**: Vitest for core logic verification.
+- **Testing**: Vitest (53 tests across 5 files).
+- **CI/CD**: GitHub Actions (lint → build → test) + Vercel deployment.
 
 ---
 

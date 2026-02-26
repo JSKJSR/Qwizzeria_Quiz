@@ -26,21 +26,22 @@ packages/
 
 ## Quiz App Routes (apps/quiz-app)
 
-All authenticated routes use `ProtectedRoute` + `DashboardLayout` (sidebar). Unauthenticated users see the Landing page.
+Authenticated routes use `ProtectedRoute` + `DashboardLayout` (sidebar). Unauthenticated users see the Landing page. Only `/play/free` is publicly accessible without login.
 
 | Route                      | Page/Component      | Description                            |
 |----------------------------|---------------------|----------------------------------------|
 | `/`                        | AuthRedirect        | Landing (unauthenticated) or redirect to /dashboard (authenticated) |
+| `/play/free`               | FreeQuizPage        | Flat card grid, random questions (public, no login required) |
 | `/dashboard`               | DashboardHome       | Welcome, quick actions, resumable sessions |
-| `/play/free`               | FreeQuizPage        | Flat card grid, random questions        |
 | `/play/resume/:sessionId`  | ResumePlay          | Resume an in-progress quiz session     |
-| `/packs`                   | PackBrowse          | Grid of public packs, category filter  |
+| `/packs`                   | PackBrowse          | Grid of packs with category filter (requires login, sidebar) |
 | `/packs/:id`               | PackDetail          | Pack info, premium gate, pack leaderboard, "Start Quiz" |
 | `/packs/:id/play`          | PackPlay            | Format selection → Jeopardy or Sequential |
 | `/profile`                 | Profile             | User stats, display name, resumable sessions |
 | `/history`                 | History             | Paginated session history with expandable details |
-| `/leaderboard`             | Leaderboard         | Global leaderboard with time filters   |
+| `/leaderboard`             | Leaderboard         | Global leaderboard with time filters (requires login, sidebar) |
 | `/host`                    | HostQuizPage        | Host multiplayer quiz: pack select → setup → grid → score → results |
+| `/guide`                   | Guide               | How to Play guide |
 
 ## Admin CMS Routes (apps/admin-cms)
 
@@ -78,7 +79,8 @@ All authenticated routes use `ProtectedRoute` + `DashboardLayout` (sidebar). Una
   - Answer view with participant point-awarding buttons
   - Session persistence in localStorage (24h expiry)
   - Full-screen overlay (`position: fixed; inset: 0; z-index: 200`)
-- **Pack visibility**: Packs default to `is_public=false, status='draft'`. Must set `is_public=true` AND `status='active'` (via Admin CMS) for users to see them.
+- **Landing page**: LandingPageB with hero section + pack carousel (fetches all active packs via `fetchShowcasePacks`)
+- **Pack visibility**: Packs default to `is_public=false, status='draft'`. Must set `status='active'` (via Admin CMS) for packs to be visible. RLS allows all active packs to be read by everyone (including anonymous); app-layer role checks control who can actually play (premium/host gating).
 - **Session tracking**: createQuizSession → recordAttempt → completeQuizSession (non-blocking)
 - **Session lifecycle**: in_progress → completed (on finish) or abandoned (on quit)
 - **Resume**: Sessions store metadata (question_ids, format) in JSONB; ResumePlay restores state
@@ -106,7 +108,7 @@ All authenticated routes use `ProtectedRoute` + `DashboardLayout` (sidebar). Una
 
 ## RLS Policies (Key)
 
-- `quiz_packs`: Public+active readable by everyone. Admin has full CRUD. Editors can read/write granted packs.
+- `quiz_packs`: All active packs readable by everyone (including anonymous). Admin sees all packs (including drafts). Admin has full CRUD. Editors can read/write granted packs.
 - `pack_questions`: Readable if parent pack is public+active, or user is admin, or editor with grant.
 - `questions_master`: Public+active readable by all. Admin has full CRUD. Editors can read/write granted categories.
 - `user_profiles`: Users read own. Admins read all. Superadmin can update any (role assignment).
@@ -129,7 +131,7 @@ All authenticated routes use `ProtectedRoute` + `DashboardLayout` (sidebar). Una
 - `npm run dev` — Start all dev servers (quiz-app :5173, admin-cms :5174)
 - `npm run build` — Build all packages
 - `npm run lint` — Lint all packages
-- `cd apps/quiz-app && npx vitest run` — Run tests (10 tests)
+- `cd apps/quiz-app && npx vitest run` — Run tests (53 tests across 5 files)
 
 ## Key Component Files
 
@@ -146,6 +148,8 @@ All authenticated routes use `ProtectedRoute` + `DashboardLayout` (sidebar). Una
 - `apps/quiz-app/src/components/AuthRedirect.jsx` — Landing or redirect to /dashboard
 - `apps/quiz-app/src/layouts/DashboardLayout.jsx` — Sidebar + content layout
 - `apps/quiz-app/src/pages/DashboardHome.jsx` — Welcome, quick actions, resumable sessions
+- `apps/quiz-app/src/components/LandingPageB.jsx` — Landing page with hero + pack carousel
+- `packages/supabase-client/src/packs.js` — Pack CRUD, browsing, play, showcase, admin analytics RPCs
 
 ## Completed Phases
 
@@ -157,6 +161,7 @@ All authenticated routes use `ProtectedRoute` + `DashboardLayout` (sidebar). Una
 - Phase 5: Retention + Competition + Admin Intelligence (profile, history, resume, leaderboards, admin analytics)
 - Phase 6: Dashboard Layout + Host Quiz (sidebar layout, auth routing, host quiz with pack select, multiplayer, integrated scoreboard bar with self-contained timer, flat card grid layout for all quiz modes)
 - Phase 7: RBAC (DB-backed roles in user_profiles, Two-Gate security: feature_access + content_permissions, updated RLS policies to use is_admin()/get_role(), editor CMS access, premium as DB role, User Management UI)
+- Phase 8: Polish & Quality (test coverage 53 tests, error UI with retry on all pages, skeleton loading states, WCAG accessibility improvements, CI/CD pipeline, landing page pack carousel, host pack cover images, simplified RLS for active pack showcase)
 
 ## Full Documentation
 
