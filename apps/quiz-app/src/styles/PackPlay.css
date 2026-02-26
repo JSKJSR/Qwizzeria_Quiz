@@ -100,13 +100,13 @@
   padding: 2rem 2.5rem;
   text-align: center;
   cursor: pointer;
-  transition: border-color 0.2s, transform 0.2s;
+  transition: border-color 0.2s, box-shadow 0.2s;
   width: 220px;
 }
 
 .pack-play__format-card:hover {
   border-color: var(--accent-primary, #be1332);
-  transform: translateY(-2px);
+  box-shadow: 0 4px 20px rgba(190, 19, 50, 0.2);
 }
 
 .pack-play__format-icon {

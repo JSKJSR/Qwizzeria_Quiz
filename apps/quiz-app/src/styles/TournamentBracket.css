@@ -74,8 +74,7 @@
 }
 
 .tournament-match--playable:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 20px rgba(190, 19, 50, 0.3);
+  box-shadow: 0 4px 20px rgba(190, 19, 50, 0.35);
 }
 
 .tournament-match--completed {

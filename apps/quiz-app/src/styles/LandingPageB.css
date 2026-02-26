@@ -116,7 +116,7 @@
   background: var(--accent-primary, #be1332);
   color: #fff;
   border: none;
-  border-radius: 10px;
+  border-radius: var(--radius, 12px);
   font-size: 1.05rem;
   font-weight: 700;
   text-decoration: none;
@@ -137,7 +137,7 @@
   background: transparent;
   color: var(--text-secondary, #ccc);
   border: 1px solid var(--border-color, rgba(255, 255, 255, 0.15));
-  border-radius: 10px;
+  border-radius: var(--radius, 12px);
   font-size: 1.05rem;
   font-weight: 600;
   cursor: pointer;
@@ -173,7 +173,7 @@
 .landing-b__preview-card {
   background: var(--bg-card, #1a1015);
   border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 16px;
+  border-radius: var(--radius, 12px);
   padding: 2rem;
   text-align: center;
   width: 100%;

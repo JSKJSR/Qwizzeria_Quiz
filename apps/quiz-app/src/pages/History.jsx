@@ -92,9 +92,11 @@ export default function History() {
   if (loading) {
     return (
       <div className="history">
-        <div className="history__loading">
-          <div className="history__spinner" />
-          <p>Loading history...</p>
+        <h1 className="history__title">Quiz History</h1>
+        <div className="history__skeleton">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <div key={i} className="skeleton skeleton--row" />
+          ))}
         </div>
       </div>
     );
@@ -118,13 +120,13 @@ export default function History() {
       <h1 className="history__title">Quiz History</h1>
 
       <div className="history__filters">
-        <select className="history__filter-select" value={typeFilter} onChange={handleTypeChange}>
+        <select className="history__filter-select" value={typeFilter} onChange={handleTypeChange} aria-label="Filter by quiz type">
           <option value="all">All Types</option>
           <option value="free">Free Quiz</option>
           <option value="pack">Quiz Packs</option>
           <option value="host">Host Quiz</option>
         </select>
-        <select className="history__filter-select" value={statusFilter} onChange={handleStatusChange}>
+        <select className="history__filter-select" value={statusFilter} onChange={handleStatusChange} aria-label="Filter by status">
           <option value="all">All Statuses</option>
           <option value="completed">Completed</option>
           <option value="in_progress">In Progress</option>
@@ -273,11 +275,12 @@ export default function History() {
           </div>
 
           {totalPages > 1 && (
-            <div className="history__pagination">
+            <nav className="history__pagination" aria-label="Pagination">
               <button
                 className="history__page-btn"
                 disabled={page <= 1}
                 onClick={() => setPage(p => p - 1)}
+                aria-label="Previous page"
               >
                 Previous
               </button>
@@ -288,10 +291,11 @@ export default function History() {
                 className="history__page-btn"
                 disabled={page >= totalPages}
                 onClick={() => setPage(p => p + 1)}
+                aria-label="Next page"
               >
                 Next
               </button>
-            </div>
+            </nav>
           )}
         </>
       )}

@@ -59,7 +59,7 @@
   color: var(--accent-primary, #be1332);
   padding: 0.25rem 0.75rem;
   background: rgba(190, 19, 50, 0.1);
-  border-radius: 6px;
+  border-radius: 4px;
   border: 1px solid rgba(190, 19, 50, 0.25);
 }
 
@@ -163,7 +163,7 @@
 
 .free-quiz__review-item {
   background: var(--bg-card, #1a1015);
-  border-radius: 10px;
+  border-radius: var(--radius, 12px);
   padding: 1rem 1.25rem;
   border-left: 4px solid;
 }

@@ -102,8 +102,7 @@
 
 .host-pack-select__card:hover {
   border-color: var(--accent-primary, #be1332);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 20px rgba(190, 19, 50, 0.15);
+  box-shadow: 0 4px 20px rgba(190, 19, 50, 0.2);
 }
 
 .host-pack-select__card--loading {
@@ -220,7 +219,6 @@
 }
 
 .host-setup__player-input:focus {
-  outline: none;
   border-color: var(--accent-primary, #be1332);
 }
 
@@ -312,8 +310,7 @@
 .host-grid__cell:hover:not(.host-grid__cell--completed) {
   background: var(--bg-card-hover, #251520);
   border-color: var(--accent-primary, #be1332);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 20px rgba(190, 19, 50, 0.2);
+  box-shadow: 0 4px 20px rgba(190, 19, 50, 0.25);
 }
 
 .host-grid__cell--completed {
@@ -687,13 +684,12 @@
   background: var(--bg-primary, #0a0a0a);
   color: var(--text-primary, #f0f0f0);
   border: 1px solid var(--border-color, #2a1520);
-  border-radius: 6px;
+  border-radius: 4px;
   font-size: 0.9rem;
   text-align: center;
 }
 
 .host-setup__setting-input:focus {
-  outline: none;
   border-color: var(--accent-primary, #be1332);
 }
 

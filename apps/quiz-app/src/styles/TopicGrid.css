@@ -30,8 +30,7 @@
 .topic-grid__cell:hover {
   background: var(--bg-card-hover);
   border-color: var(--accent-primary);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 20px rgba(190, 19, 50, 0.2);
+  box-shadow: 0 4px 20px rgba(190, 19, 50, 0.25);
 }
 
 .topic-grid__cell--completed {

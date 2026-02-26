@@ -55,6 +55,7 @@ export default function PackBrowse() {
           className="pack-browse__filter-select"
           value={categoryFilter}
           onChange={(e) => setCategoryFilter(e.target.value)}
+          aria-label="Filter by category"
         >
           <option value="">All Categories</option>
           {categories.map((c) => (
@@ -69,9 +70,10 @@ export default function PackBrowse() {
           <button className="pack-browse__retry-btn" onClick={() => { setLoading(true); setRetryKey(k => k + 1); }}>Try Again</button>
         </div>
       ) : loading ? (
-        <div className="pack-browse__loading">
-          <div className="pack-browse__spinner" />
-          <p>Loading packs...</p>
+        <div className="pack-browse__skeleton">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <div key={i} className="skeleton skeleton--card" />
+          ))}
         </div>
       ) : packs.length === 0 ? (
         <div className="pack-browse__empty">
@@ -86,6 +88,10 @@ export default function PackBrowse() {
                 key={pack.id}
                 className={`pack-browse__card ${isLocked ? 'pack-browse__card--locked' : ''}`}
                 onClick={() => handleCardClick(pack)}
+                role="button"
+                tabIndex={isLocked ? -1 : 0}
+                aria-label={`${pack.title}${isLocked ? ' (Premium locked)' : ''}`}
+                onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleCardClick(pack); } }}
               >
                 {pack.cover_image_url ? (
                   <img

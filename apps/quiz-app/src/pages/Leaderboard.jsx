@@ -62,10 +62,12 @@ export default function Leaderboard() {
       />
       <h1 className="leaderboard__title">Leaderboard</h1>
 
-      <div className="leaderboard__tabs">
+      <div className="leaderboard__tabs" role="tablist" aria-label="Time period filter">
         {TIME_FILTERS.map((f) => (
           <button
             key={f.key}
+            role="tab"
+            aria-selected={timeFilter === f.key}
             className={`leaderboard__tab ${timeFilter === f.key ? 'leaderboard__tab--active' : ''}`}
             onClick={() => handleFilterChange(f.key)}
           >
@@ -80,9 +82,10 @@ export default function Leaderboard() {
           <button className="leaderboard__retry-btn" onClick={() => { setLoading(true); setRetryKey(k => k + 1); }}>Try Again</button>
         </div>
       ) : loading ? (
-        <div className="leaderboard__loading">
-          <div className="leaderboard__spinner" />
-          <p>Loading leaderboard...</p>
+        <div className="leaderboard__skeleton">
+          {Array.from({ length: 8 }).map((_, i) => (
+            <div key={i} className="skeleton skeleton--row" />
+          ))}
         </div>
       ) : entries.length === 0 ? (
         <p className="leaderboard__empty">

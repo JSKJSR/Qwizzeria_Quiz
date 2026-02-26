@@ -107,18 +107,16 @@
 
 .landing__cta-primary:hover {
   background: var(--accent-primary-hover);
-  transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(190, 19, 50, 0.4);
+  box-shadow: 0 8px 24px rgba(190, 19, 50, 0.45);
 }
 
 .landing__cta-primary:active {
-  transform: translateY(0);
-  box-shadow: 0 4px 12px rgba(190, 19, 50, 0.3);
+  box-shadow: 0 2px 8px rgba(190, 19, 50, 0.3);
 }
 
 .landing__cta-icon {
-  font-size: 1.1rem;
-  display: inline-block;
+  display: inline-flex;
+  flex-shrink: 0;
 }
 
 .landing__cta-secondary {
@@ -149,8 +147,7 @@
 .landing__cta-btn:hover {
   border-color: var(--accent-primary);
   color: var(--text-primary);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(190, 19, 50, 0.2);
+  box-shadow: 0 4px 16px rgba(190, 19, 50, 0.25);
 }
 
 .landing__cta-btn:active {

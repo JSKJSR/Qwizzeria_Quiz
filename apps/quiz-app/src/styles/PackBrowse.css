@@ -69,12 +69,12 @@
   overflow: hidden;
   border: 1px solid rgba(255, 255, 255, 0.06);
   cursor: pointer;
-  transition: transform 0.2s, border-color 0.2s;
+  transition: border-color 0.2s, box-shadow 0.2s;
 }
 
 .pack-browse__card:hover {
-  transform: translateY(-2px);
   border-color: rgba(255, 255, 255, 0.15);
+  box-shadow: 0 4px 20px rgba(190, 19, 50, 0.15);
 }
 
 .pack-browse__card--locked {
@@ -176,6 +176,12 @@
   justify-content: center;
   padding: 4rem;
   gap: 1rem;
+}
+
+.pack-browse__skeleton {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.25rem;
 }
 
 .pack-browse__error { text-align: center; padding: 3rem; color: #999; }

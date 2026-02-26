@@ -42,12 +42,12 @@
 
 .dash-home__action-card:hover {
   border-color: var(--accent-primary, #be1332);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 20px rgba(190, 19, 50, 0.15);
+  box-shadow: 0 4px 20px rgba(190, 19, 50, 0.2);
 }
 
 .dash-home__action-icon {
-  font-size: 2rem;
+  display: flex;
+  color: var(--accent-primary, #be1332);
 }
 
 .dash-home__action-title {
@@ -84,7 +84,8 @@
 }
 
 .dash-home__stat-icon {
-  font-size: 1.5rem;
+  display: flex;
+  color: var(--text-secondary, #b0a0a5);
 }
 
 .dash-home__stat-value {
@@ -195,8 +196,8 @@
 }
 
 .dash-home__dismiss-btn {
-  width: 28px;
-  height: 28px;
+  width: 44px;
+  height: 44px;
   border-radius: 50%;
   border: 1px solid var(--border-color, #2a1520);
   background: none;

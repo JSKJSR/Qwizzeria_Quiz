@@ -104,7 +104,7 @@
 .answer-view__team-btn:hover {
   background: var(--accent-primary);
   color: #fff;
-  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(190, 19, 50, 0.3);
 }
 
 .answer-view__no-points-btn {

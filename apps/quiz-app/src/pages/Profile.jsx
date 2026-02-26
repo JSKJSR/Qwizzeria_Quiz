@@ -108,9 +108,13 @@ export default function Profile() {
   if (loading) {
     return (
       <div className="profile">
-        <div className="profile__loading">
-          <div className="profile__spinner" />
-          <p>Loading profile...</p>
+        <h1 className="profile__title">Settings</h1>
+        <div className="profile__skeleton">
+          <div className="skeleton skeleton--text" />
+          <div className="skeleton skeleton--row" />
+          <div className="skeleton skeleton--text" />
+          <div className="skeleton skeleton--row" />
+          <div className="skeleton skeleton--text-short" />
         </div>
       </div>
     );

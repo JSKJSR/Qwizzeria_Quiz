@@ -12,7 +12,7 @@
 .login-modal {
   background: var(--bg-card, #1a1015);
   border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 16px;
+  border-radius: var(--radius, 12px);
   padding: 2rem;
   width: 100%;
   max-width: 400px;
@@ -114,7 +114,6 @@
   background: rgba(0, 0, 0, 0.3);
   color: #fff;
   font-size: 1rem;
-  outline: none;
   transition: border-color 0.2s;
 }
 
@@ -127,7 +126,7 @@
   font-size: 0.85rem;
   padding: 0.5rem;
   background: rgba(244, 67, 54, 0.1);
-  border-radius: 6px;
+  border-radius: 4px;
 }
 
 .login-modal__message {
@@ -135,7 +134,7 @@
   font-size: 0.85rem;
   padding: 0.5rem;
   background: rgba(76, 175, 80, 0.1);
-  border-radius: 6px;
+  border-radius: 4px;
 }
 
 .login-modal__submit {
