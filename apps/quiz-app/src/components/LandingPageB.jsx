@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
+import { browsePublicPacks } from '@qwizzeria/supabase-client/src/packs.js';
 import LoginModal from './LoginModal';
 import SEO from './SEO';
 import '../styles/LandingPageB.css';
@@ -10,6 +11,21 @@ export default function LandingPageB() {
   const navigate = useNavigate();
   const [showLogin, setShowLogin] = useState(false);
   const [loginMode, setLoginMode] = useState('login');
+
+  const [packs, setPacks] = useState([]);
+  const trackRef = useRef(null);
+
+  useEffect(() => {
+    browsePublicPacks().then(setPacks).catch(() => {});
+  }, []);
+
+  const scrollCarousel = useCallback((dir) => {
+    const track = trackRef.current;
+    if (!track) return;
+    const card = track.querySelector('.landing-b__pack-card');
+    const amount = card ? card.offsetWidth + 16 : 280;
+    track.scrollBy({ left: dir * amount, behavior: 'smooth' });
+  }, []);
 
   const openLogin = (mode) => {
     setLoginMode(mode);
@@ -100,7 +116,7 @@ export default function LandingPageB() {
 
         <div className="landing-b__hero-visual">
           <div className="landing-b__preview-card">
-            <span className="landing-b__preview-icon">&#129504;</span>
+            <img src="/qwizzeria_logoB.jpg" alt="Qwizzeria" className="landing-b__preview-image" />
             <span className="landing-b__preview-label">Live Quiz Preview</span>
             <div className="landing-b__preview-grid">
               <div className="landing-b__preview-cell">Science</div>
@@ -113,6 +129,60 @@ export default function LandingPageB() {
           </div>
         </div>
       </section>
+
+      {/* Pack Carousel */}
+      {packs.length > 0 && (
+        <section className="landing-b__packs">
+          <div className="landing-b__packs-header">
+            <h2 className="landing-b__packs-title">Popular Quiz Packs</h2>
+            <div className="landing-b__packs-nav">
+              <button
+                className="landing-b__packs-arrow"
+                onClick={() => scrollCarousel(-1)}
+                aria-label="Scroll left"
+              >
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><polyline points="15 18 9 12 15 6" /></svg>
+              </button>
+              <button
+                className="landing-b__packs-arrow"
+                onClick={() => scrollCarousel(1)}
+                aria-label="Scroll right"
+              >
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6" /></svg>
+              </button>
+            </div>
+          </div>
+          <div className="landing-b__packs-track" ref={trackRef}>
+            {packs.map((pack) => (
+              <div key={pack.id} className="landing-b__pack-card">
+                {pack.cover_image_url ? (
+                  <img
+                    className="landing-b__pack-image"
+                    src={pack.cover_image_url}
+                    alt={pack.title}
+                    onError={(e) => { e.target.style.display = 'none'; }}
+                  />
+                ) : (
+                  <div className="landing-b__pack-image-placeholder" />
+                )}
+                <div className="landing-b__pack-body">
+                  <div className="landing-b__pack-title">{pack.title}</div>
+                  {pack.category && (
+                    <div className="landing-b__pack-tags">
+                      {pack.category.split(',').map((tag) => (
+                        <span key={tag.trim()} className="landing-b__pack-tag">{tag.trim()}</span>
+                      ))}
+                    </div>
+                  )}
+                  <div className="landing-b__pack-meta">
+                    {pack.question_count} questions
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
 
       {/* Footer */}
       <footer className="landing-b__footer">

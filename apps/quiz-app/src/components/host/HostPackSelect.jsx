@@ -95,12 +95,24 @@ export default function HostPackSelect({ onSelectPack }) {
               onClick={() => handleSelectPack(pack)}
               disabled={!!loadingPack}
             >
-              <div className="host-pack-select__card-title">{pack.title}</div>
-              {pack.category && (
-                <span className="host-pack-select__card-category">{pack.category}</span>
+              {pack.cover_image_url ? (
+                <img
+                  className="host-pack-select__card-image"
+                  src={pack.cover_image_url}
+                  alt={pack.title}
+                  onError={(e) => { e.target.style.display = 'none'; }}
+                />
+              ) : (
+                <div className="host-pack-select__card-image-placeholder" />
               )}
-              <div className="host-pack-select__card-meta">
-                {pack.question_count} questions
+              <div className="host-pack-select__card-body">
+                <div className="host-pack-select__card-title">{pack.title}</div>
+                {pack.category && (
+                  <span className="host-pack-select__card-category">{pack.category}</span>
+                )}
+                <div className="host-pack-select__card-meta">
+                  {pack.question_count} questions
+                </div>
               </div>
               {loadingPack === pack.id && (
                 <div className="host-pack-select__card-overlay">Loading...</div>

@@ -91,13 +91,30 @@
   background: var(--bg-card, #1a1015);
   border: 1px solid var(--border-color, #2a1520);
   border-radius: var(--radius, 12px);
-  padding: 1.25rem;
+  padding: 0;
   text-align: left;
   color: var(--text-primary, #f0f0f0);
   cursor: pointer;
   transition: all 0.2s ease;
   position: relative;
   overflow: hidden;
+}
+
+.host-pack-select__card-image {
+  width: 100%;
+  height: 160px;
+  object-fit: cover;
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.host-pack-select__card-image-placeholder {
+  width: 100%;
+  height: 160px;
+  background: linear-gradient(135deg, rgba(190, 19, 50, 0.2), rgba(232, 92, 26, 0.2));
+}
+
+.host-pack-select__card-body {
+  padding: 1rem 1.25rem 1.25rem;
 }
 
 .host-pack-select__card:hover {
