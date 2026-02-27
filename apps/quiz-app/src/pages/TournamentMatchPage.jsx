@@ -200,11 +200,21 @@ export default function TournamentMatchPage() {
           }
         }
 
-        // 3. Load pack questions
-        const allQuestions = await fetchPackPlayQuestions(tournament.pack_id);
+        // 3. Determine pack source: per-match (matchRow.pack_id) or tournament-level
+        const packId = matchRow.pack_id || tournament.pack_id;
+        if (!packId) {
+          dispatch({ type: ACTIONS.INIT, phase: 'error', topics: [], participants: [], matchData: matchRow, tournamentData: tournament, errorMessage: 'No pack has been selected for this match yet.' });
+          return;
+        }
 
-        // 4. Allocate questions for this match from the pool
-        const pool = tournament.question_pool || [];
+        // 4. Load pack questions for the effective pack
+        const allQuestions = await fetchPackPlayQuestions(packId);
+
+        // 5. Allocate questions for this match
+        const isPerMatch = !!matchRow.pack_id;
+        const pool = isPerMatch
+          ? (matchRow.match_question_pool || [])
+          : (tournament.question_pool || []);
         const qpm = tournament.questions_per_match;
         let matchQuestionIds = matchRow.question_ids || [];
 
@@ -379,11 +389,14 @@ export default function TournamentMatchPage() {
 
   const { phase, topics, participants, selectedQuestion, completedQuestionIds, skippedQuestions, errorMessage, matchData, tournamentData } = state;
 
-  // Round/match label
+  // Round/match label (include pack name for per-match tournaments)
   const roundName = matchData && tournamentData
     ? getRoundName(tournamentData.bracket?.rounds?.length || 1, matchData.round_index)
     : '';
-  const matchLabel = matchData ? `${roundName} — Match ${matchData.match_index + 1}` : '';
+  const packTitle = matchData?.quiz_packs?.title;
+  const matchLabel = matchData
+    ? `${roundName} — Match ${matchData.match_index + 1}${packTitle ? ` — ${packTitle}` : ''}`
+    : '';
 
   // --- Loading ---
   if (phase === 'loading') {

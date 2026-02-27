@@ -5,14 +5,15 @@ import { getSupabase } from './index.js';
  *
  * @param {object} params
  * @param {string} params.userId - Creator's auth user ID
- * @param {string} params.packId - Quiz pack ID
+ * @param {string|null} params.packId - Quiz pack ID (null for per-match pack mode)
  * @param {string[]} params.teamNames - Team names in seed order
  * @param {number} params.questionsPerMatch
  * @param {object} params.bracket - Full bracket state (rounds, teams, etc.)
- * @param {string[]} params.questionPool - Shuffled question IDs
+ * @param {string[]} params.questionPool - Shuffled question IDs (empty for per-match mode)
+ * @param {boolean} [params.perMatchPacks] - Whether each match selects its own pack
  * @returns {object} Created tournament row
  */
-export async function createTournament({ userId, packId, teamNames, questionsPerMatch, bracket, questionPool }) {
+export async function createTournament({ userId, packId, teamNames, questionsPerMatch, bracket, questionPool, perMatchPacks = false }) {
   const supabase = getSupabase();
 
   // Insert tournament
@@ -20,11 +21,11 @@ export async function createTournament({ userId, packId, teamNames, questionsPer
     .from('host_tournaments')
     .insert({
       created_by: userId,
-      pack_id: packId,
+      pack_id: perMatchPacks ? null : packId,
       status: 'in_progress',
       team_names: teamNames,
       questions_per_match: questionsPerMatch,
-      question_pool: questionPool,
+      question_pool: perMatchPacks ? [] : questionPool,
       bracket,
     })
     .select()
@@ -88,7 +89,7 @@ export async function fetchTournament(tournamentId) {
 
   const { data: matches, error: mError } = await supabase
     .from('host_tournament_matches')
-    .select('*')
+    .select('*, quiz_packs(id, title)')
     .eq('tournament_id', tournamentId)
     .order('round_index', { ascending: true })
     .order('match_index', { ascending: true });
@@ -224,7 +225,8 @@ export async function reclaimStaleMatch(matchId, userId) {
  * @param {string[]} completedQuestionIds
  * @param {object[]} skippedQuestions
  * @param {object} updatedBracket - Full updated bracket JSONB
- * @param {string[]} updatedQuestionPool - Remaining question pool
+ * @param {string[]} updatedQuestionPool - Remaining question pool (unused in per-match mode)
+ * @param {boolean} [isPerMatch] - When true, skip updating tournament-level question pool
  */
 export async function advanceMatchWinner({
   tournamentId,
@@ -238,6 +240,7 @@ export async function advanceMatchWinner({
   skippedQuestions,
   updatedBracket,
   updatedQuestionPool,
+  isPerMatch = false,
 }) {
   const supabase = getSupabase();
 
@@ -275,18 +278,49 @@ export async function advanceMatchWinner({
     }
   }
 
-  // 3. Update tournament bracket JSONB and question pool
+  // 3. Update tournament bracket JSONB (and question pool for single-pack mode)
+  const bracketUpdate = { bracket: updatedBracket };
+  if (!isPerMatch) {
+    bracketUpdate.question_pool = updatedQuestionPool;
+  }
+
   const { error: bracketError } = await supabase
     .from('host_tournaments')
-    .update({
-      bracket: updatedBracket,
-      question_pool: updatedQuestionPool,
-    })
+    .update(bracketUpdate)
     .eq('id', tournamentId);
 
   if (bracketError) {
     throw new Error(`Failed to update tournament bracket: ${bracketError.message}`);
   }
+}
+
+/**
+ * Set the pack for a specific match (before it starts) in per-match pack mode.
+ *
+ * @param {object} params
+ * @param {string} params.matchId - Match row ID
+ * @param {string} params.packId - Pack UUID to assign
+ * @param {string[]} params.questionPool - Shuffled question IDs for this match
+ * @returns {object} Updated match row
+ */
+export async function setMatchPack({ matchId, packId, questionPool }) {
+  const supabase = getSupabase();
+
+  const { data, error } = await supabase
+    .from('host_tournament_matches')
+    .update({
+      pack_id: packId,
+      match_question_pool: questionPool,
+    })
+    .eq('id', matchId)
+    .select()
+    .single();
+
+  if (error) {
+    throw new Error(`Failed to set match pack: ${error.message}`);
+  }
+
+  return data;
 }
 
 /**

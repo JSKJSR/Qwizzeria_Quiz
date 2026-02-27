@@ -10,7 +10,7 @@ function isMatchStale(match, staleThresholdMs) {
   return elapsed > staleThresholdMs;
 }
 
-function MatchCard({ match, teams, roundIndex, onSelectMatch, onOpenInNewTab, onResumeMatch, isRecentlyCompleted, staleThresholdMs }) {
+function MatchCard({ match, teams, roundIndex, onSelectMatch, onOpenInNewTab, onResumeMatch, isRecentlyCompleted, staleThresholdMs, packTitle, isPerMatchMode }) {
   const playable = isMatchPlayable(match);
   const stale = isMatchStale(match, staleThresholdMs);
   const { team1Index, team2Index, team1Score, team2Score, winnerIndex, status } = match;
@@ -102,6 +102,16 @@ function MatchCard({ match, teams, roundIndex, onSelectMatch, onOpenInNewTab, on
         status === 'completed' && !isTeam2Winner,
         status === 'bye' && team2Index === null
       )}
+      {/* Per-match pack label */}
+      {isPerMatchMode && (
+        <div className="tournament-match__pack-label">
+          {packTitle
+            ? packTitle
+            : playable
+              ? 'Select pack to play'
+              : null}
+        </div>
+      )}
       {/* Open in new tab button for playable matches */}
       {playable && onOpenInNewTab && (
         <button
@@ -146,12 +156,13 @@ function ConnectorColumn({ matchCount }) {
   );
 }
 
-export default function TournamentBracket({ bracket, onSelectMatch, onOpenInNewTab, onResumeMatch, recentlyCompleted, staleThresholdMs }) {
+export default function TournamentBracket({ bracket, onSelectMatch, onOpenInNewTab, onResumeMatch, recentlyCompleted, staleThresholdMs, matchPacks }) {
   if (!bracket || !bracket.rounds) return null;
 
   const { rounds, teams } = bracket;
   const totalRounds = rounds.length;
   const champion = getChampion(bracket);
+  const isPerMatchMode = !!bracket.perMatchPacks || !!matchPacks;
 
   const taggedRounds = rounds.map(round =>
     round.map((match, i) => ({ ...match, _matchIndex: i }))
@@ -163,6 +174,7 @@ export default function TournamentBracket({ bracket, onSelectMatch, onOpenInNewT
         <h2 className="tournament-bracket__title">Tournament Bracket</h2>
         <p className="tournament-bracket__subtitle">
           {teams.length} teams &middot; {bracket.totalMatches} matches &middot; {bracket.questionsPerMatch} questions per match
+          {isPerMatchMode && <span className="tournament-bracket__subtitle-badge"> &middot; Per-match packs</span>}
         </p>
       </div>
 
@@ -174,19 +186,25 @@ export default function TournamentBracket({ bracket, onSelectMatch, onOpenInNewT
                 {getRoundName(totalRounds, roundIndex)}
               </div>
               <div className="tournament-bracket__matches">
-                {round.map((match, matchIndex) => (
-                  <MatchCard
-                    key={matchIndex}
-                    match={match}
-                    teams={teams}
-                    roundIndex={roundIndex}
-                    onSelectMatch={onSelectMatch}
-                    onOpenInNewTab={onOpenInNewTab}
-                    onResumeMatch={onResumeMatch}
-                    isRecentlyCompleted={recentlyCompleted?.has(`${roundIndex}-${matchIndex}`)}
-                    staleThresholdMs={staleThresholdMs}
-                  />
-                ))}
+                {round.map((match, matchIndex) => {
+                  const matchKey = `r${roundIndex}-m${matchIndex}`;
+                  const packTitle = matchPacks?.[matchKey]?.packTitle || match.quiz_packs?.title;
+                  return (
+                    <MatchCard
+                      key={matchIndex}
+                      match={match}
+                      teams={teams}
+                      roundIndex={roundIndex}
+                      onSelectMatch={onSelectMatch}
+                      onOpenInNewTab={onOpenInNewTab}
+                      onResumeMatch={onResumeMatch}
+                      isRecentlyCompleted={recentlyCompleted?.has(`${roundIndex}-${matchIndex}`)}
+                      staleThresholdMs={staleThresholdMs}
+                      packTitle={packTitle}
+                      isPerMatchMode={isPerMatchMode}
+                    />
+                  );
+                })}
               </div>
             </div>
             {roundIndex < totalRounds - 1 && (

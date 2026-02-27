@@ -1,0 +1,56 @@
+/* ============================================================
+   Match Pack Select — per-match pack selection header overlay
+   ============================================================ */
+
+.match-pack-select__header {
+  padding: 1.5rem 2rem 0.75rem;
+  text-align: center;
+  border-bottom: 1px solid var(--border-color, #2a1520);
+  background: var(--bg-surface, #0a0008);
+  flex-shrink: 0;
+}
+
+.match-pack-select__title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text-primary, #f0f0f0);
+  margin: 0 0 0.35rem;
+}
+
+.match-pack-select__matchup {
+  font-size: 0.9rem;
+  color: var(--accent-primary, #e85c1a);
+  font-weight: 600;
+  margin: 0;
+}
+
+/* Pack label on bracket match cards */
+.tournament-match__pack-label {
+  font-size: 0.65rem;
+  color: var(--text-muted, #665555);
+  font-style: italic;
+  margin-top: 0.2rem;
+  padding: 0 0.5rem 0.3rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tournament-match--playable .tournament-match__pack-label {
+  color: var(--text-secondary, #b0a0a5);
+}
+
+/* Per-match packs badge in bracket subtitle */
+.tournament-bracket__subtitle-badge {
+  color: var(--accent-primary, #e85c1a);
+  font-weight: 600;
+}
+
+/* Checkbox styling for the setup toggle */
+.host-setup__setting-checkbox {
+  width: 1.1rem;
+  height: 1.1rem;
+  accent-color: var(--accent-primary, #e85c1a);
+  cursor: pointer;
+  flex-shrink: 0;
+}

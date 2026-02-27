@@ -107,6 +107,7 @@ export default function TournamentBracketPage() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const [bracket, setBracket] = useState(null);
+  const [matchPacksMap, setMatchPacksMap] = useState({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [recentlyCompleted, setRecentlyCompleted] = useState(new Set());
@@ -119,6 +120,19 @@ export default function TournamentBracketPage() {
       setError(null);
       const { tournament: t, matches } = await fetchTournament(tournamentId);
       setBracket(reconstructBracket(t, matches));
+
+      // Build per-match packs map from match rows (new columns from fetchTournament join)
+      const packsMap = {};
+      for (const m of matches) {
+        if (m.pack_id) {
+          const key = `r${m.round_index}-m${m.match_index}`;
+          packsMap[key] = {
+            packId: m.pack_id,
+            packTitle: m.quiz_packs?.title || null,
+          };
+        }
+      }
+      setMatchPacksMap(packsMap);
     } catch (err) {
       setError(err.message);
     } finally {
@@ -256,6 +270,7 @@ export default function TournamentBracketPage() {
         onResumeMatch={handleResumeMatch}
         recentlyCompleted={recentlyCompleted}
         staleThresholdMs={STALE_THRESHOLD_MS}
+        matchPacks={Object.keys(matchPacksMap).length > 0 ? matchPacksMap : undefined}
       />
     </div>
   );

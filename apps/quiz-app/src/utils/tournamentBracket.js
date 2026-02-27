@@ -41,10 +41,10 @@ export function getRoundName(totalRounds, roundIndex) {
  *
  * @param {string[]} teamNames - Team names in entry order
  * @param {number} questionsPerMatch - Questions allocated per match
- * @param {object[]} allQuestions - All available questions (already built by buildTopics)
- * @returns {{ rounds: Array, teams: Array, questionsPerMatch: number, questionPool: string[], totalMatches: number }}
+ * @param {object[]|null} allQuestions - All available questions (null for per-match pack mode)
+ * @returns {{ rounds: Array, teams: Array, questionsPerMatch: number, questionPool: string[], totalMatches: number, perMatchPacks?: boolean }}
  */
-export function generateBracket(teamNames, questionsPerMatch, allQuestions) {
+export function generateBracket(teamNames, questionsPerMatch, allQuestions = null) {
   const numTeams = teamNames.length;
   const bracketSize = nextPowerOf2(numTeams);
   const totalRounds = Math.log2(bracketSize);
@@ -115,10 +115,12 @@ export function generateBracket(teamNames, questionsPerMatch, allQuestions) {
   // Check if any round-2 match now has both teams from byes — mark those as playable
   // (They'll be playable once the bracket view checks canPlay)
 
-  // Shuffle question IDs for the pool
-  const allQIds = allQuestions.map(q => q.id);
-  const questionPool = [...allQIds].sort(() => Math.random() - 0.5);
+  // Shuffle question IDs for the pool (empty when per-match packs mode)
+  const questionPool = allQuestions
+    ? [...allQuestions.map(q => q.id)].sort(() => Math.random() - 0.5)
+    : [];
 
+  const perMatchPacks = allQuestions === null;
   const totalMatches = numTeams - 1; // single elimination
 
   return {
@@ -128,6 +130,7 @@ export function generateBracket(teamNames, questionsPerMatch, allQuestions) {
     questionPool,
     totalMatches,
     completedMatches: 0,
+    ...(perMatchPacks && { perMatchPacks: true }),
   };
 }
 

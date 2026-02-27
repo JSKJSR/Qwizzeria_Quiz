@@ -8,6 +8,7 @@ import {
   createTournament as dbCreateTournament,
   advanceMatchWinner as dbAdvanceMatchWinner,
   completeTournament as dbCompleteTournament,
+  setMatchPack as dbSetMatchPack,
 } from '@qwizzeria/supabase-client/src/tournaments.js';
 import {
   generateBracket,
@@ -28,6 +29,7 @@ import HostQuestionReview from './HostQuestionReview';
 import TournamentBracket from './TournamentBracket';
 import QuestionView from '../QuestionView';
 import '../../styles/HostQuiz.css';
+import '../../styles/MatchPackSelect.css';
 
 const ACTIONS = {
   SELECT_PACK: 'SELECT_PACK',
@@ -46,6 +48,7 @@ const ACTIONS = {
   // Tournament actions
   START_TOURNAMENT: 'START_TOURNAMENT',
   SELECT_MATCH: 'SELECT_MATCH',
+  SELECT_MATCH_PACK: 'SELECT_MATCH_PACK',
   MATCH_SELECT_QUESTION: 'MATCH_SELECT_QUESTION',
   MATCH_REVEAL_ANSWER: 'MATCH_REVEAL_ANSWER',
   MATCH_AWARD_POINTS: 'MATCH_AWARD_POINTS',
@@ -59,7 +62,7 @@ const ACTIONS = {
 };
 
 const initialState = {
-  phase: 'packSelect', // packSelect | setup | grid | question | answer | review | results | bracket | matchGrid | matchQuestion | matchAnswer | tournamentResults
+  phase: 'packSelect', // packSelect | setup | grid | question | answer | review | results | bracket | matchPackSelect | matchGrid | matchQuestion | matchAnswer | tournamentResults
   pack: null,
   topics: [],
   allQuestions: [],
@@ -76,6 +79,9 @@ const initialState = {
   matchParticipants: [],
   matchCompletedQuestionIds: [],
   matchSkippedQuestions: [],
+  // Per-match pack state
+  matchPacks: {}, // { [matchKey]: { packId, packTitle, topics, questionPool, _persisted } }
+  pendingMatch: null, // { roundIndex, matchIndex } — awaiting pack selection
 };
 
 /**
@@ -225,8 +231,9 @@ function reducer(state, action) {
 
     // ===== Tournament mode =====
     case ACTIONS.START_TOURNAMENT: {
-      const { participants, questionsPerMatch } = action;
-      const allTopicQuestions = state.topics.flatMap(t => t.questions);
+      const { participants, questionsPerMatch, perMatchPacks } = action;
+      // Per-match mode: pass null for questions so bracket gets empty pool
+      const allTopicQuestions = perMatchPacks ? null : state.topics.flatMap(t => t.questions);
       const bracket = generateBracket(participants, questionsPerMatch, allTopicQuestions);
       return {
         ...state,
@@ -234,6 +241,8 @@ function reducer(state, action) {
         mode: 'tournament',
         tournament: bracket,
         participants: participants.map(name => ({ name, score: 0 })),
+        matchPacks: {},
+        pendingMatch: null,
       };
     }
 
@@ -243,7 +252,53 @@ function reducer(state, action) {
       const match = tournament.rounds[roundIndex][matchIndex];
       if (!isMatchPlayable(match)) return state;
 
-      // Allocate questions from pool
+      // Per-match pack mode: if no pack assigned yet, go to pack selection
+      if (tournament.perMatchPacks) {
+        const matchKey = `r${roundIndex}-m${matchIndex}`;
+        if (!state.matchPacks[matchKey]) {
+          return {
+            ...state,
+            phase: 'matchPackSelect',
+            pendingMatch: { roundIndex, matchIndex },
+          };
+        }
+        // Pack already chosen — allocate from match-specific pool
+        const matchPackData = state.matchPacks[matchKey];
+        const { allocatedQuestions, remainingPool } = allocateMatchQuestions(
+          matchPackData.questionPool,
+          tournament.questionsPerMatch,
+          matchPackData.topics
+        );
+        const matchTopics = buildMatchTopics(allocatedQuestions);
+        const updatedMatchPacks = {
+          ...state.matchPacks,
+          [matchKey]: { ...matchPackData, questionPool: remainingPool },
+        };
+        const newRounds = tournament.rounds.map((round, ri) =>
+          round.map((m, mi) =>
+            ri === roundIndex && mi === matchIndex ? { ...m, status: 'in_progress' } : m
+          )
+        );
+        const matchParticipants = [
+          { name: tournament.teams[match.team1Index].name, score: 0, teamIndex: match.team1Index },
+          { name: tournament.teams[match.team2Index].name, score: 0, teamIndex: match.team2Index },
+        ];
+        return {
+          ...state,
+          phase: 'matchGrid',
+          tournament: { ...tournament, rounds: newRounds },
+          currentMatch: { roundIndex, matchIndex },
+          matchTopics,
+          matchParticipants,
+          matchCompletedQuestionIds: [],
+          matchSkippedQuestions: [],
+          matchPacks: updatedMatchPacks,
+          pendingMatch: null,
+          selectedQuestion: null,
+        };
+      }
+
+      // Standard single-pack mode: allocate questions from shared pool
       const { allocatedQuestions, remainingPool } = allocateMatchQuestions(
         tournament.questionPool,
         tournament.questionsPerMatch,
@@ -290,6 +345,62 @@ function reducer(state, action) {
         matchParticipants,
         matchCompletedQuestionIds: [],
         matchSkippedQuestions: [],
+        selectedQuestion: null,
+      };
+    }
+
+    case ACTIONS.SELECT_MATCH_PACK: {
+      const { roundIndex, matchIndex, pack, questions } = action;
+      const matchKey = `r${roundIndex}-m${matchIndex}`;
+      const tournament = state.tournament;
+      const match = tournament.rounds[roundIndex][matchIndex];
+
+      const topics = buildTopics(questions);
+      const questionPool = [...questions.map(q => q.id || q.id)].sort(() => Math.random() - 0.5);
+
+      // Allocate questions for this match
+      const { allocatedQuestions, remainingPool } = allocateMatchQuestions(
+        questionPool,
+        tournament.questionsPerMatch,
+        topics
+      );
+
+      const matchTopics = buildMatchTopics(allocatedQuestions);
+
+      const updatedMatchPacks = {
+        ...state.matchPacks,
+        [matchKey]: {
+          packId: pack.id,
+          packTitle: pack.title,
+          topics,
+          questionPool: remainingPool,
+          _persisted: false,
+        },
+      };
+
+      // Mark match as in_progress in bracket
+      const newRounds = tournament.rounds.map((round, ri) =>
+        round.map((m, mi) =>
+          ri === roundIndex && mi === matchIndex ? { ...m, status: 'in_progress' } : m
+        )
+      );
+
+      const matchParticipants = [
+        { name: tournament.teams[match.team1Index].name, score: 0, teamIndex: match.team1Index },
+        { name: tournament.teams[match.team2Index].name, score: 0, teamIndex: match.team2Index },
+      ];
+
+      return {
+        ...state,
+        phase: 'matchGrid',
+        tournament: { ...tournament, rounds: newRounds },
+        currentMatch: { roundIndex, matchIndex },
+        matchTopics,
+        matchParticipants,
+        matchCompletedQuestionIds: [],
+        matchSkippedQuestions: [],
+        matchPacks: updatedMatchPacks,
+        pendingMatch: null,
         selectedQuestion: null,
       };
     }
@@ -547,15 +658,18 @@ export default function HostQuiz() {
   // Persist new tournament to DB when bracket phase starts without a DB ID
   useEffect(() => {
     if (state.phase !== 'bracket' || !state.tournament || state.tournamentId) return;
-    if (!user?.id || !state.pack?.id) return;
+    if (!user?.id) return;
+    const perMatchPacks = !!state.tournament.perMatchPacks;
+    if (!perMatchPacks && !state.pack?.id) return;
 
     dbCreateTournament({
       userId: user.id,
-      packId: state.pack.id,
+      packId: perMatchPacks ? null : state.pack.id,
       teamNames: state.tournament.teams.map(t => t.name),
       questionsPerMatch: state.tournament.questionsPerMatch,
       bracket: state.tournament,
       questionPool: state.tournament.questionPool,
+      perMatchPacks,
     })
       .then(tournament => {
         dispatch({ type: ACTIONS.SET_TOURNAMENT_ID, tournamentId: tournament.id });
@@ -563,14 +677,35 @@ export default function HostQuiz() {
       .catch(err => console.warn('Failed to persist tournament to DB:', err));
   }, [state.phase, state.tournament, state.tournamentId, user, state.pack]);
 
+  // Persist match pack assignments to DB (non-blocking, once per match)
+  useEffect(() => {
+    if (!state.tournamentId || !state.tournament?.perMatchPacks) return;
+
+    for (const [matchKey, mp] of Object.entries(state.matchPacks)) {
+      if (mp._persisted) continue;
+      const parts = matchKey.replace('r', '').split('-m').map(Number);
+      const [ri, mi] = parts;
+      const matchId = `${state.tournamentId}-m-${ri}-${mi}`;
+      dbSetMatchPack({
+        matchId,
+        packId: mp.packId,
+        questionPool: mp.questionPool,
+      })
+        .then(() => {
+          // Mark as persisted in state (fire-and-forget — no dispatch needed for correctness)
+        })
+        .catch(err => console.warn('Failed to persist match pack:', err));
+    }
+  }, [state.tournamentId, state.matchPacks, state.tournament]);
+
   // --- Standard mode handlers (unchanged) ---
   const handleSelectPack = useCallback((pack, questions) => {
     dispatch({ type: ACTIONS.SELECT_PACK, pack, questions });
   }, []);
 
-  const handleStartQuiz = useCallback((participants, mode, questionsPerMatch) => {
+  const handleStartQuiz = useCallback((participants, mode, questionsPerMatch, perMatchPacks) => {
     if (mode === 'tournament') {
-      dispatch({ type: ACTIONS.START_TOURNAMENT, participants, questionsPerMatch });
+      dispatch({ type: ACTIONS.START_TOURNAMENT, participants, questionsPerMatch, perMatchPacks: !!perMatchPacks });
       // DB persistence happens after state update via effect
     } else {
       dispatch({ type: ACTIONS.START_QUIZ, participants });
@@ -640,6 +775,10 @@ export default function HostQuiz() {
     dispatch({ type: ACTIONS.SELECT_MATCH, roundIndex, matchIndex });
   }, []);
 
+  const handleSelectMatchPack = useCallback((pack, questions, roundIndex, matchIndex) => {
+    dispatch({ type: ACTIONS.SELECT_MATCH_PACK, roundIndex, matchIndex, pack, questions });
+  }, []);
+
   const handleMatchSelectQuestion = useCallback((question) => {
     dispatch({ type: ACTIONS.MATCH_SELECT_QUESTION, question });
   }, []);
@@ -681,6 +820,7 @@ export default function HostQuiz() {
     if (state.tournamentId && state.currentMatch) {
       const { roundIndex, matchIndex } = state.currentMatch;
       const matchId = `${state.tournamentId}-m-${roundIndex}-${matchIndex}`;
+      const isPerMatch = !!state.tournament?.perMatchPacks;
 
       // We need the updated bracket — compute it here to persist
       const updatedRounds = state.tournament.rounds.map((round, ri) =>
@@ -707,6 +847,7 @@ export default function HostQuiz() {
         skippedQuestions: state.matchSkippedQuestions,
         updatedBracket: advancedBracket,
         updatedQuestionPool: state.tournament.questionPool,
+        isPerMatch,
       })
         .then(() => {
           if (isComplete) {
@@ -804,8 +945,37 @@ export default function HostQuiz() {
     );
   }
 
+  // --- Per-match Pack Selection ---
+  if (phase === 'matchPackSelect') {
+    const { roundIndex, matchIndex } = state.pendingMatch || {};
+    const tournament = state.tournament;
+    const roundName = tournament ? getRoundName(tournament.rounds.length, roundIndex) : '';
+    const match = tournament?.rounds[roundIndex]?.[matchIndex];
+    const team1 = match?.team1Index != null ? tournament.teams[match.team1Index]?.name : '';
+    const team2 = match?.team2Index != null ? tournament.teams[match.team2Index]?.name : '';
+
+    return (
+      <div className="host-quiz host-quiz--fullscreen">
+        <div className="match-pack-select__header">
+          <h2 className="match-pack-select__title">Select Pack for Match</h2>
+          <p className="match-pack-select__matchup">
+            {team1} vs {team2} &mdash; {roundName}
+          </p>
+        </div>
+        <HostPackSelect
+          onSelectPack={(pack, questions) => handleSelectMatchPack(pack, questions, roundIndex, matchIndex)}
+        />
+      </div>
+    );
+  }
+
   // --- Tournament Bracket ---
   if (phase === 'bracket') {
+    // Build matchPacks map for bracket display { matchKey → { packTitle } }
+    const bracketMatchPacks = Object.fromEntries(
+      Object.entries(state.matchPacks).map(([key, mp]) => [key, { packTitle: mp.packTitle }])
+    );
+
     return (
       <div className="host-quiz host-quiz--fullscreen">
         {state.tournamentId && (
@@ -827,6 +997,7 @@ export default function HostQuiz() {
         <TournamentBracket
           bracket={state.tournament}
           onSelectMatch={handleSelectMatch}
+          matchPacks={state.tournament?.perMatchPacks ? bracketMatchPacks : undefined}
           onOpenInNewTab={state.tournamentId ? ((ri, mi) => {
             const matchId = `${state.tournamentId}-m-${ri}-${mi}`;
             window.open(`/host/tournament/${state.tournamentId}/match/${matchId}`, '_blank');
@@ -855,7 +1026,9 @@ export default function HostQuiz() {
     const roundName = currentMatch
       ? getRoundName(state.tournament.rounds.length, currentMatch.roundIndex)
       : '';
-    const matchLabel = `${roundName} — Match ${(currentMatch?.matchIndex || 0) + 1}`;
+    const matchKey = currentMatch ? `r${currentMatch.roundIndex}-m${currentMatch.matchIndex}` : null;
+    const matchPackTitle = matchKey && state.matchPacks[matchKey]?.packTitle;
+    const matchLabel = `${roundName} — Match ${(currentMatch?.matchIndex || 0) + 1}${matchPackTitle ? ` — ${matchPackTitle}` : ''}`;
 
     return (
       <div className="host-quiz host-quiz--fullscreen">

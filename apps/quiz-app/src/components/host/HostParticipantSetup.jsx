@@ -9,6 +9,7 @@ export default function HostParticipantSetup({ pack, questionCount, onStart, onC
   const [names, setNames] = useState(['']);
   const [mode, setMode] = useState('standard');
   const [questionsPerMatch, setQuestionsPerMatch] = useState(DEFAULT_QUESTIONS_PER_MATCH);
+  const [perMatchPacks, setPerMatchPacks] = useState(false);
 
   const isTournament = mode === 'tournament';
   const effectiveMax = MAX_PLAYERS;
@@ -41,11 +42,11 @@ export default function HostParticipantSetup({ pack, questionCount, onStart, onC
     if (!allNamesFilled || !hasEnoughPlayers) return;
     const trimmedNames = names.map(n => n.trim());
     if (isTournament) {
-      onStart(trimmedNames, 'tournament', questionsPerMatch);
+      onStart(trimmedNames, 'tournament', questionsPerMatch, perMatchPacks);
     } else {
       onStart(trimmedNames);
     }
-  }, [allNamesFilled, hasEnoughPlayers, names, onStart, isTournament, questionsPerMatch]);
+  }, [allNamesFilled, hasEnoughPlayers, names, onStart, isTournament, questionsPerMatch, perMatchPacks]);
 
   const handleModeChange = useCallback((newMode) => {
     setMode(newMode);
@@ -111,7 +112,24 @@ export default function HostParticipantSetup({ pack, questionCount, onStart, onC
               onChange={e => setQuestionsPerMatch(Math.max(1, parseInt(e.target.value) || 1))}
             />
           </div>
-          {names.length >= 2 && (
+          <div className="host-setup__setting-row">
+            <label className="host-setup__setting-label" htmlFor="per-match-packs">
+              Different pack per match
+            </label>
+            <input
+              id="per-match-packs"
+              className="host-setup__setting-checkbox"
+              type="checkbox"
+              checked={perMatchPacks}
+              onChange={e => setPerMatchPacks(e.target.checked)}
+            />
+          </div>
+          {perMatchPacks && (
+            <p className="host-setup__tournament-info">
+              You&apos;ll pick a quiz pack before each match starts.
+            </p>
+          )}
+          {!perMatchPacks && names.length >= 2 && (
             <p className="host-setup__tournament-info">
               {names.length} teams = {totalMatches} matches &middot; {totalQuestionsNeeded} questions needed
               {totalQuestionsNeeded > questionCount && (
