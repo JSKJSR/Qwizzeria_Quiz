@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { fetchAllQuestions, fetchCategories } from '@qwizzeria/supabase-client/src/questions.js';
 import { fetchAdminAnalytics, fetchPackPerformance, fetchHardestQuestions } from '@qwizzeria/supabase-client/src/packs.js';
+import { getSubscriptionAnalytics } from '@qwizzeria/supabase-client/src/users.js';
 
 export default function Dashboard() {
   const navigate = useNavigate();
@@ -10,6 +11,7 @@ export default function Dashboard() {
   const [analytics, setAnalytics] = useState(null);
   const [packPerf, setPackPerf] = useState([]);
   const [hardest, setHardest] = useState([]);
+  const [subAnalytics, setSubAnalytics] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -30,17 +32,19 @@ export default function Dashboard() {
         });
 
         // Load remaining data in parallel (non-critical)
-        const [recentResult, analyticsData, perfData, hardestData] = await Promise.all([
+        const [recentResult, analyticsData, perfData, hardestData, subData] = await Promise.all([
           fetchAllQuestions({ pageSize: 10 }),
           fetchAdminAnalytics().catch(() => null),
           fetchPackPerformance().catch(() => []),
           fetchHardestQuestions(10).catch(() => []),
+          getSubscriptionAnalytics().catch(() => null),
         ]);
 
         setRecent(recentResult.data);
         setAnalytics(analyticsData);
         setPackPerf(perfData);
         setHardest(hardestData);
+        setSubAnalytics(subData);
       } catch (err) {
         console.error('Failed to load dashboard:', err);
       } finally {
@@ -102,6 +106,39 @@ export default function Dashboard() {
             <div className="stat-card">
               <div className="stat-card__label">Active Users (7d)</div>
               <div className="stat-card__value">{analytics.active_users_7d ?? 0}</div>
+            </div>
+          </div>
+        </>
+      )}
+
+      {/* Subscription Analytics */}
+      {subAnalytics && (
+        <>
+          <h2 style={{ fontSize: 'var(--font-size-md)', marginBottom: '1rem', marginTop: '2rem' }}>Subscriptions</h2>
+          <div className="stats-grid">
+            <div className="stat-card">
+              <div className="stat-card__label">Trialing</div>
+              <div className="stat-card__value">{subAnalytics.trialing ?? 0}</div>
+            </div>
+            <div className="stat-card">
+              <div className="stat-card__label">Active (Basic)</div>
+              <div className="stat-card__value">{subAnalytics.activeBasic ?? 0}</div>
+            </div>
+            <div className="stat-card">
+              <div className="stat-card__label">Active (Pro)</div>
+              <div className="stat-card__value">{subAnalytics.activePro ?? 0}</div>
+            </div>
+            <div className="stat-card">
+              <div className="stat-card__label">Trial Conversion</div>
+              <div className="stat-card__value">{subAnalytics.conversionRate ?? 0}%</div>
+            </div>
+            <div className="stat-card">
+              <div className="stat-card__label">Canceled</div>
+              <div className="stat-card__value">{subAnalytics.canceled ?? 0}</div>
+            </div>
+            <div className="stat-card">
+              <div className="stat-card__label">Expired Trials</div>
+              <div className="stat-card__value">{subAnalytics.expired ?? 0}</div>
             </div>
           </div>
         </>

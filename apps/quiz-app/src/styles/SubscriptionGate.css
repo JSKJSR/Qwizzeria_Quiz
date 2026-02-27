@@ -1,0 +1,297 @@
+/* ============================================================
+   Trial Widget (Sidebar)
+   ============================================================ */
+
+.trial-widget {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem;
+  margin: 0 0.75rem 0.75rem;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 12px;
+}
+
+.trial-widget__ring {
+  display: block;
+}
+
+.trial-widget__ring-text {
+  fill: #f0f0f0;
+  font-size: 1.5rem;
+  font-weight: 700;
+  font-family: var(--font-family, system-ui, sans-serif);
+}
+
+.trial-widget__subtitle {
+  font-size: 0.75rem;
+  color: var(--text-secondary, #b0a0a5);
+  text-align: center;
+  line-height: 1.4;
+  margin: 0;
+}
+
+.trial-widget__upgrade-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.5rem 1.25rem;
+  background: var(--accent-primary, #e85c1a);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.trial-widget__upgrade-btn:hover {
+  background: #d04f15;
+  color: #fff;
+}
+
+.trial-widget__upgrade-link {
+  font-size: 0.75rem;
+  color: var(--accent-primary, #e85c1a);
+  text-decoration: none;
+}
+
+.trial-widget__upgrade-link:hover {
+  text-decoration: underline;
+}
+
+.trial-widget__user {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.2rem;
+  width: 100%;
+  padding-top: 0.5rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.trial-widget__name {
+  font-size: 0.85rem;
+  color: var(--text-primary, #f0f0f0);
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 100%;
+}
+
+.trial-widget__label {
+  font-size: 0.65rem;
+  color: var(--text-muted, #998888);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 600;
+}
+
+.trial-widget__label--active {
+  color: #4ade80;
+}
+
+.trial-widget__label--staff {
+  color: var(--accent-warning, #e8a825);
+  text-transform: capitalize;
+}
+
+.trial-widget__label--warning {
+  color: var(--accent-warning, #e8a825);
+}
+
+.trial-widget__warning {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.8rem;
+  color: var(--accent-warning, #e8a825);
+}
+
+/* ============================================================
+   Nav Lock Icon
+   ============================================================ */
+
+.dashboard__nav-lock {
+  margin-left: auto;
+  opacity: 0.4;
+  flex-shrink: 0;
+}
+
+/* ============================================================
+   Trial Banner
+   ============================================================ */
+
+.trial-banner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  padding: 0.5rem 1rem;
+  background: linear-gradient(135deg, rgba(232, 92, 26, 0.15), rgba(232, 168, 37, 0.1));
+  border-bottom: 1px solid rgba(232, 92, 26, 0.2);
+}
+
+.trial-banner__text {
+  font-size: 0.85rem;
+  color: var(--text-primary, #f0f0f0);
+}
+
+.trial-banner__link {
+  color: var(--accent-primary, #e85c1a);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.trial-banner__link:hover {
+  text-decoration: underline;
+}
+
+.trial-banner__dismiss {
+  background: none;
+  border: none;
+  color: var(--text-muted, #998888);
+  cursor: pointer;
+  padding: 0.25rem;
+  display: flex;
+  align-items: center;
+  min-width: 28px;
+  min-height: 28px;
+  justify-content: center;
+}
+
+.trial-banner__dismiss:hover {
+  color: var(--text-primary, #f0f0f0);
+}
+
+/* ============================================================
+   Upgrade Wall
+   ============================================================ */
+
+.upgrade-wall {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 2rem 1.5rem;
+  min-height: 80vh;
+}
+
+.upgrade-wall__card {
+  max-width: 720px;
+  width: 100%;
+  text-align: center;
+  padding: 2.5rem 2rem;
+}
+
+.upgrade-wall__logo {
+  height: 60px;
+  margin-bottom: 1.5rem;
+}
+
+.upgrade-wall__title {
+  font-size: 1.5rem;
+  color: var(--text-primary, #f0f0f0);
+  margin: 0 0 0.5rem;
+}
+
+.upgrade-wall__subtitle {
+  font-size: 0.95rem;
+  color: var(--text-secondary, #b0a0a5);
+  margin: 0 0 0.5rem;
+}
+
+.upgrade-wall__feature {
+  font-size: 0.85rem;
+  color: var(--text-muted, #998888);
+  margin: 0 0 2rem;
+}
+
+/* Feature comparison table */
+.upgrade-wall__comparison {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  text-align: left;
+}
+
+.upgrade-wall__tier-col {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 12px;
+  padding: 1rem;
+}
+
+.upgrade-wall__tier-col--highlight {
+  border-color: var(--accent-primary, #e85c1a);
+  background: rgba(232, 92, 26, 0.05);
+}
+
+.upgrade-wall__tier-name {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-primary, #f0f0f0);
+  margin: 0 0 0.75rem;
+  text-align: center;
+}
+
+.upgrade-wall__feature-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.75rem;
+  color: var(--text-secondary, #b0a0a5);
+  padding: 0.25rem 0;
+}
+
+.upgrade-wall__actions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.upgrade-wall__cta {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.75rem 2rem;
+  background: var(--accent-primary, #e85c1a);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 700;
+  text-decoration: none;
+  transition: background 0.15s ease;
+}
+
+.upgrade-wall__cta:hover {
+  background: #d04f15;
+  color: #fff;
+}
+
+.upgrade-wall__free-link {
+  font-size: 0.85rem;
+  color: var(--text-secondary, #b0a0a5);
+  text-decoration: none;
+}
+
+.upgrade-wall__free-link:hover {
+  color: var(--text-primary, #f0f0f0);
+}
+
+@media (max-width: 600px) {
+  .upgrade-wall__comparison {
+    grid-template-columns: 1fr;
+  }
+
+  .upgrade-wall__card {
+    padding: 1.5rem 1rem;
+  }
+}

@@ -1,8 +1,10 @@
 import { useState, useEffect, useCallback } from 'react';
 import { getSupabase } from '@qwizzeria/supabase-client';
 import { onAuthStateChange, signOut as authSignOut, signInWithEmail, signUpWithEmail } from '@qwizzeria/supabase-client/src/auth.js';
-import { fetchUserRole, hasMinRole } from '@qwizzeria/supabase-client/src/users.js';
+import { fetchUserRole, hasMinRole, getSubscriptionState } from '@qwizzeria/supabase-client/src/users.js';
 import { AuthContext } from '../contexts/AuthContext';
+
+const DEFAULT_SUBSCRIPTION = { status: 'expired', tier: 'free', gated: true };
 
 function isSupabaseConfigured() {
   try {
@@ -16,6 +18,7 @@ function isSupabaseConfigured() {
 export default function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [role, setRole] = useState('user');
+  const [subscription, setSubscription] = useState(DEFAULT_SUBSCRIPTION);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -33,14 +36,24 @@ export default function AuthProvider({ children }) {
 
       if (currentUser?.id) {
         try {
-          const userRole = await fetchUserRole(currentUser.id);
-          if (mounted) setRole(userRole);
+          const [userRole, subState] = await Promise.all([
+            fetchUserRole(currentUser.id),
+            getSubscriptionState(currentUser.id).catch(() => null),
+          ]);
+          if (mounted) {
+            setRole(userRole);
+            setSubscription(subState || DEFAULT_SUBSCRIPTION);
+          }
         } catch (err) {
           console.error('AuthProvider: Error fetching role:', err);
-          if (mounted) setRole('user');
+          if (mounted) {
+            setRole('user');
+            setSubscription(DEFAULT_SUBSCRIPTION);
+          }
         }
       } else {
         setRole('user');
+        setSubscription(DEFAULT_SUBSCRIPTION);
       }
 
       if (mounted) setLoading(false);
@@ -112,8 +125,12 @@ export default function AuthProvider({ children }) {
   const signIn = useCallback(async (email, password) => {
     const data = await signInWithEmail(email, password);
     setUser(data.user);
-    const userRole = await fetchUserRole(data.user?.id);
+    const [userRole, subState] = await Promise.all([
+      fetchUserRole(data.user?.id),
+      getSubscriptionState(data.user?.id).catch(() => null),
+    ]);
     setRole(userRole || 'user');
+    setSubscription(subState || DEFAULT_SUBSCRIPTION);
     return { ...data, role: userRole || 'user' };
   }, []);
 
@@ -126,15 +143,41 @@ export default function AuthProvider({ children }) {
     await authSignOut();
     setUser(null);
     setRole('user');
+    setSubscription(DEFAULT_SUBSCRIPTION);
   }, []);
+
+  const refreshSubscription = useCallback(async () => {
+    if (!user) return;
+    try {
+      const subState = await getSubscriptionState(user.id);
+      setSubscription(subState || DEFAULT_SUBSCRIPTION);
+    } catch {
+      // Silently fail — subscription state will be stale
+    }
+  }, [user]);
 
   const isPremium = hasMinRole(role, 'premium');
   const isEditor = hasMinRole(role, 'editor');
   const isAdmin = hasMinRole(role, 'admin');
   const isSuperadmin = role === 'superadmin';
 
+  // Subscription-derived helpers
+  const isTrial = subscription.status === 'trialing';
+  const isGated = subscription.gated === true;
+  const hasTier = useCallback((requiredTier) => {
+    if (subscription.status === 'staff') return true;
+    if (subscription.gated) return false;
+    if (requiredTier === 'basic') return ['basic', 'pro'].includes(subscription.tier);
+    if (requiredTier === 'pro') return subscription.tier === 'pro';
+    return true;
+  }, [subscription]);
+
   return (
-    <AuthContext.Provider value={{ user, role, isPremium, isEditor, isAdmin, isSuperadmin, loading, signIn, signUp, signOut }}>
+    <AuthContext.Provider value={{
+      user, role, isPremium, isEditor, isAdmin, isSuperadmin, loading,
+      signIn, signUp, signOut,
+      subscription, isTrial, isGated, hasTier, refreshSubscription,
+    }}>
       {children}
     </AuthContext.Provider>
   );

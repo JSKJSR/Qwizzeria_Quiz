@@ -2,13 +2,20 @@ import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import { fetchUserProfile, upsertUserProfile, fetchUserStats } from '@qwizzeria/supabase-client/src/users.js';
+import { getSupabase } from '@qwizzeria/supabase-client';
 import { updatePassword, deleteOwnAccount } from '@qwizzeria/supabase-client/src/auth.js';
 import SEO from '../components/SEO';
 import '../styles/Profile.css';
 
+async function getAuthToken() {
+  const supabase = getSupabase();
+  const { data } = await supabase.auth.getSession();
+  return data?.session?.access_token;
+}
+
 export default function Profile() {
   const navigate = useNavigate();
-  const { user, signOut } = useAuth();
+  const { user, signOut, subscription, isTrial } = useAuth();
 
   const [, setProfile] = useState(null);
   const [stats, setStats] = useState(null);
@@ -18,6 +25,9 @@ export default function Profile() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [retryKey, setRetryKey] = useState(0);
+
+  // Subscription state
+  const [portalLoading, setPortalLoading] = useState(false);
 
   // Password state
   const [newPassword, setNewPassword] = useState('');
@@ -64,6 +74,22 @@ export default function Profile() {
       setSaveMsg({ type: 'error', text: `Failed to save: ${err.message}` });
     } finally {
       setSaving(false);
+    }
+  };
+
+  const handleManageSubscription = async () => {
+    setPortalLoading(true);
+    try {
+      const token = await getAuthToken();
+      const res = await fetch('/api/stripe/create-portal', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error);
+      window.location.href = data.url;
+    } catch {
+      setPortalLoading(false);
     }
   };
 
@@ -180,6 +206,74 @@ export default function Profile() {
           <p className={`profile__feedback profile__feedback--${saveMsg.type}`}>{saveMsg.text}</p>
         )}
       </section>
+
+      {/* Subscription Section */}
+      {subscription.status !== 'staff' && (
+        <section className="profile__section">
+          <div className="profile__section-header">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
+              <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
+            </svg>
+            <h2>Subscription</h2>
+          </div>
+
+          {isTrial && (
+            <div className="profile__sub-info">
+              <p className="profile__sub-status">
+                Free Trial — <strong>{subscription.trialDaysLeft ?? 0} days remaining</strong>
+              </p>
+              <Link to="/pricing" className="profile__action-link">Upgrade Now</Link>
+            </div>
+          )}
+
+          {subscription.status === 'active' && (
+            <div className="profile__sub-info">
+              <p className="profile__sub-status">
+                <strong>{subscription.tier === 'pro' ? 'Pro' : 'Basic'} Plan</strong>
+                {subscription.cancelAtPeriodEnd && ' (cancels at period end)'}
+              </p>
+              {subscription.currentPeriodEnd && (
+                <p className="profile__sub-date">
+                  {subscription.cancelAtPeriodEnd
+                    ? `Access until ${new Date(subscription.currentPeriodEnd).toLocaleDateString()}`
+                    : `Next billing: ${new Date(subscription.currentPeriodEnd).toLocaleDateString()}`}
+                </p>
+              )}
+              <button className="profile__action-link" onClick={handleManageSubscription} disabled={portalLoading} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, fontFamily: 'inherit' }}>
+                {portalLoading ? 'Loading...' : 'Manage Subscription'}
+              </button>
+            </div>
+          )}
+
+          {subscription.status === 'canceled' && (
+            <div className="profile__sub-info">
+              <p className="profile__sub-status">Canceled</p>
+              {subscription.currentPeriodEnd && new Date(subscription.currentPeriodEnd) > new Date() && (
+                <p className="profile__sub-date">Access until {new Date(subscription.currentPeriodEnd).toLocaleDateString()}</p>
+              )}
+              <Link to="/pricing" className="profile__action-link">Resubscribe</Link>
+            </div>
+          )}
+
+          {subscription.status === 'expired' && (
+            <div className="profile__sub-info">
+              <p className="profile__sub-status">Free Plan</p>
+              <Link to="/pricing" className="profile__action-link">Upgrade</Link>
+            </div>
+          )}
+
+          {subscription.status === 'past_due' && (
+            <div className="profile__sub-info">
+              <p className="profile__sub-status profile__sub-status--warning">Payment Failed</p>
+              <p className="profile__sub-date">Please update your payment method to avoid losing access.</p>
+              <button className="profile__action-link" onClick={handleManageSubscription} disabled={portalLoading} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, fontFamily: 'inherit' }}>
+                {portalLoading ? 'Loading...' : 'Update Payment Method'}
+              </button>
+            </div>
+          )}
+        </section>
+      )}
 
       {/* Stats Section */}
       {stats && (

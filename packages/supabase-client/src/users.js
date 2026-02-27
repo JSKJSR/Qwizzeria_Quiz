@@ -95,6 +95,33 @@ export async function fetchSessionDetail(sessionId) {
 }
 
 // ============================================================
+// Subscription Functions
+// ============================================================
+
+/**
+ * Get subscription state for a user via Postgres RPC.
+ * Returns: { status, tier, gated, trialEnd?, trialDaysLeft?, cancelAtPeriodEnd?, currentPeriodEnd?, stripeCustomerId?, role? }
+ */
+export async function getSubscriptionState(userId) {
+  const supabase = getSupabase();
+  const { data, error } = await supabase.rpc('get_subscription_state', { target_user_id: userId });
+
+  if (error) throw new Error(`Failed to fetch subscription state: ${error.message}`);
+  return data;
+}
+
+/**
+ * Get subscription analytics (admin-only).
+ */
+export async function getSubscriptionAnalytics() {
+  const supabase = getSupabase();
+  const { data, error } = await supabase.rpc('get_subscription_analytics');
+
+  if (error) throw new Error(`Failed to fetch subscription analytics: ${error.message}`);
+  return data;
+}
+
+// ============================================================
 // RBAC Functions
 // ============================================================
 

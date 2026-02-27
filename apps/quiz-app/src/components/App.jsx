@@ -3,6 +3,7 @@ import AuthProvider from './AuthProvider';
 import AuthRedirect from './AuthRedirect';
 import ProtectedRoute from './ProtectedRoute';
 import AdminRoute from './AdminRoute';
+import { TierRoute } from './SubscriptionGate';
 import DashboardLayout from '../layouts/DashboardLayout';
 import AdminLayout from '../layouts/AdminLayout';
 import DashboardHome from '../pages/DashboardHome';
@@ -16,6 +17,7 @@ import Leaderboard from '../pages/Leaderboard';
 import ResumePlay from '../pages/ResumePlay';
 import HostQuizPage from '../pages/HostQuizPage';
 import Guide from '../pages/Guide';
+import Pricing from '../pages/Pricing';
 import TournamentBracketPage from '../pages/TournamentBracketPage';
 import TournamentMatchPage from '../pages/TournamentMatchPage';
 
@@ -43,21 +45,33 @@ export default function App() {
         <Route element={<ProtectedRoute />}>
           {/* Quiz app routes with sidebar layout */}
           <Route element={<DashboardLayout />}>
+            {/* Always-free routes (no tier gate) */}
             <Route path="/dashboard" element={<DashboardHome />} />
-            <Route path="/packs" element={<PackBrowse />} />
-            <Route path="/leaderboard" element={<Leaderboard />} />
-            <Route path="/play/resume/:sessionId" element={<ResumePlay />} />
-            <Route path="/packs/:id" element={<PackDetail />} />
-            <Route path="/packs/:id/play" element={<PackPlay />} />
             <Route path="/profile" element={<Profile />} />
-            <Route path="/history" element={<History />} />
-            <Route path="/host" element={<HostQuizPage />} />
             <Route path="/guide" element={<Guide />} />
+            <Route path="/pricing" element={<Pricing />} />
+
+            {/* Basic tier routes */}
+            <Route element={<TierRoute requiredTier="basic" />}>
+              <Route path="/packs" element={<PackBrowse />} />
+              <Route path="/packs/:id" element={<PackDetail />} />
+              <Route path="/packs/:id/play" element={<PackPlay />} />
+              <Route path="/leaderboard" element={<Leaderboard />} />
+              <Route path="/history" element={<History />} />
+              <Route path="/play/resume/:sessionId" element={<ResumePlay />} />
+            </Route>
+
+            {/* Pro tier routes */}
+            <Route element={<TierRoute requiredTier="pro" />}>
+              <Route path="/host" element={<HostQuizPage />} />
+            </Route>
           </Route>
 
-          {/* Tournament routes (full-screen, no sidebar) */}
-          <Route path="/host/tournament/:tournamentId" element={<TournamentBracketPage />} />
-          <Route path="/host/tournament/:tournamentId/match/:matchId" element={<TournamentMatchPage />} />
+          {/* Tournament routes (full-screen, no sidebar) — pro tier */}
+          <Route element={<TierRoute requiredTier="pro" />}>
+            <Route path="/host/tournament/:tournamentId" element={<TournamentBracketPage />} />
+            <Route path="/host/tournament/:tournamentId/match/:matchId" element={<TournamentMatchPage />} />
+          </Route>
 
           {/* Admin CMS routes (editor+ only) */}
           <Route path="/admin" element={<AdminRoute />}>
