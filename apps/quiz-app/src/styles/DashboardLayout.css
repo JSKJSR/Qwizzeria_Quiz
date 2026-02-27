@@ -23,6 +23,7 @@
   border-bottom: 1px solid var(--border-color, #2a1520);
   display: flex;
   flex-direction: column;
+  align-items: center;
   gap: 0.25rem;
 }
 
