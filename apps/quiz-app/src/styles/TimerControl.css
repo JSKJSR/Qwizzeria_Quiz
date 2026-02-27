@@ -71,7 +71,7 @@
 
 .timer__btn:hover {
   background: var(--bg-card-hover, #251520);
-  border-color: var(--accent-primary, #be1332);
+  border-color: var(--accent-primary, #e85c1a);
 }
 
 .timer__btn--primary:hover {
@@ -101,20 +101,20 @@
 }
 
 .timer--critical {
-  border-color: var(--accent-primary, #be1332);
+  border-color: var(--accent-primary, #e85c1a);
 }
 
 .timer--critical .timer__display {
-  color: var(--accent-primary, #be1332);
+  color: var(--accent-primary, #e85c1a);
 }
 
 .timer--expired {
-  border-color: var(--accent-primary, #be1332);
+  border-color: var(--accent-primary, #e85c1a);
   animation: timerExpiredBorder 1s ease-in-out infinite;
 }
 
 .timer--expired .timer__display {
-  color: var(--accent-primary, #be1332);
+  color: var(--accent-primary, #e85c1a);
 }
 
 .timer__display--pulse {
@@ -134,7 +134,7 @@
 
 @keyframes timerExpiredBorder {
   0%, 100% {
-    border-color: var(--accent-primary, #be1332);
+    border-color: var(--accent-primary, #e85c1a);
   }
   50% {
     border-color: var(--accent-primary-hover, #d4163a);

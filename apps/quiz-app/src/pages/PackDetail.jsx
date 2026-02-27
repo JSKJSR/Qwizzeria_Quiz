@@ -162,7 +162,7 @@ export default function PackDetail() {
                       {entry.display_name || 'Anonymous'}
                       {isCurrentUser && ' (You)'}
                     </td>
-                    <td style={{ fontWeight: 700, color: 'var(--accent-primary, #be1332)' }}>
+                    <td style={{ fontWeight: 700, color: 'var(--accent-primary, #e85c1a)' }}>
                       {entry.best_score ?? 0}
                     </td>
                     <td style={{ fontSize: '0.8rem', color: '#999' }}>

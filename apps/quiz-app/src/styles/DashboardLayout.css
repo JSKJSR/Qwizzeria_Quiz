@@ -67,8 +67,8 @@
 
 .dashboard__nav-link--active {
   color: var(--text-primary, #f0f0f0);
-  background: rgba(190, 19, 50, 0.08);
-  border-left-color: var(--accent-primary, #be1332);
+  background: rgba(232, 92, 26, 0.08);
+  border-left-color: var(--accent-primary, #e85c1a);
 }
 
 .dashboard__nav-icon {
@@ -152,7 +152,7 @@
 }
 
 .dashboard__signout-btn:hover {
-  color: var(--accent-primary, #be1332);
+  color: var(--accent-primary, #e85c1a);
 }
 
 /* Main content */

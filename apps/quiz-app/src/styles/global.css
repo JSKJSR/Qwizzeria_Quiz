@@ -12,15 +12,15 @@
   --text-secondary: #b0a0a5;
   --text-muted: #998888;
 
-  --accent-primary: #be1332;
-  --accent-primary-hover: #a01028;
-  --accent-secondary: #e85c1a;
+  --accent-primary: #e85c1a;
+  --accent-primary-hover: #cc4e15;
+  --accent-secondary: #be1332;
   --accent-success: #4caf50;
   --accent-warning: #e8a825;
   --accent-danger: #e53935;
 
   --border-color: #2a1520;
-  --border-active: #be1332;
+  --border-active: #e85c1a;
 
   --font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
   --font-size-hero: 3rem;

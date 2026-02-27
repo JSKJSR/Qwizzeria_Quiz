@@ -75,7 +75,7 @@ export default function PackPlay() {
           <button
             className="pack-play__back-btn"
             onClick={() => navigate('/packs')}
-            style={{ padding: '0.75rem 1.5rem', background: 'var(--accent-primary, #be1332)', borderRadius: '8px', color: '#fff' }}
+            style={{ padding: '0.75rem 1.5rem', background: 'var(--accent-primary, #e85c1a)', borderRadius: '8px', color: '#fff' }}
           >
             Browse Packs
           </button>

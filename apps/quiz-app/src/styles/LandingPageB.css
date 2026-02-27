@@ -45,7 +45,7 @@
 
 .landing-b__btn-primary {
   padding: 0.6rem 1.25rem;
-  background: var(--accent-primary, #be1332);
+  background: var(--accent-primary, #e85c1a);
   color: #fff;
   border: none;
   border-radius: 8px;
@@ -113,7 +113,7 @@
   align-items: center;
   justify-content: center;
   padding: 0.85rem 1.75rem;
-  background: var(--accent-primary, #be1332);
+  background: var(--accent-primary, #e85c1a);
   color: #fff;
   border: none;
   border-radius: var(--radius, 12px);
@@ -294,7 +294,7 @@
 .landing-b__pack-image-placeholder {
   width: 100%;
   height: 130px;
-  background: linear-gradient(135deg, rgba(190, 19, 50, 0.2), rgba(232, 92, 26, 0.2));
+  background: linear-gradient(135deg, rgba(232, 92, 26, 0.2), rgba(232, 92, 26, 0.2));
 }
 
 .landing-b__pack-body {
@@ -319,8 +319,8 @@
 
 .landing-b__pack-tag {
   padding: 0.1rem 0.45rem;
-  background: rgba(190, 19, 50, 0.15);
-  color: var(--accent-primary, #be1332);
+  background: rgba(232, 92, 26, 0.15);
+  color: var(--accent-primary, #e85c1a);
   border-radius: 4px;
   font-size: 0.65rem;
   font-weight: 500;

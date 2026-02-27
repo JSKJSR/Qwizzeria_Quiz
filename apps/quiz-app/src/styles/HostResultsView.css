@@ -69,7 +69,7 @@
 .host-results__score {
   font-size: 1.25rem;
   font-weight: 700;
-  color: var(--accent-primary, #be1332);
+  color: var(--accent-primary, #e85c1a);
   font-variant-numeric: tabular-nums;
 }
 
@@ -94,7 +94,7 @@
 }
 
 .host-results__skipped-toggle:hover {
-  border-color: var(--accent-primary, #be1332);
+  border-color: var(--accent-primary, #e85c1a);
 }
 
 .host-results__skipped-arrow {
@@ -124,7 +124,7 @@
   font-size: 0.75rem;
   text-transform: uppercase;
   letter-spacing: 1px;
-  color: var(--accent-primary, #be1332);
+  color: var(--accent-primary, #e85c1a);
   font-weight: 600;
   margin-bottom: 0.4rem;
 }
@@ -165,7 +165,7 @@
 }
 
 .host-results__btn--primary {
-  background: var(--accent-primary, #be1332);
+  background: var(--accent-primary, #e85c1a);
   color: #fff;
 }
 
@@ -180,7 +180,7 @@
 }
 
 .host-results__btn--secondary:hover {
-  border-color: var(--accent-primary, #be1332);
+  border-color: var(--accent-primary, #e85c1a);
 }
 
 @media (max-width: 768px) {

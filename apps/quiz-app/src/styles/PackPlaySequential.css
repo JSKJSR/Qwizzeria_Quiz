@@ -21,11 +21,11 @@
 .seq-play__score-bar {
   font-size: 1rem;
   font-weight: 700;
-  color: var(--accent-primary, #be1332);
+  color: var(--accent-primary, #e85c1a);
   padding: 0.25rem 0.75rem;
-  background: rgba(190, 19, 50, 0.1);
+  background: rgba(232, 92, 26, 0.1);
   border-radius: 4px;
-  border: 1px solid rgba(190, 19, 50, 0.25);
+  border: 1px solid rgba(232, 92, 26, 0.25);
 }
 
 .seq-play__quit-btn {
@@ -58,7 +58,7 @@
 
 .seq-play__progress-fill {
   height: 100%;
-  background: var(--accent-primary, #be1332);
+  background: var(--accent-primary, #e85c1a);
   transition: width 0.3s ease;
   border-radius: 3px;
 }
@@ -90,7 +90,7 @@
 .seq-play__score-number {
   font-size: 4rem;
   font-weight: 700;
-  color: var(--accent-primary, #be1332);
+  color: var(--accent-primary, #e85c1a);
 }
 
 .seq-play__score-label {
@@ -150,7 +150,7 @@
 .seq-play__review-points {
   font-size: 0.85rem;
   font-weight: 700;
-  color: var(--accent-primary, #be1332);
+  color: var(--accent-primary, #e85c1a);
 }
 
 .seq-play__review-question {
@@ -196,7 +196,7 @@
 }
 
 .seq-play__cta-btn--primary {
-  background: var(--accent-primary, #be1332);
+  background: var(--accent-primary, #e85c1a);
   color: #fff;
 }
 

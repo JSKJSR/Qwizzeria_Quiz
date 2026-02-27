@@ -29,7 +29,7 @@
   font-size: 0.75rem;
   text-transform: uppercase;
   letter-spacing: 1px;
-  color: var(--accent-primary, #be1332);
+  color: var(--accent-primary, #e85c1a);
   font-weight: 600;
   margin-bottom: 0.5rem;
 }
@@ -47,7 +47,7 @@
 
 .host-review__card--skipped {
   border-style: dashed;
-  border-color: rgba(190, 19, 50, 0.4);
+  border-color: rgba(232, 92, 26, 0.4);
 }
 
 .host-review__card--unanswered {
@@ -72,8 +72,8 @@
 }
 
 .host-review__badge--skipped {
-  background: rgba(190, 19, 50, 0.15);
-  color: var(--accent-primary, #be1332);
+  background: rgba(232, 92, 26, 0.15);
+  color: var(--accent-primary, #e85c1a);
 }
 
 .host-review__badge--unanswered {

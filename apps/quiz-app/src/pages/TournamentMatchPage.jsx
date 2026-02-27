@@ -427,7 +427,7 @@ export default function TournamentMatchPage() {
         <SEO title="Match Complete" noIndex />
         <div style={{ textAlign: 'center', maxWidth: 500 }}>
           <h2 style={{ fontSize: '1.5rem', marginBottom: '0.5rem' }}>Match Complete</h2>
-          {matchLabel && <p style={{ color: 'var(--accent-primary, #be1332)', fontSize: '0.85rem', marginBottom: '1rem' }}>{matchLabel}</p>}
+          {matchLabel && <p style={{ color: 'var(--accent-primary, #e85c1a)', fontSize: '0.85rem', marginBottom: '1rem' }}>{matchLabel}</p>}
           {winner && (
             <div style={{ marginBottom: '1.5rem' }}>
               <div style={{ fontSize: '2.5rem' }}>&#127942;</div>

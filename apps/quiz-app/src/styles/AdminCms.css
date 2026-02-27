@@ -323,7 +323,7 @@
 }
 
 .badge--admin {
-  background: rgba(190, 19, 50, 0.15);
+  background: rgba(232, 92, 26, 0.15);
   color: var(--accent-primary);
 }
 
@@ -365,7 +365,7 @@
 .import-zone:hover,
 .import-zone--active {
   border-color: var(--accent-primary);
-  background: rgba(190, 19, 50, 0.05);
+  background: rgba(232, 92, 26, 0.05);
 }
 
 .import-zone p {

@@ -257,7 +257,7 @@ export default function History() {
                           style={{
                             marginTop: '0.75rem',
                             padding: '0.5rem 1rem',
-                            background: 'var(--accent-primary, #be1332)',
+                            background: 'var(--accent-primary, #e85c1a)',
                             color: '#fff',
                             border: 'none',
                             borderRadius: '8px',

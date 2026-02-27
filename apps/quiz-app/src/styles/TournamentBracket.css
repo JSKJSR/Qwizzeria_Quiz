@@ -68,13 +68,13 @@
 }
 
 .tournament-match--playable {
-  border-color: var(--accent-primary, #be1332);
+  border-color: var(--accent-primary, #e85c1a);
   cursor: pointer;
-  box-shadow: 0 0 12px rgba(190, 19, 50, 0.2);
+  box-shadow: 0 0 12px rgba(232, 92, 26, 0.2);
 }
 
 .tournament-match--playable:hover {
-  box-shadow: 0 4px 20px rgba(190, 19, 50, 0.35);
+  box-shadow: 0 4px 20px rgba(232, 92, 26, 0.35);
 }
 
 .tournament-match--completed {
@@ -128,8 +128,8 @@
   height: 24px;
   border-radius: 4px;
   background: var(--bg-card, #1a1015);
-  border: 1px solid var(--accent-primary, #be1332);
-  color: var(--accent-primary, #be1332);
+  border: 1px solid var(--accent-primary, #e85c1a);
+  color: var(--accent-primary, #e85c1a);
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -140,7 +140,7 @@
 }
 
 .tournament-match__new-tab-btn:hover {
-  background: var(--accent-primary, #be1332);
+  background: var(--accent-primary, #e85c1a);
   color: #fff;
 }
 
@@ -196,7 +196,7 @@
   font-weight: 700;
   min-width: 2rem;
   text-align: right;
-  color: var(--accent-primary, #be1332);
+  color: var(--accent-primary, #e85c1a);
 }
 
 .tournament-match__status {
@@ -212,7 +212,7 @@
 }
 
 .tournament-match__status--playable {
-  background: var(--accent-primary, #be1332);
+  background: var(--accent-primary, #e85c1a);
   color: #fff;
 }
 

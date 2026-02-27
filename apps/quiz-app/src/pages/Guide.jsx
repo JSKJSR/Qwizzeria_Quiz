@@ -43,9 +43,9 @@ function PackCardsVisual() {
       <rect x="10" y="20" width="50" height="80" rx="6" fill="#1a1015" stroke="#2a1520" strokeWidth="1.5" />
       <text x="35" y="55" textAnchor="middle" fill="#b0a0a5" fontSize="8">Science</text>
       <text x="35" y="75" textAnchor="middle" fill="#b0a0a5" fontSize="9">12 Qs</text>
-      <rect x="75" y="15" width="50" height="90" rx="6" fill="#1a1015" stroke="#be1332" strokeWidth="2.5" />
+      <rect x="75" y="15" width="50" height="90" rx="6" fill="#1a1015" stroke="#e85c1a" strokeWidth="2.5" />
       <text x="100" y="52" textAnchor="middle" fill="#f0f0f0" fontSize="8" fontWeight="bold">History</text>
-      <text x="100" y="72" textAnchor="middle" fill="#be1332" fontSize="9" fontWeight="bold">20 Qs</text>
+      <text x="100" y="72" textAnchor="middle" fill="#e85c1a" fontSize="9" fontWeight="bold">20 Qs</text>
       <rect x="140" y="20" width="50" height="80" rx="6" fill="#1a1015" stroke="#2a1520" strokeWidth="1.5" />
       <text x="165" y="55" textAnchor="middle" fill="#b0a0a5" fontSize="8">Sports</text>
       <text x="165" y="75" textAnchor="middle" fill="#b0a0a5" fontSize="9">15 Qs</text>
@@ -64,8 +64,8 @@ function ParticipantsVisual() {
           </text>
         </g>
       ))}
-      <circle cx="182" cy="50" r="18" fill="#1a1015" stroke="#be1332" strokeWidth="2" strokeDasharray="4 2" />
-      <text x="182" y="56" textAnchor="middle" fill="#be1332" fontSize="18">+</text>
+      <circle cx="182" cy="50" r="18" fill="#1a1015" stroke="#e85c1a" strokeWidth="2" strokeDasharray="4 2" />
+      <text x="182" y="56" textAnchor="middle" fill="#e85c1a" fontSize="18">+</text>
       <text x="100" y="90" textAnchor="middle" fill="#b0a0a5" fontSize="9">2–16 players</text>
     </svg>
   );
@@ -81,7 +81,7 @@ function ModeToggleVisual({ active = 'standard' }) {
         width="78"
         height="36"
         rx="18"
-        fill="#be1332"
+        fill="#e85c1a"
       />
       <text x="60" y="65" textAnchor="middle" fill={active === 'standard' ? '#fff' : '#b0a0a5'} fontSize="10" fontWeight="bold">Standard</text>
       <text x="140" y="65" textAnchor="middle" fill={active === 'tournament' ? '#fff' : '#b0a0a5'} fontSize="10" fontWeight="bold">Tournament</text>
@@ -98,7 +98,7 @@ function QuizGridVisual() {
         <g key={`${col}-${row}`}>
           <rect x={10 + col * 64} y={10 + row * 52} width="58" height="46" rx="5" fill="#1a1015" stroke="#2a1520" strokeWidth="1.5" />
           <text x={39 + col * 64} y={30 + row * 52} textAnchor="middle" fill="#f0f0f0" fontSize="7">{cat}</text>
-          <text x={39 + col * 64} y={46 + row * 52} textAnchor="middle" fill="#be1332" fontSize="11" fontWeight="bold">{pt}</text>
+          <text x={39 + col * 64} y={46 + row * 52} textAnchor="middle" fill="#e85c1a" fontSize="11" fontWeight="bold">{pt}</text>
         </g>
       )))}
     </svg>
@@ -109,14 +109,14 @@ function QuestionFlowVisual() {
   return (
     <svg viewBox="0 0 200 120" aria-hidden="true" className="guide__svg">
       <circle cx="35" cy="60" r="22" fill="#1a1015" stroke="#2a1520" strokeWidth="1.5" />
-      <text x="35" y="67" textAnchor="middle" fill="#be1332" fontSize="22" fontWeight="bold">?</text>
+      <text x="35" y="67" textAnchor="middle" fill="#e85c1a" fontSize="22" fontWeight="bold">?</text>
       <line x1="60" y1="60" x2="72" y2="60" stroke="#b0a0a5" strokeWidth="1.5" markerEnd="url(#arrowhead)" />
       <circle cx="100" cy="60" r="22" fill="#1a1015" stroke="#2a1520" strokeWidth="1.5" />
       <path d="M91 60 Q95 52 100 56 Q105 52 109 60 Q105 68 100 72 Q95 68 91 60Z" fill="none" stroke="#f0f0f0" strokeWidth="1.5" />
       <circle cx="100" cy="60" r="3" fill="#f0f0f0" />
       <line x1="125" y1="60" x2="137" y2="60" stroke="#b0a0a5" strokeWidth="1.5" markerEnd="url(#arrowhead)" />
-      <circle cx="165" cy="60" r="22" fill="#1a1015" stroke="#be1332" strokeWidth="2" />
-      <path d="M155 60 L162 67 L177 52" fill="none" stroke="#be1332" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+      <circle cx="165" cy="60" r="22" fill="#1a1015" stroke="#e85c1a" strokeWidth="2" />
+      <path d="M155 60 L162 67 L177 52" fill="none" stroke="#e85c1a" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
       <defs>
         <marker id="arrowhead" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
           <polygon points="0 0, 8 3, 0 6" fill="#b0a0a5" />
@@ -182,8 +182,8 @@ function BracketVisual() {
       <line x1="70" y1="79" x2="70" y2="101" stroke="#2a1520" strokeWidth="1" />
       <line x1="70" y1="90" x2="85" y2="90" stroke="#2a1520" strokeWidth="1" />
       {/* Round 2 */}
-      <rect x="85" y="21" width="50" height="18" rx="3" fill="#1a1015" stroke="#be1332" strokeWidth="1.5" />
-      <text x="110" y="34" textAnchor="middle" fill="#be1332" fontSize="7">Winner</text>
+      <rect x="85" y="21" width="50" height="18" rx="3" fill="#1a1015" stroke="#e85c1a" strokeWidth="1.5" />
+      <text x="110" y="34" textAnchor="middle" fill="#e85c1a" fontSize="7">Winner</text>
       <rect x="85" y="81" width="50" height="18" rx="3" fill="#1a1015" stroke="#2a1520" strokeWidth="1" />
       <text x="110" y="94" textAnchor="middle" fill="#b0a0a5" fontSize="7">Winner</text>
       {/* Final */}
@@ -202,13 +202,13 @@ function MatchHighlightVisual() {
     <svg viewBox="0 0 200 120" aria-hidden="true" className="guide__svg">
       <rect x="20" y="15" width="60" height="22" rx="3" fill="#1a1015" stroke="#2a1520" strokeWidth="1" />
       <text x="50" y="30" textAnchor="middle" fill="#b0a0a5" fontSize="7">Match 1</text>
-      <rect x="20" y="50" width="60" height="22" rx="3" fill="#1a1015" stroke="#be1332" strokeWidth="2.5" />
-      <text x="50" y="65" textAnchor="middle" fill="#be1332" fontSize="7" fontWeight="bold">Match 2</text>
+      <rect x="20" y="50" width="60" height="22" rx="3" fill="#1a1015" stroke="#e85c1a" strokeWidth="2.5" />
+      <text x="50" y="65" textAnchor="middle" fill="#e85c1a" fontSize="7" fontWeight="bold">Match 2</text>
       <rect x="20" y="85" width="60" height="22" rx="3" fill="#1a1015" stroke="#2a1520" strokeWidth="1" />
       <text x="50" y="100" textAnchor="middle" fill="#b0a0a5" fontSize="7">Match 3</text>
       {/* Cursor / tap indicator */}
-      <circle cx="95" cy="61" r="8" fill="none" stroke="#be1332" strokeWidth="1.5" opacity="0.6" />
-      <circle cx="95" cy="61" r="3" fill="#be1332" />
+      <circle cx="95" cy="61" r="8" fill="none" stroke="#e85c1a" strokeWidth="1.5" opacity="0.6" />
+      <circle cx="95" cy="61" r="3" fill="#e85c1a" />
       <text x="150" y="63" textAnchor="middle" fill="#b0a0a5" fontSize="8">Tap to play</text>
     </svg>
   );
@@ -217,16 +217,16 @@ function MatchHighlightVisual() {
 function AdvanceVisual() {
   return (
     <svg viewBox="0 0 200 120" aria-hidden="true" className="guide__svg">
-      <rect x="15" y="40" width="65" height="40" rx="5" fill="#1a1015" stroke="#be1332" strokeWidth="2" />
+      <rect x="15" y="40" width="65" height="40" rx="5" fill="#1a1015" stroke="#e85c1a" strokeWidth="2" />
       <text x="47" y="57" textAnchor="middle" fill="#f0f0f0" fontSize="8">Match</text>
-      <text x="47" y="70" textAnchor="middle" fill="#be1332" fontSize="7">Winner: A</text>
-      <line x1="80" y1="60" x2="115" y2="60" stroke="#be1332" strokeWidth="2" markerEnd="url(#advArrow)" />
+      <text x="47" y="70" textAnchor="middle" fill="#e85c1a" fontSize="7">Winner: A</text>
+      <line x1="80" y1="60" x2="115" y2="60" stroke="#e85c1a" strokeWidth="2" markerEnd="url(#advArrow)" />
       <rect x="120" y="40" width="65" height="40" rx="5" fill="#1a1015" stroke="#2a1520" strokeWidth="1.5" />
       <text x="152" y="57" textAnchor="middle" fill="#f0f0f0" fontSize="8">Next Round</text>
       <text x="152" y="70" textAnchor="middle" fill="#b0a0a5" fontSize="7">Team A</text>
       <defs>
         <marker id="advArrow" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
-          <polygon points="0 0, 8 3, 0 6" fill="#be1332" />
+          <polygon points="0 0, 8 3, 0 6" fill="#e85c1a" />
         </marker>
       </defs>
     </svg>
@@ -239,14 +239,14 @@ function NewTabVisual() {
       <rect x="20" y="20" width="100" height="80" rx="6" fill="#1a1015" stroke="#2a1520" strokeWidth="1.5" />
       <rect x="20" y="20" width="100" height="18" rx="6" fill="#2a1520" />
       <rect x="20" y="32" width="100" height="6" rx="0" fill="#2a1520" />
-      <circle cx="30" cy="29" r="3" fill="#be1332" />
+      <circle cx="30" cy="29" r="3" fill="#e85c1a" />
       <circle cx="40" cy="29" r="3" fill="#b0a0a5" />
       <rect x="55" y="25" width="55" height="9" rx="3" fill="#1a1015" />
       <text x="82" y="32" textAnchor="middle" fill="#b0a0a5" fontSize="5">/tournament/123</text>
       <text x="70" y="70" textAnchor="middle" fill="#b0a0a5" fontSize="8">Match page</text>
       {/* Open arrow */}
-      <line x1="130" y1="55" x2="155" y2="35" stroke="#be1332" strokeWidth="1.5" />
-      <polygon points="150,30 160,33 153,40" fill="#be1332" />
+      <line x1="130" y1="55" x2="155" y2="35" stroke="#e85c1a" strokeWidth="1.5" />
+      <polygon points="150,30 160,33 153,40" fill="#e85c1a" />
       <text x="165" y="60" textAnchor="middle" fill="#b0a0a5" fontSize="7">Open in</text>
       <text x="165" y="72" textAnchor="middle" fill="#b0a0a5" fontSize="7">new tab</text>
     </svg>
@@ -257,10 +257,10 @@ function LiveBadgeVisual() {
   return (
     <svg viewBox="0 0 200 120" aria-hidden="true" className="guide__svg">
       <rect x="50" y="35" width="100" height="50" rx="8" fill="#1a1015" stroke="#2a1520" strokeWidth="1.5" />
-      <circle cx="75" cy="55" r="5" fill="#be1332">
+      <circle cx="75" cy="55" r="5" fill="#e85c1a">
         <animate attributeName="opacity" values="1;0.3;1" dur="1.5s" repeatCount="indefinite" />
       </circle>
-      <text x="88" y="53" fill="#be1332" fontSize="10" fontWeight="bold">LIVE</text>
+      <text x="88" y="53" fill="#e85c1a" fontSize="10" fontWeight="bold">LIVE</text>
       {/* Sync arrows */}
       <path d="M120 50 L132 50 L128 46" fill="none" stroke="#b0a0a5" strokeWidth="1.5" strokeLinecap="round" />
       <path d="M132 60 L120 60 L124 64" fill="none" stroke="#b0a0a5" strokeWidth="1.5" strokeLinecap="round" />
@@ -280,13 +280,13 @@ function TrophyVisual() {
       <path d="M75 30 Q55 30 55 50 Q55 60 72 60" fill="none" stroke="#FFD700" strokeWidth="3" />
       <path d="M125 30 Q145 30 145 50 Q145 60 128 60" fill="none" stroke="#FFD700" strokeWidth="3" />
       {/* Confetti dots */}
-      <circle cx="40" cy="25" r="3" fill="#be1332" />
-      <circle cx="160" cy="30" r="2.5" fill="#be1332" />
+      <circle cx="40" cy="25" r="3" fill="#e85c1a" />
+      <circle cx="160" cy="30" r="2.5" fill="#e85c1a" />
       <circle cx="55" cy="95" r="2" fill="#FFD700" />
       <circle cx="150" cy="90" r="3" fill="#FFD700" />
       <circle cx="35" cy="60" r="2" fill="#f0f0f0" />
       <circle cx="170" cy="65" r="2.5" fill="#f0f0f0" />
-      <circle cx="100" cy="10" r="2" fill="#be1332" />
+      <circle cx="100" cy="10" r="2" fill="#e85c1a" />
       <circle cx="60" cy="15" r="1.5" fill="#C0C0C0" />
       <circle cx="145" cy="15" r="1.5" fill="#C0C0C0" />
     </svg>

@@ -101,17 +101,17 @@
   transition: all 0.3s ease;
   margin-bottom: 2rem;
   animation: fadeIn 1.2s ease;
-  box-shadow: 0 4px 12px rgba(190, 19, 50, 0.3);
+  box-shadow: 0 4px 12px rgba(232, 92, 26, 0.3);
   text-decoration: none;
 }
 
 .landing__cta-primary:hover {
   background: var(--accent-primary-hover);
-  box-shadow: 0 8px 24px rgba(190, 19, 50, 0.45);
+  box-shadow: 0 8px 24px rgba(232, 92, 26, 0.45);
 }
 
 .landing__cta-primary:active {
-  box-shadow: 0 2px 8px rgba(190, 19, 50, 0.3);
+  box-shadow: 0 2px 8px rgba(232, 92, 26, 0.3);
 }
 
 .landing__cta-icon {
@@ -147,7 +147,7 @@
 .landing__cta-btn:hover {
   border-color: var(--accent-primary);
   color: var(--text-primary);
-  box-shadow: 0 4px 16px rgba(190, 19, 50, 0.25);
+  box-shadow: 0 4px 16px rgba(232, 92, 26, 0.25);
 }
 
 .landing__cta-btn:active {

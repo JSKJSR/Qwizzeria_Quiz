@@ -25,7 +25,7 @@
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 1px;
-  color: var(--accent-primary, #be1332);
+  color: var(--accent-primary, #e85c1a);
   white-space: nowrap;
   flex-shrink: 0;
 }
@@ -113,7 +113,7 @@
 }
 
 .scoreboard__adjust-btn:hover {
-  border-color: var(--accent-primary, #be1332);
+  border-color: var(--accent-primary, #e85c1a);
   color: var(--text-primary, #f0f0f0);
 }
 
@@ -151,8 +151,8 @@
 }
 
 .scoreboard__adjust-option:hover {
-  border-color: var(--accent-primary, #be1332);
-  background: rgba(190, 19, 50, 0.1);
+  border-color: var(--accent-primary, #e85c1a);
+  background: rgba(232, 92, 26, 0.1);
 }
 
 @media (max-width: 768px) {

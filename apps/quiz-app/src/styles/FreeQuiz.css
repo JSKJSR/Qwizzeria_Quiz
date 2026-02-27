@@ -56,11 +56,11 @@
 .free-quiz__score-bar {
   font-size: 1rem;
   font-weight: 700;
-  color: var(--accent-primary, #be1332);
+  color: var(--accent-primary, #e85c1a);
   padding: 0.25rem 0.75rem;
-  background: rgba(190, 19, 50, 0.1);
+  background: rgba(232, 92, 26, 0.1);
   border-radius: 4px;
-  border: 1px solid rgba(190, 19, 50, 0.25);
+  border: 1px solid rgba(232, 92, 26, 0.25);
 }
 
 /* Loading / Error states */
@@ -80,7 +80,7 @@
   width: 40px;
   height: 40px;
   border: 3px solid rgba(255, 255, 255, 0.1);
-  border-top-color: var(--accent-primary, #be1332);
+  border-top-color: var(--accent-primary, #e85c1a);
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
 }
@@ -96,7 +96,7 @@
 
 .free-quiz__retry-btn {
   padding: 0.75rem 1.5rem;
-  background: var(--accent-primary, #be1332);
+  background: var(--accent-primary, #e85c1a);
   color: #fff;
   border: none;
   border-radius: 8px;
@@ -112,7 +112,7 @@
 
 .free-quiz__progress-fill {
   height: 100%;
-  background: var(--accent-primary, #be1332);
+  background: var(--accent-primary, #e85c1a);
   transition: width 0.3s ease;
 }
 
@@ -136,7 +136,7 @@
 .free-quiz__score-number {
   font-size: 4rem;
   font-weight: 700;
-  color: var(--accent-primary, #be1332);
+  color: var(--accent-primary, #e85c1a);
 }
 
 .free-quiz__score-label {
@@ -197,7 +197,7 @@
 .free-quiz__review-points {
   font-size: 0.85rem;
   font-weight: 700;
-  color: var(--accent-primary, #be1332);
+  color: var(--accent-primary, #e85c1a);
 }
 
 .free-quiz__review-question {
@@ -250,7 +250,7 @@
 }
 
 .free-quiz__cta-btn--primary {
-  background: var(--accent-primary, #be1332);
+  background: var(--accent-primary, #e85c1a);
   color: #fff;
 }
 

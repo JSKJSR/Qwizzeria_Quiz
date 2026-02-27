@@ -51,8 +51,8 @@
 
 .host-pack-select__error {
   padding: 0.75rem 1rem;
-  background: rgba(190, 19, 50, 0.1);
-  border: 1px solid rgba(190, 19, 50, 0.3);
+  background: rgba(232, 92, 26, 0.1);
+  border: 1px solid rgba(232, 92, 26, 0.3);
   border-radius: var(--radius-sm, 8px);
   color: #ff6b6b;
   margin-bottom: 1rem;
@@ -69,7 +69,7 @@
   width: 32px;
   height: 32px;
   border: 3px solid var(--border-color, #2a1520);
-  border-top-color: var(--accent-primary, #be1332);
+  border-top-color: var(--accent-primary, #e85c1a);
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
   margin: 0 auto 1rem;
@@ -110,7 +110,7 @@
 .host-pack-select__card-image-placeholder {
   width: 100%;
   height: 160px;
-  background: linear-gradient(135deg, rgba(190, 19, 50, 0.2), rgba(232, 92, 26, 0.2));
+  background: linear-gradient(135deg, rgba(232, 92, 26, 0.2), rgba(232, 92, 26, 0.2));
 }
 
 .host-pack-select__card-body {
@@ -118,8 +118,8 @@
 }
 
 .host-pack-select__card:hover {
-  border-color: var(--accent-primary, #be1332);
-  box-shadow: 0 4px 20px rgba(190, 19, 50, 0.2);
+  border-color: var(--accent-primary, #e85c1a);
+  box-shadow: 0 4px 20px rgba(232, 92, 26, 0.2);
 }
 
 .host-pack-select__card--loading {
@@ -136,8 +136,8 @@
 .host-pack-select__card-category {
   display: inline-block;
   padding: 0.15rem 0.5rem;
-  background: rgba(190, 19, 50, 0.15);
-  color: var(--accent-primary, #be1332);
+  background: rgba(232, 92, 26, 0.15);
+  color: var(--accent-primary, #e85c1a);
   border-radius: 4px;
   font-size: 0.75rem;
   margin-bottom: 0.5rem;
@@ -189,15 +189,15 @@
 .host-setup__change-btn {
   padding: 0.4rem 0.75rem;
   background: transparent;
-  color: var(--accent-primary, #be1332);
-  border: 1px solid var(--accent-primary, #be1332);
+  color: var(--accent-primary, #e85c1a);
+  border: 1px solid var(--accent-primary, #e85c1a);
   border-radius: var(--radius-sm, 8px);
   cursor: pointer;
   font-size: 0.8rem;
 }
 
 .host-setup__change-btn:hover {
-  background: rgba(190, 19, 50, 0.1);
+  background: rgba(232, 92, 26, 0.1);
 }
 
 .host-setup__title {
@@ -236,7 +236,7 @@
 }
 
 .host-setup__player-input:focus {
-  border-color: var(--accent-primary, #be1332);
+  border-color: var(--accent-primary, #e85c1a);
 }
 
 .host-setup__remove-btn {
@@ -269,14 +269,14 @@
 }
 
 .host-setup__add-btn:hover {
-  border-color: var(--accent-primary, #be1332);
-  color: var(--accent-primary, #be1332);
+  border-color: var(--accent-primary, #e85c1a);
+  color: var(--accent-primary, #e85c1a);
 }
 
 .host-setup__start-btn {
   width: 100%;
   padding: 0.85rem;
-  background: var(--accent-primary, #be1332);
+  background: var(--accent-primary, #e85c1a);
   color: #fff;
   border: none;
   border-radius: var(--radius-sm, 8px);
@@ -326,8 +326,8 @@
 
 .host-grid__cell:hover:not(.host-grid__cell--completed) {
   background: var(--bg-card-hover, #251520);
-  border-color: var(--accent-primary, #be1332);
-  box-shadow: 0 4px 20px rgba(190, 19, 50, 0.25);
+  border-color: var(--accent-primary, #e85c1a);
+  box-shadow: 0 4px 20px rgba(232, 92, 26, 0.25);
 }
 
 .host-grid__cell--completed {
@@ -342,7 +342,7 @@
 
 .host-grid__cell--skipped {
   background: var(--bg-completed, #0d0d0d);
-  border-color: rgba(190, 19, 50, 0.25);
+  border-color: rgba(232, 92, 26, 0.25);
   border-style: dashed;
   opacity: 0.5;
   cursor: not-allowed;
@@ -356,7 +356,7 @@
   right: 8px;
   width: 22px;
   height: 22px;
-  background: rgba(190, 19, 50, 0.6);
+  background: rgba(232, 92, 26, 0.6);
   color: #fff;
   border-radius: 50%;
   font-size: 0.75rem;
@@ -377,7 +377,7 @@
 .host-grid__points {
   font-size: var(--font-size-lg, 1.25rem);
   font-weight: 800;
-  color: var(--accent-primary, #be1332);
+  color: var(--accent-primary, #e85c1a);
 }
 
 .host-grid__media-icons {
@@ -412,7 +412,7 @@
 
 .host-answer__topic {
   font-size: 0.85rem;
-  color: var(--accent-primary, #be1332);
+  color: var(--accent-primary, #e85c1a);
   text-transform: uppercase;
   font-weight: 600;
   letter-spacing: 1px;
@@ -539,7 +539,7 @@
 }
 
 .host-answer__no-points-btn:hover {
-  border-color: var(--accent-primary, #be1332);
+  border-color: var(--accent-primary, #e85c1a);
   color: var(--text-primary, #f0f0f0);
 }
 
@@ -565,7 +565,7 @@
 }
 
 .host-answer__skip-btn:hover {
-  border-color: var(--accent-primary, #be1332);
+  border-color: var(--accent-primary, #e85c1a);
   color: var(--text-secondary, #b0a0a5);
 }
 
@@ -610,7 +610,7 @@
 
 .tournament-toolbar__btn {
   padding: 0.4rem 0.85rem;
-  background: var(--accent-primary, #be1332);
+  background: var(--accent-primary, #e85c1a);
   color: #fff;
   border: none;
   border-radius: var(--radius-sm, 8px);
@@ -630,7 +630,7 @@
 }
 
 .tournament-toolbar__btn--secondary:hover {
-  border-color: var(--accent-primary, #be1332);
+  border-color: var(--accent-primary, #e85c1a);
   color: var(--text-primary, #f0f0f0);
   opacity: 1;
 }
@@ -658,12 +658,12 @@
 }
 
 .host-setup__mode-btn--active {
-  background: var(--accent-primary, #be1332);
+  background: var(--accent-primary, #e85c1a);
   color: #fff;
 }
 
 .host-setup__mode-btn:not(.host-setup__mode-btn--active):hover {
-  background: rgba(190, 19, 50, 0.1);
+  background: rgba(232, 92, 26, 0.1);
 }
 
 .host-setup__mode-desc {
@@ -707,7 +707,7 @@
 }
 
 .host-setup__setting-input:focus {
-  border-color: var(--accent-primary, #be1332);
+  border-color: var(--accent-primary, #e85c1a);
 }
 
 .host-setup__tournament-info {
@@ -732,7 +732,7 @@
 
 .tiebreaker-modal {
   background: var(--bg-card, #1a1015);
-  border: 2px solid var(--accent-primary, #be1332);
+  border: 2px solid var(--accent-primary, #e85c1a);
   border-radius: var(--radius, 12px);
   padding: 2rem;
   max-width: 400px;
@@ -744,7 +744,7 @@
   font-size: 1.5rem;
   font-weight: 700;
   margin-bottom: 0.75rem;
-  color: var(--accent-primary, #be1332);
+  color: var(--accent-primary, #e85c1a);
 }
 
 .tiebreaker-modal__text {
@@ -772,8 +772,8 @@
 }
 
 .tiebreaker-modal__btn:hover {
-  border-color: var(--accent-primary, #be1332);
-  background: rgba(190, 19, 50, 0.1);
+  border-color: var(--accent-primary, #e85c1a);
+  background: rgba(232, 92, 26, 0.1);
 }
 
 /* ---- Tournament Results ---- */
