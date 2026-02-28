@@ -39,6 +39,7 @@ export default function PackBrowse() {
         title="Quiz Packs"
         description="Browse curated quiz packs by category. Play Jeopardy-style grids or sequential quizzes with friends."
         path="/packs"
+        keywords="quiz packs, trivia packs, curated quizzes, jeopardy packs, pub quiz packs"
       />
       <h1 className="pack-browse__title">Quiz Packs</h1>
 

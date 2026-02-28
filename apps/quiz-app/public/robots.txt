@@ -6,4 +6,5 @@ Disallow: /history
 Disallow: /host
 Disallow: /play/resume/
 Disallow: /admin/
+Disallow: /packs/*/play
 Sitemap: https://qwizzeria.com/sitemap.xml

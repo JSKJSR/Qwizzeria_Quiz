@@ -298,7 +298,12 @@ function TrophyVisual() {
 export default function Guide() {
   return (
     <div className="guide">
-      <SEO title="How to Play | Qwizzeria" />
+      <SEO
+        title="How to Play | Qwizzeria"
+        description="Learn how to host quizzes and run tournaments with Qwizzeria. Step-by-step guide for Standard and Tournament modes."
+        path="/guide"
+        keywords="how to play quiz, host quiz guide, tournament mode, multiplayer quiz tutorial"
+      />
       <h1 className="guide__title">How to Play</h1>
       <p className="guide__subtitle">
         Learn how to host quizzes and run tournaments with Qwizzeria.

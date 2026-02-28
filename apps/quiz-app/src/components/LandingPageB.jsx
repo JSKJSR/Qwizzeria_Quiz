@@ -187,9 +187,11 @@ export default function LandingPageB() {
       {/* Footer */}
       <footer className="landing-b__footer">
         <div className="landing-b__footer-links">
-          <a href="https://patreon.com/Qwizzeria" target="_blank" rel="noopener noreferrer">Patreon</a>
+          <Link to="/guide">How to Play</Link>
           <span className="landing-b__footer-sep">&middot;</span>
-          <a href="https://instagram.com/qwizzeria" target="_blank" rel="noopener noreferrer">Instagram</a>
+          <a href="https://patreon.com/Qwizzeria" target="_blank" rel="noopener noreferrer me">Patreon</a>
+          <span className="landing-b__footer-sep">&middot;</span>
+          <a href="https://instagram.com/qwizzeria" target="_blank" rel="noopener noreferrer me">Instagram</a>
           <span className="landing-b__footer-sep">&middot;</span>
           <a href="mailto:rajan@qwizzeria.com">rajan@qwizzeria.com</a>
         </div>

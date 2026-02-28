@@ -59,6 +59,7 @@ export default function Leaderboard() {
         title="Leaderboard"
         description="See the top quiz players on Qwizzeria. Compete for the highest scores across all quizzes."
         path="/leaderboard"
+        keywords="quiz leaderboard, top trivia players, quiz rankings, high scores"
       />
       <h1 className="leaderboard__title">Leaderboard</h1>
 

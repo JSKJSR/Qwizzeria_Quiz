@@ -8,6 +8,7 @@
 
     <!-- Default SEO -->
     <meta name="description" content="Where Intelligence Meets Entertainment. Play beautifully designed quizzes, compete with friends, and host unforgettable quiz sessions." />
+    <meta name="keywords" content="quiz, trivia, game night, pub quiz, jeopardy, quiz packs, multiplayer quiz, host quiz, leaderboard, online trivia" />
     <meta name="author" content="Qwizzeria" />
     <meta name="theme-color" content="#e85c1a" />
     <link rel="canonical" href="https://qwizzeria.com/" />
@@ -19,12 +20,16 @@
     <meta property="og:url" content="https://qwizzeria.com/" />
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="Qwizzeria" />
+    <meta property="og:locale" content="en_US" />
 
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:site" content="@Qwizzeria" />
+    <meta name="twitter:creator" content="@Qwizzeria" />
     <meta name="twitter:title" content="Qwizzeria — Where Intelligence Meets Entertainment" />
     <meta name="twitter:description" content="Play beautifully designed quizzes, compete with friends, and host unforgettable quiz sessions." />
     <meta name="twitter:image" content="https://qwizzeria.com/qwizzeria-logo.png" />
+    <meta name="twitter:image:alt" content="Qwizzeria logo" />
 
     <!-- PWA Manifest -->
     <link rel="manifest" href="/manifest.json" />
@@ -38,13 +43,23 @@
           "@type": "WebSite",
           "name": "Qwizzeria",
           "url": "https://qwizzeria.com",
-          "description": "Turn any gathering into a smart game night. Play beautifully designed quizzes, compete with friends, and host unforgettable quiz sessions."
+          "description": "Turn any gathering into a smart game night. Play beautifully designed quizzes, compete with friends, and host unforgettable quiz sessions.",
+          "potentialAction": {
+            "@type": "SearchAction",
+            "target": "https://qwizzeria.com/packs?q={search_term_string}",
+            "query-input": "required name=search_term_string"
+          }
         },
         {
           "@type": "Organization",
           "name": "Qwizzeria",
           "url": "https://qwizzeria.com",
-          "logo": "https://qwizzeria.com/qwizzeria-logo.png",
+          "logo": {
+            "@type": "ImageObject",
+            "url": "https://qwizzeria.com/qwizzeria-logo.png",
+            "width": 512,
+            "height": 512
+          },
           "sameAs": [
             "https://instagram.com/qwizzeria",
             "https://patreon.com/Qwizzeria"
@@ -54,6 +69,19 @@
             "email": "rajan@qwizzeria.com",
             "contactType": "customer support"
           }
+        },
+        {
+          "@type": "WebApplication",
+          "name": "Qwizzeria",
+          "url": "https://qwizzeria.com",
+          "applicationCategory": "GameApplication",
+          "operatingSystem": "Any",
+          "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "USD"
+          },
+          "description": "Host live multiplayer quizzes with friends, family, or teams. Free to start, no setup required."
         }
       ]
     }

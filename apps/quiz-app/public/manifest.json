@@ -2,15 +2,43 @@
   "name": "Qwizzeria",
   "short_name": "Qwizzeria",
   "description": "Turn any gathering into a smart game night. Play quizzes, compete with friends, and host unforgettable quiz sessions.",
+  "lang": "en",
+  "dir": "ltr",
   "start_url": "/",
   "display": "standalone",
+  "orientation": "any",
   "theme_color": "#be1332",
   "background_color": "#1a1a2e",
+  "categories": ["games", "entertainment", "education"],
   "icons": [
     {
       "src": "/qwizzeria-logo.png",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Play Free Quiz",
+      "short_name": "Free Quiz",
+      "description": "Jump into a free Jeopardy-style quiz instantly",
+      "url": "/play/free",
+      "icons": [{ "src": "/qwizzeria-logo.png", "sizes": "96x96" }]
+    },
+    {
+      "name": "Browse Quiz Packs",
+      "short_name": "Packs",
+      "description": "Browse curated quiz packs by category",
+      "url": "/packs",
+      "icons": [{ "src": "/qwizzeria-logo.png", "sizes": "96x96" }]
+    },
+    {
+      "name": "Leaderboard",
+      "short_name": "Rankings",
+      "description": "See the top quiz players globally",
+      "url": "/leaderboard",
+      "icons": [{ "src": "/qwizzeria-logo.png", "sizes": "96x96" }]
     }
   ]
 }

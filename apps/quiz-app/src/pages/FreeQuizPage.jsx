@@ -8,6 +8,7 @@ export default function FreeQuizPage() {
         title="Surprise Me!"
         description="Play a free Jeopardy-style quiz with random questions. Test your knowledge across multiple categories."
         path="/play/free"
+        keywords="free quiz, jeopardy quiz, random trivia, play quiz online, free trivia game"
       />
       <FreeQuiz />
     </>

@@ -7,19 +7,26 @@ Qwizzeria is a web-based quiz platform for playing, hosting, and competing in be
 ## Pages
 
 - / — Landing page with links to play, browse packs, and view leaderboard
-- /play/free — Play a free quiz with random questions in a Jeopardy-style grid
-- /packs — Browse curated quiz packs by category
-- /leaderboard — Global leaderboard with time filters
+- /play/free — Play a free quiz with random questions in a Jeopardy-style grid (public, no login required)
+- /packs — Browse curated quiz packs by category (login required)
+- /leaderboard — Global leaderboard with time filters (all time, this month, this week)
+- /guide — How to Play guide covering Standard and Tournament modes
+- /dashboard — User dashboard with quick actions and resumable sessions (login required)
+- /profile — User profile, display name, stats, and account settings (login required)
+- /history — Paginated session history with expandable question details (login required)
+- /host — Host a live multiplayer quiz: pack select → setup → grid → score → results (login required)
 
 ## Features
 
-- Free Quiz: 3x3 Jeopardy grid with random questions
+- Free Quiz: Jeopardy-style grid with random questions — no login required
 - Quiz Packs: Curated question sets with Jeopardy or Sequential play modes
-- Host Mode: Multiplayer quiz hosting with timer and live scoreboard (2-8 players)
-- Leaderboard: Global and per-pack rankings
-- Premium packs available via Patreon
+- Host Mode: Live multiplayer quiz hosting with countdown timer and live scoreboard (2–8 players)
+- Tournament Mode: Auto-generated single-elimination bracket for 2–16 players
+- Leaderboard: Global and per-pack rankings with time-based filters
+- Premium Packs: Unlocked for Patreon supporters
+- Resume Sessions: In-progress quizzes saved and resumable from the dashboard
 
-## Contact
+## Social & Contact
 
 - Website: https://qwizzeria.com
 - Email: rajan@qwizzeria.com
