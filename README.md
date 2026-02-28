@@ -14,11 +14,13 @@ Qwizzeria is a high-performance, premium quiz platform built with a modern tech 
 
 ### 🎮 Player Experience
 - **Landing Page Showcase**: Browse all available quiz packs with cover images in a scrollable carousel — no login required.
+- **14-Day Free Trial**: All new users get full access to every feature for 14 days.
 - **Jeopardy & Sequential Formats**: Choose how you want to play curated quiz packs.
 - **Multisided Multiplayer**: Host live quiz sessions with a dedicated teacher/host view and participant scoring.
+- **Tournament Mode**: Single-elimination bracket competitions for 2–16 teams with realtime bracket updates, shareable match URLs, and multi-tab parallel play.
 - **Resume Anywhere**: In-progress sessions are synced, allowing users to pick up where they left off.
 - **Leaderboards**: Compete globally or per-pack with real-time score tracking.
-- **Premium Access**: Exclusive content gated by a sophisticated RBAC system.
+- **Subscription Tiers**: Free, Basic ($5/mo), and Pro ($10/mo) plans powered by Stripe.
 
 ### 🛡️ Security & Access Control
 - **Two-Gate Security Model**:
@@ -29,7 +31,7 @@ Qwizzeria is a high-performance, premium quiz platform built with a modern tech 
 ### 🛠️ Admin CMS
 - **Content Management**: Full CRUD for questions and quiz packs.
 - **Bulk Operations**: High-speed Excel import for mass question ingestion.
-- **Platform Analytics**: Advanced insights into pack performance, user engagement, and question difficulty.
+- **Platform Analytics**: Advanced insights into pack performance, user engagement, question difficulty, and subscription metrics (trial conversion, active subscribers by tier).
 - **User Management**: Superadmin interface for role assignment and platform oversight.
 
 ---
@@ -49,7 +51,8 @@ packages/
 
 ### Tech Stack
 - **Frontend**: React 19, Vite, Vanilla CSS (Design-driven).
-- **Backend**: Supabase (Auth, Postgres, Real-time).
+- **Backend**: Supabase (Auth, Postgres, Realtime).
+- **Payments**: Stripe (subscriptions, billing portal).
 - **Orchestration**: Turborepo, npm workspaces.
 - **Testing**: Vitest (53 tests across 5 files).
 - **CI/CD**: GitHub Actions (lint → build → test) + Vercel deployment.
@@ -102,16 +105,3 @@ Qwizzeria follows a **vibrant, dark-mode-first** aesthetic:
 ---
 
 © 2026 Qwizzeria Team. Built with ❤️ and high-performance React.
-
-What business decisions are hardest today because of data gaps?
-Where does your data governance or KPI framework break down today?
-What does success look like for this role in the first 6 months?
-What blocks your analysts the most today — data quality, speed, or stakeholder alignment?
-
-This role sits exactly where I deliver the most value: business strategy, analytics, and leadership. I bring structure to data and clarity to decision-making.
-
-I’ve led governance initiatives where the main goal was making data trustworthy at scale — defining ownership, documentation, and standards so reporting wasn’t constantly questioned
-
-At Pictet, I helped move data from being ‘project by project’ to a structured governance model leadership could trust. That changed how executives used reporting for risk and compliance decisions.
-
-I brought structure to how data moved across platforms and vendors so leadership could trust event reporting, not firefight data issues during competitions.

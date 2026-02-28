@@ -32,6 +32,37 @@ Tracks player progress.
 - `status` (TEXT): `in_progress`, `completed`, `abandoned`.
 - `metadata` (JSONB): Stores remaining question IDs and play format.
 
+### `host_tournaments`
+Tournament bracket state for Host Quiz tournament mode.
+- `id` (UUID): Primary key.
+- `host_user_id` (UUID): FK to auth.users.
+- `pack_id` (UUID): FK to quiz_packs.
+- `participants` (JSONB): Team names and seeding.
+- `bracket` (JSONB): Full bracket structure.
+- `status` (TEXT): `in_progress`, `completed`.
+
+### `host_tournament_matches`
+Individual matches within a tournament.
+- `id` (UUID): Primary key.
+- `tournament_id` (UUID): FK to host_tournaments.
+- `round` (INT): Round number (0-indexed).
+- `match_index` (INT): Position within the round.
+- `team_a`, `team_b` (TEXT): Team names.
+- `winner` (TEXT): Winning team name (null until complete).
+- `scores` (JSONB): Match scores.
+- `status` (TEXT): `pending`, `in_progress`, `completed`.
+- `claimed_by` (UUID): Optimistic lock for multi-tab play.
+
+### `subscriptions`
+Stripe subscription tracking for billing.
+- `user_id` (UUID): FK to auth.users (UNIQUE).
+- `tier` (TEXT): `basic` or `pro`.
+- `status` (TEXT): `trialing`, `active`, `past_due`, `canceled`, `expired`.
+- `stripe_customer_id` (TEXT): Stripe customer ID.
+- `stripe_subscription_id` (TEXT): Stripe subscription ID (UNIQUE).
+- `current_period_start`, `current_period_end` (TIMESTAMPTZ): Billing period.
+- `cancel_at_period_end` (BOOL): Whether subscription cancels at period end.
+
 ---
 
 ## 🛡️ Security & RBAC Tables
@@ -62,6 +93,8 @@ We use database functions for performance-critical logic:
 - **`get_admin_analytics()`**: Admin-only metrics (Total users, 7-day churn, avg sessions).
 - **`increment_pack_play_count(pack_id)`**: Securely increments metrics on quiz start.
 - **`get_all_users_admin(search, role)`**: Paginated user management for Superadmins. Joins `user_profiles` with `auth.users` to provide emails safely (SECURITY DEFINER).
+- **`get_subscription_state(user_id)`**: Single source of truth for subscription/trial state. Computes trial from `created_at + 14 days`, returns status/tier/gating. Staff roles bypass.
+- **`get_subscription_analytics()`**: Admin-only metrics — trialing, active, canceled counts, trial conversion rate.
 
 ---
 
@@ -82,6 +115,17 @@ Every table has **Row-Level Security (RLS)** enabled:
 | user | Play | See only | See only |
 | premium | Play | Play | See only |
 | editor/admin/superadmin | Play | Play | Play |
+
+### Subscription RLS
+
+- **`subscriptions`**: Users can `SELECT` their own row. Admins can `SELECT` all. Only service role (Stripe webhook) can `INSERT`/`UPDATE`/`DELETE`.
+
+---
+
+## 🏆 Tournament Tables RLS
+
+- **`host_tournaments`**: Users can read/write their own tournaments. Admins can read all.
+- **`host_tournament_matches`**: Readable if user owns the parent tournament. `claimed_by` column provides optimistic locking for multi-tab match play.
 
 ---
 

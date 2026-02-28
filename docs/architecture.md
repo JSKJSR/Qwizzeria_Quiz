@@ -58,8 +58,17 @@ Each quiz mode (Free Quiz, Pack Play, Host Quiz) is powered by a **state-machine
 - **`answer`**: Result reveal and point awarding.
 - **`results`**: Final score tally and medals.
 
+### Tournament Mode
+Host Quiz supports a **Tournament Mode** for single-elimination bracket competitions:
+- **Bracket Generation**: Auto-generated single-elimination brackets for 2–16 teams, randomized seeding.
+- **Match Play**: Each match is a full quiz session between two teams. Matches can be opened in separate browser tabs for parallel play.
+- **Realtime Sync**: Bracket pages update in realtime via Supabase Realtime subscriptions. Spectators see results appear instantly with green flash animations and notification sounds.
+- **Shareable URLs**: `/host/tournament/:id` for the bracket view, `/host/tournament/:id/match/:matchId` for individual matches.
+- **Stale Match Resume**: Matches idle for 5+ minutes are flagged with pulsing indicators.
+- **DB Persistence**: `host_tournaments` and `host_tournament_matches` tables store bracket state (DB is source of truth for tournaments).
+
 ### Persistence
-- **Client-Side**: `localStorage` is used for 24-hour host session recovery.
+- **Client-Side**: `localStorage` is used for 24-hour host session recovery (standard mode). Tournament mode uses DB as source of truth with lightweight session caching.
 - **Server-Side**: The `quiz_sessions` table tracks progress for resumable sessions across devices.
 
 ---
@@ -91,6 +100,26 @@ The landing page (`LandingPageB`) serves as the public-facing marketing page:
 - **Footer**: Social links (Patreon, Instagram, email).
 
 Pack metadata (title, image, category) is visible to anonymous users via RLS. Playing is gated by app-layer role checks after login.
+
+---
+
+## 💳 Subscription & Billing
+
+Qwizzeria integrates **Stripe** for subscription management with a **14-day free trial** for all new users.
+
+### Tier Model
+- **Free**: Free Quiz, Dashboard, Profile/Guide only.
+- **Basic** (~$5/mo): Adds Quiz Packs, History, Leaderboard.
+- **Pro** (~$10/mo): Adds Host Quiz (multiplayer) and Tournaments.
+
+### Architecture
+- **`subscriptions` table**: Tracks Stripe customer/subscription IDs, tier, status, billing period.
+- **`get_subscription_state()` RPC**: Single source of truth — computes trial from `user_profiles.created_at + 14 days`, returns status/tier/gating for the frontend.
+- **Staff bypass**: Editor/admin/superadmin roles skip all subscription checks.
+- **Vercel Serverless API**: `api/stripe/create-checkout.js`, `api/stripe/create-portal.js`, `api/stripe/webhook.js` handle Stripe integration.
+- **Frontend gating**: `TierRoute` (route-level) and `SubscriptionGate` (inline) components check `hasTier()` from AuthContext.
+- **Sidebar trial widget**: SVG circular progress ring showing trial days remaining, UPGRADE button, subscription status label.
+- **Grace period**: 3-day access window for `past_due` subscriptions before full gating.
 
 ---
 

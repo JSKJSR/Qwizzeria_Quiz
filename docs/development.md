@@ -14,6 +14,22 @@ VITE_SUPABASE_URL=your_supabase_project_url
 VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
 ```
 
+### Stripe (Production — Vercel Environment Variables)
+The following are set in the Vercel dashboard (never committed to the repo):
+
+```env
+STRIPE_SECRET_KEY=sk_...
+STRIPE_WEBHOOK_SECRET=whsec_...
+STRIPE_BASIC_PRICE_ID=price_...
+STRIPE_PRO_PRICE_ID=price_...
+SUPABASE_SERVICE_ROLE_KEY=...
+```
+
+For local Stripe testing, use the [Stripe CLI](https://stripe.com/docs/stripe-cli):
+```bash
+stripe listen --forward-to localhost:5173/api/stripe/webhook
+```
+
 ### Running Locally
 Use the root scripts to manage the monorepo:
 
@@ -79,9 +95,9 @@ cd apps/quiz-app && npx vitest run
 ## 🚀 Deployment
 
 ### Database Migrations
-Migrations are stored in `packages/supabase-client/migrations`. 
+Migrations are stored in `packages/supabase-client/migrations`.
 **Note**: Migrations must be run manually via the Supabase SQL Editor in order:
-1. `001_initial_schema.sql` through `015_showcase_packs_policy.sql`
+1. `001_initial_schema.sql` through `016_subscriptions.sql`
 
 ### CI/CD
 The project includes a GitHub Actions pipeline (`.github/workflows/ci.yml`) that runs on every push/PR to `main`:
