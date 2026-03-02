@@ -1,22 +1,9 @@
-import { useState } from 'react';
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
-import LandingPage from './LandingPage';
 import LandingPageB from './LandingPageB';
-
-const VARIANT_KEY = 'qwizzeria_landing_variant';
-
-function getVariant() {
-  let variant = localStorage.getItem(VARIANT_KEY);
-  if (variant === 'A' || variant === 'B') return variant;
-  variant = Math.random() < 0.5 ? 'A' : 'B';
-  localStorage.setItem(VARIANT_KEY, variant);
-  return variant;
-}
 
 export default function AuthRedirect() {
   const { user, isEditor, loading } = useAuth();
-  const [variant] = useState(getVariant);
 
   if (loading) {
     return (
@@ -33,5 +20,5 @@ export default function AuthRedirect() {
     return <Navigate to="/dashboard" replace />;
   }
 
-  return variant === 'B' ? <LandingPageB /> : <LandingPage />;
+  return <LandingPageB />;
 }

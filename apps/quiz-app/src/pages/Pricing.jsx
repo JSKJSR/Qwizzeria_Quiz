@@ -8,7 +8,7 @@ const TIERS = [
   {
     id: 'basic',
     name: 'Basic',
-    price: '$5',
+    price: '$9.99',
     period: '/month',
     features: [
       { text: 'Free Quiz', included: true },
@@ -24,7 +24,7 @@ const TIERS = [
   {
     id: 'pro',
     name: 'Pro',
-    price: '$10',
+    price: '$99',
     period: '/month',
     popular: true,
     features: [
