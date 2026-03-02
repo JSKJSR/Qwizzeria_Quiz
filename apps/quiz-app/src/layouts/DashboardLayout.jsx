@@ -33,7 +33,6 @@ const LockIcon = () => (
 
 const NAV_ITEMS = [
   { to: '/dashboard', icon: NAV_ICONS.home, label: 'Home' },
-  { to: '/profile', icon: NAV_ICONS.profile, label: 'Profile' },
   { to: '/play/free', icon: NAV_ICONS.play, label: 'Surprise Me!' },
   { to: '/host', icon: NAV_ICONS.host, label: 'Host Quiz', requiredTier: 'pro' },
   { to: '/packs', icon: NAV_ICONS.packs, label: 'Browse Packs', requiredTier: 'basic' },
