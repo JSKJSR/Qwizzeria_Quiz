@@ -22,7 +22,7 @@ function enrichWithMedia(q) {
   const media = q.media_url ? detectMediaType(q.media_url) : { type: 'none', embedUrl: null };
   return {
     id: q.id,
-    topic: q.category || 'General',
+    topic: q.display_title || q.category || 'General',
     points: POINTS_PER_QUESTION,
     question: q.question_text,
     answer: q.answer_text,

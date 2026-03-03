@@ -38,7 +38,7 @@ export async function fetchGridQuestions({ categoriesCount = 3, perCategory = 3 
 
   const { data, error } = await supabase
     .from('questions_master')
-    .select('id, question_text, answer_text, answer_explanation, category, media_url, points')
+    .select('id, question_text, answer_text, answer_explanation, category, display_title, media_url, points')
     .eq('is_public', true)
     .eq('status', 'active')
     .limit(500);
@@ -78,7 +78,7 @@ export async function fetchGridQuestions({ categoriesCount = 3, perCategory = 3 
       name: categoryName,
       questions: selected.map((q, i) => ({
         id: q.id,
-        topic: categoryName,
+        topic: q.display_title || categoryName,
         points: q.points != null ? q.points : (pointValues[i] || (i + 1) * 10),
         question: q.question_text,
         answer: q.answer_text,

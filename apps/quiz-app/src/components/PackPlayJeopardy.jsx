@@ -118,7 +118,7 @@ export default function PackPlayJeopardy({ pack, questions, user, resumeData }) 
       name: categoryName,
       questions: qs.slice(0, 3).map((q, i) => ({
         id: q.id,
-        topic: categoryName,
+        topic: q.display_title || categoryName,
         points: q.points != null ? q.points : (pointValues[i] || (i + 1) * 10),
         question: q.question_text,
         answer: q.answer_text,

@@ -54,7 +54,7 @@ function buildTopicsFromQuestions(questions) {
       const media = q.media_url ? detectMediaType(q.media_url) : { type: 'none', embedUrl: null };
       return {
         id: q.id,
-        topic: categoryName,
+        topic: q.display_title || categoryName,
         points: q.points != null ? q.points : (pointLevels[i] || (i + 1) * 10),
         question: q.question_text,
         answer: q.answer_text,
