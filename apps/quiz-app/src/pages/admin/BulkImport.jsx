@@ -176,6 +176,7 @@ export default function BulkImport() {
                   <th>Answer</th>
                   <th>Category</th>
                   <th>Sub Category</th>
+                  <th>Display Title</th>
                   <th>Tags</th>
                 </tr>
               </thead>
@@ -201,6 +202,7 @@ export default function BulkImport() {
                         </span>
                       )}
                     </td>
+                    <td>{q.display_title || '—'}</td>
                     <td>{Array.isArray(q.tags) ? q.tags.join(', ') : '—'}</td>
                   </tr>
                 ))}

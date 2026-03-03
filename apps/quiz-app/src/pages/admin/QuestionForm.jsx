@@ -13,6 +13,7 @@ const EMPTY_FORM = {
   answer_explanation: '',
   category: '',
   sub_category: '',
+  display_title: '',
   points: '',
   media_url: '',
   tags: '',
@@ -43,6 +44,7 @@ export default function QuestionForm() {
           answer_explanation: q.answer_explanation || '',
           category: q.category || '',
           sub_category: q.sub_category || '',
+          display_title: q.display_title || '',
           points: q.points != null ? String(q.points) : '',
           media_url: q.media_url || '',
           tags: Array.isArray(q.tags) ? q.tags.join(', ') : (q.tags || ''),
@@ -82,6 +84,7 @@ export default function QuestionForm() {
         answer_explanation: form.answer_explanation.trim() || null,
         category: form.category.trim() || null,
         sub_category: form.sub_category.trim() || null,
+        display_title: form.display_title.trim() || null,
         points: pointsVal && !isNaN(Number(pointsVal)) ? Number(pointsVal) : null,
         media_url: form.media_url.trim() || null,
         tags: form.tags
@@ -214,6 +217,18 @@ export default function QuestionForm() {
               </small>
             )}
           </div>
+        </div>
+
+        <div className="form-group">
+          <label htmlFor="display_title">Display Title</label>
+          <input
+            id="display_title"
+            type="text"
+            className="form-input"
+            placeholder="Custom card label (defaults to category)"
+            value={form.display_title}
+            onChange={(e) => handleChange('display_title', e.target.value)}
+          />
         </div>
 
         <div className="form-group">

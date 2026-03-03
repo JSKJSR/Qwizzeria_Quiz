@@ -14,6 +14,8 @@ const COLUMN_MAP = {
   'tags': 'tags',
   'sub category': 'sub_category',
   'sub_category': 'sub_category',
+  'display title': 'display_title',
+  'display_title': 'display_title',
   'points': 'points',
   'score': 'points',
 };
@@ -99,12 +101,13 @@ export function parseExcelFile(arrayBuffer) {
  * Generate a template Excel file as a Blob for download.
  */
 export function generateTemplate() {
-  const headers = ['Question', 'Answer', 'Category', 'Sub Category', 'Explanation', 'Media URL', 'Tags', 'Points'];
+  const headers = ['Question', 'Answer', 'Category', 'Sub Category', 'Display Title', 'Explanation', 'Media URL', 'Tags', 'Points'];
   const sampleRow = [
     'What is the capital of France?',
     'Paris',
     'World',
     'Cities',
+    '',
     'Paris has been the capital since the 10th century.',
     '',
     'geography, europe, capitals',
