@@ -1,6 +1,6 @@
 import '../../styles/HostQuiz.css';
 
-export default function HostTopicGrid({ topics, completedQuestionIds, skippedQuestionIds = [], onSelectQuestion }) {
+export default function HostTopicGrid({ topics, completedQuestionIds, skippedQuestionIds = [], onSelectQuestion, packTitle, packSubtitle }) {
   if (!topics || topics.length === 0) {
     return <p className="host-grid__empty">No questions loaded.</p>;
   }
@@ -10,6 +10,12 @@ export default function HostTopicGrid({ topics, completedQuestionIds, skippedQue
 
   return (
     <div className="host-grid">
+      {packTitle && (
+        <div className="host-grid__header">
+          <h2 className="host-grid__pack-title">{packTitle}</h2>
+          {packSubtitle && <p className="host-grid__pack-subtitle">{packSubtitle}</p>}
+        </div>
+      )}
       <div className="host-grid__grid">
         {topics.flatMap(topic =>
           topic.questions.map(q => {
