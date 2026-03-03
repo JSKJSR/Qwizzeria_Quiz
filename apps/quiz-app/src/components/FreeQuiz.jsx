@@ -19,7 +19,8 @@ function getScoreMessage(score, maxScore) {
 
 // Add media info to a question object
 function enrichWithMedia(q) {
-  const media = q.mediaUrl ? detectMediaType(q.mediaUrl) : { type: 'none', embedUrl: null };
+  const rawMediaUrl = q.media_url || q.mediaUrl;
+  const media = rawMediaUrl ? detectMediaType(rawMediaUrl) : { type: 'none', embedUrl: null };
   return { ...q, mediaType: media.type, embedUrl: media.embedUrl };
 }
 

@@ -9,6 +9,7 @@
   padding: 2rem;
   z-index: 100;
   animation: fadeIn 0.2s ease;
+  overflow-y: auto;
 }
 
 @keyframes fadeIn {

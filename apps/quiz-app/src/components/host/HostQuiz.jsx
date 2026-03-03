@@ -101,7 +101,8 @@ function buildTopics(questions) {
   return Object.entries(grouped).map(([categoryName, qs]) => ({
     name: categoryName,
     questions: qs.map((q, i) => {
-      const media = q.mediaUrl ? detectMediaType(q.mediaUrl) : { type: 'none', embedUrl: null };
+      const rawMediaUrl = q.media_url || q.mediaUrl;
+      const media = rawMediaUrl ? detectMediaType(rawMediaUrl) : { type: 'none', embedUrl: null };
       return {
         id: q.id,
         topic: categoryName,
@@ -109,7 +110,7 @@ function buildTopics(questions) {
         question: q.question_text,
         answer: q.answer_text,
         answerExplanation: q.answer_explanation,
-        mediaUrl: q.mediaUrl || q.media_url,
+        mediaUrl: rawMediaUrl,
         mediaType: media.type,
         embedUrl: media.embedUrl,
       };
