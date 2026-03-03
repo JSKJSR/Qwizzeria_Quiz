@@ -2,7 +2,11 @@ import { useState, useEffect } from 'react';
 import '../styles/QuestionView.css';
 
 export default function QuestionView({ question, onRevealAnswer, onBack, onSkip }) {
-  const [mediaVisible, setMediaVisible] = useState(false);
+  const [mediaVisible, setMediaVisible] = useState(question.mediaType === 'image');
+
+  useEffect(() => {
+    setMediaVisible(question.mediaType === 'image');
+  }, [question]);
 
   useEffect(() => {
     function handleKey(e) {
@@ -23,16 +27,16 @@ export default function QuestionView({ question, onRevealAnswer, onBack, onSkip 
         <div className="question-view__points">{question.points} pts</div>
         <div className="question-view__text">{question.question}</div>
 
-        {hasMedia && (
+        {hasMedia && isVideo && (
           <button
             className={`question-view__media-btn ${mediaVisible ? 'question-view__media-btn--active' : ''}`}
             onClick={() => setMediaVisible(!mediaVisible)}
           >
-            {isVideo ? <>▶ Video</> : <>📷 Image</>}
+            ▶ Video
           </button>
         )}
 
-        {hasMedia && mediaVisible && (
+        {hasMedia && (question.mediaType === 'image' || mediaVisible) && (
           <div className="question-view__media-container">
             {isVideo ? (
               isDirectVideo ? (
