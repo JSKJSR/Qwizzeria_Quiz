@@ -6,9 +6,25 @@ import '../styles/Pricing.css';
 
 const TIERS = [
   {
+    id: 'free',
+    name: 'Free',
+    price: '$0',
+    period: '',
+    features: [
+      { text: 'Free Quiz', included: true },
+      { text: 'Dashboard', included: true },
+      { text: 'Profile / Guide', included: true },
+      { text: 'Quiz Packs (browse + play)', included: false },
+      { text: 'Quiz History', included: false },
+      { text: 'Global Leaderboard', included: false },
+      { text: 'Host Quiz (multiplayer)', included: false },
+      { text: 'Tournaments', included: false },
+    ],
+  },
+  {
     id: 'basic',
     name: 'Basic',
-    price: '$9.99',
+    price: '$4.99',
     period: '/month',
     features: [
       { text: 'Free Quiz', included: true },
@@ -24,7 +40,7 @@ const TIERS = [
   {
     id: 'pro',
     name: 'Pro',
-    price: '$99',
+    price: '$9.99',
     period: '/month',
     popular: true,
     features: [
@@ -149,7 +165,9 @@ export default function Pricing() {
                 ))}
               </ul>
 
-              {isCurrent ? (
+              {tier.id === 'free' ? (
+                <div className="pricing__free-msg">Always free for basic features</div>
+              ) : isCurrent ? (
                 <button className="pricing__btn pricing__btn--manage" onClick={handleManage} disabled={loadingTier === 'manage'}>
                   {loadingTier === 'manage' ? 'Loading...' : 'Manage Subscription'}
                 </button>
@@ -163,7 +181,7 @@ export default function Pricing() {
                   onClick={() => handleSubscribe(tier.id)}
                   disabled={loadingTier === tier.id}
                 >
-                  {loadingTier === tier.id ? 'Loading...' : isCurrent ? 'Current Plan' : 'Subscribe'}
+                  {loadingTier === tier.id ? 'Loading...' : 'Subscribe'}
                 </button>
               )}
             </div>

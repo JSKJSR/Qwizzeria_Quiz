@@ -107,8 +107,10 @@ export default function DashboardLayout() {
                 className={`dashboard__nav-link ${isActive(item.to) ? 'dashboard__nav-link--active' : ''}`}
                 onClick={handleCloseSidebar}
               >
-                <span className="dashboard__nav-icon">{item.icon}</span>
-                {item.label}
+                <div className="dashboard__nav-link-content">
+                  <span className="dashboard__nav-icon">{item.icon}</span>
+                  {item.label}
+                </div>
                 {locked && <LockIcon />}
               </NavLink>
             );

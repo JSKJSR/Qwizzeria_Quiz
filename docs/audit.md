@@ -50,11 +50,15 @@ Qwizzeria is a React monorepo powered by **Turborepo**.
 
 ## 📊 Data Architecture & State
 
-### 1. Global State (`AuthContext`)
+### 2. Global State (`AuthContext`)
 - **User**: Current user metadata.
 - **Role**: `user`, `premium`, `editor`, `admin`, `superadmin`.
 - **Subscription**: Tier status (`free`, `basic`, `pro`) and trial state.
 - **Gating**: Helpers like `hasTier()` and `isPremium` for route and feature protection.
+- **Tiered Pricing**: Implemented 3-tier model:
+    - **Free**: $0 (Daily free quiz, Dashboard).
+    - **Basic**: $4.99/mo (Packs, History, Leaderboard).
+    - **Pro**: $9.99/mo (Host Quiz, Tournaments, Unlimited Players).
 
 ### 2. Quiz Engine (State Machine)
 Quizzes use a `useReducer`-based state machine with phases:
