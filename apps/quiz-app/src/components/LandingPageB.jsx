@@ -96,7 +96,7 @@ export default function LandingPageB() {
 
           <div className="landing-b__ctas">
             <Link to="/play/free" className="landing-b__cta-primary">
-              Play a Quiz
+              Play
             </Link>
             <button
               className="landing-b__cta-outline"
