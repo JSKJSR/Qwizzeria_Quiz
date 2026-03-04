@@ -96,13 +96,13 @@ export default function LandingPageB() {
 
           <div className="landing-b__ctas">
             <Link to="/play/free" className="landing-b__cta-primary">
-              Host a Quiz
+              Play a Quiz
             </Link>
             <button
               className="landing-b__cta-outline"
               onClick={handleUnlockPacks}
             >
-              &#128274; Play a Quiz
+              &#128274; Host a Quiz
             </button>
           </div>
 
