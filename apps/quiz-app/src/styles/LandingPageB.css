@@ -163,52 +163,11 @@
   margin: 0;
 }
 
-/* ----- Product Preview Placeholder ----- */
+/* ----- Hero Visual ----- */
 .landing-b__hero-visual {
   display: flex;
   align-items: center;
   justify-content: center;
-}
-
-.landing-b__preview-card {
-  background: var(--bg-card, #1a1015);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: var(--radius, 12px);
-  padding: 2rem;
-  text-align: center;
-  width: 100%;
-  max-width: 360px;
-}
-
-.landing-b__preview-image {
-  width: 100%;
-  max-width: 360px;
-  border-radius: var(--radius, 12px);
-  margin-bottom: 0.75rem;
-}
-
-.landing-b__preview-label {
-  display: block;
-  font-size: 0.9rem;
-  color: var(--text-secondary, #aaa);
-  margin-bottom: 1.25rem;
-  font-weight: 500;
-}
-
-.landing-b__preview-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 0.5rem;
-}
-
-.landing-b__preview-cell {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 8px;
-  padding: 0.6rem 0.25rem;
-  font-size: 0.75rem;
-  color: var(--text-secondary, #ccc);
-  text-align: center;
 }
 
 /* ----- Pack Carousel ----- */
@@ -417,10 +376,6 @@
     order: -1;
     margin-bottom: 1rem;
   }
-
-  .landing-b__preview-card {
-    max-width: 280px;
-  }
 }
 
 @media (max-width: 390px) {
@@ -432,9 +387,5 @@
   .landing-b__cta-outline {
     padding: 0.75rem 1.25rem;
     font-size: 0.95rem;
-  }
-
-  .landing-b__preview-card {
-    padding: 1.25rem;
   }
 }

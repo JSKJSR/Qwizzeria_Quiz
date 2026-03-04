@@ -3,7 +3,6 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import { fetchShowcasePacks } from '@qwizzeria/supabase-client/src/packs.js';
 import LoginModal from './LoginModal';
-import MiniQuizHook from './MiniQuizHook';
 import SEO from './SEO';
 import '../styles/LandingPageB.css';
 
@@ -103,7 +102,7 @@ export default function LandingPageB() {
               className="landing-b__cta-outline"
               onClick={handleUnlockPacks}
             >
-              Start Hosting &mdash; Free
+              &#128274; Host a Quiz
             </button>
           </div>
 
@@ -116,7 +115,18 @@ export default function LandingPageB() {
         </div>
 
         <div className="landing-b__hero-visual">
-          <MiniQuizHook />
+          <div className="landing-b__preview-card">
+            <img src="/qwizzeria_logoB.jpg" alt="Qwizzeria" className="landing-b__preview-image" />
+            <span className="landing-b__preview-label">Live Quiz Preview</span>
+            <div className="landing-b__preview-grid">
+              <div className="landing-b__preview-cell">Science</div>
+              <div className="landing-b__preview-cell">History</div>
+              <div className="landing-b__preview-cell">Sports</div>
+              <div className="landing-b__preview-cell">Music</div>
+              <div className="landing-b__preview-cell">Geography</div>
+              <div className="landing-b__preview-cell">Movies</div>
+            </div>
+          </div>
         </div>
       </section>
 
