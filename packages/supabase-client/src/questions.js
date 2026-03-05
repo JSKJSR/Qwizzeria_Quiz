@@ -279,20 +279,33 @@ export async function fetchAllQuestions({ category, status, search, tag, page = 
   if (search) {
     query = query.or(`question_text.ilike.%${search}%,answer_text.ilike.%${search}%`);
   }
-  if (tag) {
-    // Cast tags array to text for partial matching (e.g. "world" matches "World Cup")
-    query = query.filter('tags::text', 'ilike', `%${tag}%`);
+  // Tag filtering: if provided, we need to do a partial text match on the tags TEXT[] column.
+  // PostgREST doesn't support ilike on array columns, so we overfetch and filter client-side.
+  const hasTagFilter = Boolean(tag);
+
+  if (hasTagFilter) {
+    // Remove pagination temporarily — we'll paginate after client-side tag filtering
+    query = query.order('updated_at', { ascending: false }).limit(5000);
+  } else {
+    const from = (page - 1) * pageSize;
+    const to = from + pageSize - 1;
+    query = query.order('updated_at', { ascending: false }).range(from, to);
   }
-
-  const from = (page - 1) * pageSize;
-  const to = from + pageSize - 1;
-
-  query = query.order('updated_at', { ascending: false }).range(from, to);
 
   const { data, error, count } = await query;
 
   if (error) {
     throw new Error(`Failed to fetch questions: ${error.message}`);
+  }
+
+  if (hasTagFilter) {
+    const tagLower = tag.toLowerCase();
+    const filtered = (data || []).filter((q) =>
+      Array.isArray(q.tags) && q.tags.some((t) => t.toLowerCase().includes(tagLower))
+    );
+    const from = (page - 1) * pageSize;
+    const paged = filtered.slice(from, from + pageSize);
+    return { data: paged, count: filtered.length, page, pageSize };
   }
 
   return { data: data || [], count: count || 0, page, pageSize };

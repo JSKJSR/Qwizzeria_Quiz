@@ -92,6 +92,8 @@ For more detailed information, please refer to the following guides:
 - [**Architecture Guide**](docs/architecture.md) — Deep dive into the monorepo and security model.
 - [**Database & Security**](docs/database.md) — Schema documentation and RLS policies.
 - [**Development Workflow**](docs/development.md) — Guidelines for contributing and building new features.
+- [**Admin CMS Guide**](docs/admin-cms.md) — Details on management modules and analytics.
+- [**Supabase Client Docs**](docs/supabase-client.md) — Shared data access layer and RPC reference.
 - [**RBAC Reference**](file:///Users/shobha/Downloads/RBAC-Reference.md) — The original design document for the security model.
 
 ---

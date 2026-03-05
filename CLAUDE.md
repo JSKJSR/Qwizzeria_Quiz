@@ -16,10 +16,9 @@ Turborepo monorepo with npm workspaces:
 
 ```
 apps/
-  quiz-app/          — Main Vite + React 19 quiz app (user-facing)
-  admin-cms/         — Admin CMS for managing questions & packs
+  quiz-app/          — Main Vite + React 19 application (Player App + Admin CMS)
 packages/
-  shared-types/      — Shared type definitions
+  shared-types/      — Shared type definitions (In Progress)
   supabase-client/   — Supabase SDK wrapper (auth, questions, packs, users, leaderboard)
     migrations/      — SQL migrations (run manually in Supabase SQL Editor)
 ```
@@ -43,19 +42,22 @@ Authenticated routes use `ProtectedRoute` + `DashboardLayout` (sidebar). Unauthe
 | `/host`                    | HostQuizPage        | Host multiplayer quiz: pack select → setup → grid → score → results |
 | `/guide`                   | Guide               | How to Play guide |
 
-## Admin CMS Routes (apps/admin-cms)
+## Admin CMS Routes (apps/quiz-app/src/pages/admin)
 
-| Route                    | Page                  | Description                     |
-|--------------------------|-----------------------|---------------------------------|
-| `/`                      | Dashboard             | Stats, platform analytics, pack performance, hardest questions |
-| `/questions`             | QuestionList          | Question table with filters     |
-| `/questions/new`         | QuestionForm          | Create question                 |
-| `/questions/:id/edit`    | QuestionForm          | Edit question                   |
-| `/import`                | BulkImport            | Excel bulk import               |
-| `/packs`                 | PackList              | Pack table with filters         |
-| `/packs/new`             | PackForm              | Create pack                     |
-| `/packs/:id/edit`        | PackForm              | Edit pack (status, is_public, is_premium) |
-| `/packs/:id/questions`   | PackQuestionsManager  | Add/remove/reorder questions    |
+Access restricted via role checks (editor, admin, superadmin).
+
+| Route                      | Page                  | Description                     |
+|----------------------------|-----------------------|---------------------------------|
+| `/admin`                   | Dashboard             | Stats, platform analytics, pack performance, hardest questions |
+| `/admin/questions`         | QuestionList          | Question table with filters     |
+| `/admin/questions/new`     | QuestionForm          | Create question                 |
+| `/admin/questions/:id/edit`| QuestionForm          | Edit question                   |
+| `/admin/import`            | BulkImport            | Excel bulk import               |
+| `/admin/packs`             | PackList              | Pack table with filters         |
+| `/admin/packs/new`         | PackForm              | Create pack                     |
+| `/admin/packs/:id/edit`    | PackForm              | Edit pack (status, is_public, is_premium) |
+| `/admin/packs/:id/questions`| PackQuestionsManager | Add/remove/reorder questions    |
+| `/admin/users`             | UserList              | User management (superadmin only) |
 
 ## Key Architecture
 

@@ -9,8 +9,9 @@ The Qwizzeria WebApp is designed for performance, scalability, and security. It 
 Developed using **Turborepo** and npm workspaces, the codebase is split into independent apps and shared packages.
 
 ### `apps/`
-- **`quiz-app/`**: The primary product. Built with Vite and React 19, it handles landing (with pack showcase carousel), browsing, playing quizzes in **Jeopardy (grid-based)** or **Sequential (linear)** formats, and user profiles. All routes except `/play/free` require authentication and render with a sidebar layout.
-- **`admin-cms/`**: The management layer. Built with Vite and React, it provides authorized editors and admins with tools to manage the question bank and quiz packs. Includes a **User Management** interface for superadmins.
+- **`quiz-app/`**: The primary product (Vite + React 19). It handles:
+  - **Player App**: Landing (with pack showcase carousel), browsing, playing quizzes in **Jeopardy (grid-based)** or **Sequential (linear)** formats, and user profiles.
+  - **Admin CMS**: Integrated management layer accessible at `/admin`. Provides authorized editors and admins with tools to manage the question bank and quiz packs. Includes a **User Management** interface for superadmins.
 
 ### `packages/`
 - **`supabase-client/`**: A centralized package wrapping the Supabase SDK. It manages:
