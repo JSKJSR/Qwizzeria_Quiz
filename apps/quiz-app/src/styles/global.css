@@ -130,7 +130,7 @@ a:focus-visible {
 .results-watermark__logo {
   height: 36px;
   width: auto;
-  mix-blend-mode: screen;
+  filter: brightness(3) saturate(0.5);
 }
 
 .results-watermark__tagline {

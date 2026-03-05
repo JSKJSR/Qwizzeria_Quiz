@@ -157,12 +157,13 @@
 /* Question view watermark */
 .qv-watermark {
   position: absolute;
-  bottom: 24px;
-  right: 24px;
-  width: 110px;
-  opacity: 0.15;
+  bottom: 50%;
+  left: 50%;
+  transform: translate(-50%, 50%);
+  width: 280px;
+  opacity: 0.06;
   pointer-events: none;
   user-select: none;
-  z-index: 1;
-  mix-blend-mode: screen;
+  z-index: 0;
+  filter: brightness(3) saturate(0.5);
 }
