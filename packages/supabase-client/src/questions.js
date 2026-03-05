@@ -263,7 +263,7 @@ export async function saveHostQuizSession({ userId, packId, participants, comple
 /**
  * Fetch all questions with optional filters and pagination.
  */
-export async function fetchAllQuestions({ category, status, search, page = 1, pageSize = 20 } = {}) {
+export async function fetchAllQuestions({ category, status, search, tag, page = 1, pageSize = 20 } = {}) {
   const supabase = getSupabase();
 
   let query = supabase
@@ -278,6 +278,9 @@ export async function fetchAllQuestions({ category, status, search, page = 1, pa
   }
   if (search) {
     query = query.or(`question_text.ilike.%${search}%,answer_text.ilike.%${search}%`);
+  }
+  if (tag) {
+    query = query.contains('tags', [tag]);
   }
 
   const from = (page - 1) * pageSize;
@@ -403,4 +406,31 @@ export async function fetchCategories() {
 
   const unique = [...new Set(data.map(d => d.category))].sort();
   return unique;
+}
+
+/**
+ * Fetch distinct tags for filter dropdowns.
+ */
+export async function fetchTags() {
+  const supabase = getSupabase();
+
+  const { data, error } = await supabase
+    .from('questions_master')
+    .select('tags')
+    .not('tags', 'is', null)
+    .neq('tags', '{}');
+
+  if (error) {
+    throw new Error(`Failed to fetch tags: ${error.message}`);
+  }
+
+  const allTags = new Set();
+  for (const row of data) {
+    if (Array.isArray(row.tags)) {
+      for (const t of row.tags) {
+        if (t) allTags.add(t);
+      }
+    }
+  }
+  return [...allTags].sort();
 }

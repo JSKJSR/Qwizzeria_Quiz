@@ -3,9 +3,41 @@ import { useNavigate } from 'react-router-dom';
 import {
   fetchAllQuestions,
   fetchCategories,
+  fetchTags,
   deleteQuestion,
 } from '@qwizzeria/supabase-client/src/questions.js';
 import { CATEGORIES } from '../../utils/categoryData';
+
+function exportQuestionsCSV(questions) {
+  const headers = [
+    'Question', 'Answer', 'Explanation', 'Category', 'Tags',
+    'Points', 'Status', 'Public', 'Media URL', 'Updated',
+  ];
+  const rows = questions.map((q) => [
+    q.question_text || '',
+    q.answer_text || '',
+    q.answer_explanation || '',
+    q.category || '',
+    Array.isArray(q.tags) ? q.tags.join('; ') : '',
+    q.points != null ? q.points : '',
+    q.status || '',
+    q.is_public ? 'Yes' : 'No',
+    q.media_url || '',
+    q.updated_at ? new Date(q.updated_at).toISOString() : '',
+  ]);
+
+  const csvContent = [headers, ...rows]
+    .map((row) => row.map((cell) => `"${String(cell).replace(/"/g, '""')}"`).join(','))
+    .join('\n');
+
+  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `qwizzeria-questions-${new Date().toISOString().slice(0, 10)}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
 
 export default function QuestionList() {
   const navigate = useNavigate();
@@ -13,9 +45,11 @@ export default function QuestionList() {
   const [count, setCount] = useState(0);
   const [page, setPage] = useState(1);
   const [categories, setCategories] = useState([]);
-  const [filters, setFilters] = useState({ category: '', status: '', search: '' });
+  const [tags, setTags] = useState([]);
+  const [filters, setFilters] = useState({ category: '', status: '', search: '', tag: '' });
   const [loading, setLoading] = useState(true);
   const [deleteTarget, setDeleteTarget] = useState(null);
+  const [selectedIds, setSelectedIds] = useState(new Set());
 
   const pageSize = 20;
   const totalPages = Math.ceil(count / pageSize);
@@ -28,6 +62,7 @@ export default function QuestionList() {
         category: filters.category || undefined,
         status: filters.status || undefined,
         search: filters.search || undefined,
+        tag: filters.tag || undefined,
         page,
         pageSize,
       });
@@ -46,7 +81,6 @@ export default function QuestionList() {
 
   useEffect(() => {
     fetchCategories().then((dbCats) => {
-      // Merge predefined categories with any extra DB categories
       const merged = [...CATEGORIES];
       for (const c of dbCats) {
         if (!merged.includes(c)) merged.push(c);
@@ -55,7 +89,14 @@ export default function QuestionList() {
     }).catch(() => {
       setCategories(CATEGORIES);
     });
+
+    fetchTags().then(setTags).catch(() => setTags([]));
   }, []);
+
+  // Clear selection when page/filters change
+  useEffect(() => {
+    setSelectedIds(new Set());
+  }, [page, filters]);
 
   const handleFilterChange = (key, value) => {
     setFilters((prev) => ({ ...prev, [key]: value }));
@@ -67,19 +108,53 @@ export default function QuestionList() {
     try {
       await deleteQuestion(deleteTarget);
       setDeleteTarget(null);
+      setSelectedIds((prev) => {
+        const next = new Set(prev);
+        next.delete(deleteTarget);
+        return next;
+      });
       loadQuestions();
     } catch (err) {
       alert(`Delete failed: ${err.message}`);
     }
   };
 
+  const toggleSelectAll = () => {
+    if (selectedIds.size === questions.length) {
+      setSelectedIds(new Set());
+    } else {
+      setSelectedIds(new Set(questions.map((q) => q.id)));
+    }
+  };
+
+  const toggleSelect = (id) => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) {
+        next.delete(id);
+      } else {
+        next.add(id);
+      }
+      return next;
+    });
+  };
+
+  const handleExportSelected = () => {
+    const selected = questions.filter((q) => selectedIds.has(q.id));
+    exportQuestionsCSV(selected);
+  };
+
+  const allOnPageSelected = questions.length > 0 && selectedIds.size === questions.length;
+
   return (
     <div>
       <div className="page-header">
         <h1>Questions</h1>
-        <button className="btn btn-primary" onClick={() => navigate('/admin/questions/new')}>
-          Add Question
-        </button>
+        <div className="page-header__actions">
+          <button className="btn btn-primary" onClick={() => navigate('/admin/questions/new')}>
+            Add Question
+          </button>
+        </div>
       </div>
 
       <div className="filters-bar">
@@ -102,6 +177,16 @@ export default function QuestionList() {
         </select>
         <select
           className="form-select"
+          value={filters.tag}
+          onChange={(e) => handleFilterChange('tag', e.target.value)}
+        >
+          <option value="">All Tags</option>
+          {tags.map((t) => (
+            <option key={t} value={t}>{t}</option>
+          ))}
+        </select>
+        <select
+          className="form-select"
           value={filters.status}
           onChange={(e) => handleFilterChange('status', e.target.value)}
         >
@@ -112,6 +197,23 @@ export default function QuestionList() {
         </select>
       </div>
 
+      {/* Selection bar */}
+      {selectedIds.size > 0 && (
+        <div className="selection-bar">
+          <span className="selection-bar__count">{selectedIds.size}</span>
+          <span>question{selectedIds.size !== 1 ? 's' : ''} selected</span>
+          <button className="btn btn-secondary btn-sm" onClick={handleExportSelected}>
+            Export Selected CSV
+          </button>
+          <button
+            className="btn btn-secondary btn-sm"
+            onClick={() => setSelectedIds(new Set())}
+          >
+            Clear
+          </button>
+        </div>
+      )}
+
       {loading ? (
         <p style={{ color: 'var(--text-secondary)' }}>Loading...</p>
       ) : questions.length === 0 ? (
@@ -121,8 +223,17 @@ export default function QuestionList() {
           <table className="data-table">
             <thead>
               <tr>
+                <th className="col-checkbox">
+                  <input
+                    type="checkbox"
+                    checked={allOnPageSelected}
+                    onChange={toggleSelectAll}
+                    aria-label="Select all"
+                  />
+                </th>
                 <th>Question</th>
                 <th>Category</th>
+                <th>Tags</th>
                 <th>Points</th>
                 <th>Status</th>
                 <th>Public</th>
@@ -133,6 +244,14 @@ export default function QuestionList() {
             <tbody>
               {questions.map((q) => (
                 <tr key={q.id}>
+                  <td className="col-checkbox">
+                    <input
+                      type="checkbox"
+                      checked={selectedIds.has(q.id)}
+                      onChange={() => toggleSelect(q.id)}
+                      aria-label={`Select question ${q.id}`}
+                    />
+                  </td>
                   <td
                     className="truncate"
                     style={{ cursor: 'pointer' }}
@@ -141,6 +260,18 @@ export default function QuestionList() {
                     {q.question_text}
                   </td>
                   <td>{q.category || '—'}</td>
+                  <td>
+                    {Array.isArray(q.tags) && q.tags.length > 0 ? (
+                      <div className="tag-pills">
+                        {q.tags.slice(0, 3).map((t) => (
+                          <span key={t} className="tag-pill">{t}</span>
+                        ))}
+                        {q.tags.length > 3 && (
+                          <span className="tag-pill">+{q.tags.length - 3}</span>
+                        )}
+                      </div>
+                    ) : '—'}
+                  </td>
                   <td>{q.points != null ? q.points : '—'}</td>
                   <td>
                     <span className={`badge badge--${q.status || 'active'}`}>

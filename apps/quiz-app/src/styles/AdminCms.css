@@ -628,6 +628,55 @@
   background: none;
 }
 
+/* Selection bar */
+.selection-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.6rem 1rem;
+  background: rgba(232, 92, 26, 0.08);
+  border: 1px solid rgba(232, 92, 26, 0.2);
+  border-radius: var(--radius-sm);
+  margin-bottom: 1rem;
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+}
+
+.selection-bar__count {
+  font-weight: 600;
+  color: var(--accent-primary);
+}
+
+/* Table checkbox */
+.data-table .col-checkbox {
+  width: 36px;
+  text-align: center;
+}
+
+.data-table .col-checkbox input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--accent-primary);
+  cursor: pointer;
+}
+
+/* Tag pills in table */
+.tag-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+}
+
+.tag-pill {
+  display: inline-block;
+  padding: 0.1rem 0.45rem;
+  background: rgba(176, 160, 165, 0.12);
+  border-radius: 10px;
+  font-size: 0.7rem;
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+
 /* Responsive: hide columns on narrow screens */
 @media (max-width: 900px) {
   .data-table .col-tournaments,
