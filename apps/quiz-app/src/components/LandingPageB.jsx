@@ -71,7 +71,7 @@ export default function LandingPageB() {
                 className="landing-b__btn-primary"
                 onClick={() => openLogin('signup')}
               >
-                Get Started Free
+                Get Started Now
               </button>
               <button
                 className="landing-b__btn-text"
@@ -103,7 +103,7 @@ export default function LandingPageB() {
               className="landing-b__cta-outline"
               onClick={handleUnlockPacks}
             >
-              Start Hosting &mdash; Free
+              Start Hosting &mdash; Now
             </button>
           </div>
 
