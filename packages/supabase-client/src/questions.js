@@ -280,7 +280,8 @@ export async function fetchAllQuestions({ category, status, search, tag, page = 
     query = query.or(`question_text.ilike.%${search}%,answer_text.ilike.%${search}%`);
   }
   if (tag) {
-    query = query.contains('tags', [tag]);
+    // Cast tags array to text for partial matching (e.g. "world" matches "World Cup")
+    query = query.filter('tags::text', 'ilike', `%${tag}%`);
   }
 
   const from = (page - 1) * pageSize;

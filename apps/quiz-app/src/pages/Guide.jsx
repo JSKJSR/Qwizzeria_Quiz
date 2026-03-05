@@ -293,6 +293,40 @@ function TrophyVisual() {
   );
 }
 
+function FormatSelectVisual() {
+  return (
+    <svg viewBox="0 0 200 120" aria-hidden="true" className="guide__svg">
+      <rect x="25" y="35" width="70" height="50" rx="6" fill="#1a1015" stroke="#e85c1a" strokeWidth="2" />
+      <text x="60" y="55" textAnchor="middle" fill="#f0f0f0" fontSize="8" fontWeight="bold">Jeopardy</text>
+      <rect x="105" y="35" width="70" height="50" rx="6" fill="#1a1015" stroke="#2a1520" strokeWidth="1.5" />
+      <text x="140" y="55" textAnchor="middle" fill="#b0a0a5" fontSize="8">Sequential</text>
+    </svg>
+  );
+}
+
+function SequentialFlowVisual() {
+  return (
+    <svg viewBox="0 0 200 120" aria-hidden="true" className="guide__svg">
+      <rect x="20" y="50" width="30" height="20" rx="3" fill="#2a1520" />
+      <text x="35" y="63" textAnchor="middle" fill="#f0f0f0" fontSize="8">Q1</text>
+      <line x1="55" y1="60" x2="75" y2="60" stroke="#e85c1a" strokeWidth="1.5" markerEnd="url(#seqArrow)" />
+      <rect x="85" y="50" width="30" height="20" rx="3" fill="#e85c1a" />
+      <text x="100" y="63" textAnchor="middle" fill="#f0f0f0" fontSize="8" fontWeight="bold">Q2</text>
+      <line x1="120" y1="60" x2="140" y2="60" stroke="#b0a0a5" strokeWidth="1.5" markerEnd="url(#seqArrowGray)" />
+      <rect x="150" y="50" width="30" height="20" rx="3" fill="#2a1520" />
+      <text x="165" y="63" textAnchor="middle" fill="#f0f0f0" fontSize="8">Q3</text>
+      <defs>
+        <marker id="seqArrow" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+          <polygon points="0 0, 8 3, 0 6" fill="#e85c1a" />
+        </marker>
+        <marker id="seqArrowGray" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+          <polygon points="0 0, 8 3, 0 6" fill="#b0a0a5" />
+        </marker>
+      </defs>
+    </svg>
+  );
+}
+
 // --- Main Guide Component ---
 
 export default function Guide() {
@@ -349,6 +383,36 @@ export default function Guide() {
         />
         <GuideTip>
           You can pause the timer at any time. The timer beeps 3 times when it expires!
+        </GuideTip>
+      </GuideSection>
+
+      <GuideSection title="Play Quiz Packs" icon={'🔍'}>
+        <GuideStep
+          number={1}
+          title="Browse & Choose"
+          description="Find a pack you like from the dashboard or library. Click 'Play' to start your session."
+          visual={<PackCardsVisual />}
+        />
+        <GuideStep
+          number={2}
+          title="Select Your Format"
+          description="Choose 'Jeopardy Grid' for a non-linear points-based game, or 'Sequential' to answer in order."
+          visual={<FormatSelectVisual />}
+        />
+        <GuideStep
+          number={3}
+          title="Jeopardy Grid"
+          description="The classic Qwizzeria experience. Tap cards to reveal questions and earn points based on difficulty."
+          visual={<QuizGridVisual />}
+        />
+        <GuideStep
+          number={4}
+          title="Sequential Mode"
+          description="Perfect for rapid-fire rounds. Answer questions one-by-one until you reach the end."
+          visual={<SequentialFlowVisual />}
+        />
+        <GuideTip>
+          Your progress is saved automatically. You can resume any pack session later from the dashboard!
         </GuideTip>
       </GuideSection>
 

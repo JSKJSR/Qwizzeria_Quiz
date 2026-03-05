@@ -15,7 +15,7 @@ Qwizzeria is a high-performance, premium quiz platform built with a modern tech 
 ### 🎮 Player Experience
 - **Landing Page Showcase**: Browse all available quiz packs with cover images in a scrollable carousel — no login required.
 - **14-Day Free Trial**: All new users get full access to every feature for 14 days.
-- **Jeopardy & Sequential Formats**: Choose how you want to play curated quiz packs.
+- **Jeopardy & Sequential Formats**: Choose how you want to play curated quiz packs — either a points-based topic grid or a linear question flow.
 - **Multisided Multiplayer**: Host live quiz sessions with a dedicated teacher/host view and participant scoring.
 - **Tournament Mode**: Single-elimination bracket competitions for 2–16 teams with realtime bracket updates, shareable match URLs, and multi-tab parallel play.
 - **Resume Anywhere**: In-progress sessions are synced, allowing users to pick up where they left off.
@@ -92,7 +92,7 @@ For more detailed information, please refer to the following guides:
 - [**Architecture Guide**](docs/architecture.md) — Deep dive into the monorepo and security model.
 - [**Database & Security**](docs/database.md) — Schema documentation and RLS policies.
 - [**Development Workflow**](docs/development.md) — Guidelines for contributing and building new features.
-- [**RBAC Reference**](RBAC-Reference.md) — The original design document for the security model.
+- [**RBAC Reference**](file:///Users/shobha/Downloads/RBAC-Reference.md) — The original design document for the security model.
 
 ---
 

@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import {
   fetchAllQuestions,
   fetchCategories,
-  fetchTags,
   deleteQuestion,
 } from '@qwizzeria/supabase-client/src/questions.js';
 import { CATEGORIES } from '../../utils/categoryData';
@@ -45,9 +44,10 @@ export default function QuestionList() {
   const [count, setCount] = useState(0);
   const [page, setPage] = useState(1);
   const [categories, setCategories] = useState([]);
-  const [tags, setTags] = useState([]);
   const [filters, setFilters] = useState({ category: '', status: '', search: '', tag: '' });
+  const [tagInput, setTagInput] = useState('');
   const [loading, setLoading] = useState(true);
+  const [exporting, setExporting] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState(null);
   const [selectedIds, setSelectedIds] = useState(new Set());
 
@@ -89,9 +89,16 @@ export default function QuestionList() {
     }).catch(() => {
       setCategories(CATEGORIES);
     });
-
-    fetchTags().then(setTags).catch(() => setTags([]));
   }, []);
+
+  // Debounced tag search
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setFilters((prev) => ({ ...prev, tag: tagInput.trim() }));
+      setPage(1);
+    }, 400);
+    return () => clearTimeout(timer);
+  }, [tagInput]);
 
   // Clear selection when page/filters change
   useEffect(() => {
@@ -144,6 +151,27 @@ export default function QuestionList() {
     exportQuestionsCSV(selected);
   };
 
+  const handleExportAll = async () => {
+    setExporting(true);
+    try {
+      // Fetch all matching questions (up to 5000) without pagination
+      const result = await fetchAllQuestions({
+        category: filters.category || undefined,
+        status: filters.status || undefined,
+        search: filters.search || undefined,
+        tag: filters.tag || undefined,
+        page: 1,
+        pageSize: 5000,
+      });
+      exportQuestionsCSV(result.data);
+    } catch (err) {
+      console.error('Export failed:', err);
+      alert(`Export failed: ${err.message}`);
+    } finally {
+      setExporting(false);
+    }
+  };
+
   const allOnPageSelected = questions.length > 0 && selectedIds.size === questions.length;
 
   return (
@@ -151,6 +179,13 @@ export default function QuestionList() {
       <div className="page-header">
         <h1>Questions</h1>
         <div className="page-header__actions">
+          <button
+            className="btn btn-secondary btn-sm"
+            onClick={handleExportAll}
+            disabled={exporting || count === 0}
+          >
+            {exporting ? 'Exporting...' : `Export All (${count})`}
+          </button>
           <button className="btn btn-primary" onClick={() => navigate('/admin/questions/new')}>
             Add Question
           </button>
@@ -175,16 +210,13 @@ export default function QuestionList() {
             <option key={c} value={c}>{c}</option>
           ))}
         </select>
-        <select
-          className="form-select"
-          value={filters.tag}
-          onChange={(e) => handleFilterChange('tag', e.target.value)}
-        >
-          <option value="">All Tags</option>
-          {tags.map((t) => (
-            <option key={t} value={t}>{t}</option>
-          ))}
-        </select>
+        <input
+          type="text"
+          className="form-input"
+          placeholder="Search tags..."
+          value={tagInput}
+          onChange={(e) => setTagInput(e.target.value)}
+        />
         <select
           className="form-select"
           value={filters.status}
