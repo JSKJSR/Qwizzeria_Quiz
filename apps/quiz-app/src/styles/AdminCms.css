@@ -421,3 +421,224 @@
   width: auto;
   min-width: 120px;
 }
+
+/* Page header with actions */
+.page-header__title-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.page-header__subtitle {
+  color: var(--text-muted);
+  font-size: var(--font-size-xs);
+  font-weight: 400;
+}
+
+.page-header__actions {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+/* KPI icon */
+.stat-card__header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.4rem;
+}
+
+.stat-card__icon {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.stat-card__icon svg {
+  width: 18px;
+  height: 18px;
+}
+
+.stat-card__icon--users {
+  background: rgba(76, 175, 80, 0.15);
+  color: var(--accent-success);
+}
+
+.stat-card__icon--active {
+  background: rgba(33, 150, 243, 0.15);
+  color: #2196f3;
+}
+
+.stat-card__icon--premium {
+  background: rgba(232, 168, 37, 0.15);
+  color: var(--accent-warning);
+}
+
+.stat-card__icon--tournament {
+  background: rgba(232, 92, 26, 0.15);
+  color: var(--accent-primary);
+}
+
+/* User table name cell */
+.user-table__name-cell {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.user-table__name-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  min-width: 0;
+}
+
+.user-table__name {
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.user-table__email {
+  font-size: var(--font-size-xs);
+  color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Subscription badge */
+.badge--subscription-premium {
+  background: rgba(232, 168, 37, 0.15);
+  color: var(--accent-warning);
+}
+
+.badge--subscription-free {
+  background: rgba(176, 160, 165, 0.1);
+  color: var(--text-muted);
+}
+
+/* Status badge with dot */
+.badge--status {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.badge--status-active {
+  background: rgba(76, 175, 80, 0.12);
+  color: var(--accent-success);
+}
+
+.badge--status-inactive {
+  background: rgba(176, 160, 165, 0.1);
+  color: var(--text-muted);
+}
+
+.status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.status-dot--active {
+  background: var(--accent-success);
+}
+
+.status-dot--inactive {
+  background: var(--text-muted);
+}
+
+/* Action dropdown */
+.action-dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.action-dropdown__trigger {
+  background: none;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  padding: 0.3rem 0.5rem;
+  cursor: pointer;
+  color: var(--text-secondary);
+  font-size: var(--font-size-md);
+  line-height: 1;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.action-dropdown__trigger:hover {
+  background: var(--bg-card);
+  border-color: var(--border-color);
+}
+
+.action-dropdown__menu {
+  position: absolute;
+  right: 0;
+  top: 100%;
+  margin-top: 4px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  min-width: 160px;
+  z-index: 50;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  overflow: hidden;
+}
+
+.action-dropdown__item {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 0.55rem 0.9rem;
+  font-size: var(--font-size-xs);
+  color: var(--text-primary);
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: background 0.1s;
+}
+
+.action-dropdown__item:hover {
+  background: var(--bg-card-hover);
+}
+
+.action-dropdown__item--danger {
+  color: var(--accent-danger);
+}
+
+.action-dropdown__item--danger:hover {
+  background: rgba(229, 57, 53, 0.08);
+}
+
+.action-dropdown__item:disabled {
+  color: var(--text-muted);
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.action-dropdown__item:disabled:hover {
+  background: none;
+}
+
+/* Responsive: hide columns on narrow screens */
+@media (max-width: 900px) {
+  .data-table .col-tournaments,
+  .data-table .col-avg-score {
+    display: none;
+  }
+}
+
+@media (max-width: 700px) {
+  .data-table .col-quizzes,
+  .data-table .col-last-active {
+    display: none;
+  }
+}

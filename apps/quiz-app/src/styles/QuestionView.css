@@ -2,7 +2,7 @@
   position: fixed;
   inset: 60px 0 0 0;
   background:
-    url('/qwizzeria-logo.png') center center / 280px no-repeat,
+    url('/qwizzeria-logo.png') center bottom 40px / 280px no-repeat,
     var(--bg-overlay);
   background-blend-mode: lighten;
   display: flex;

@@ -186,6 +186,14 @@ export async function updateUserRole(userId, role) {
  * Fetch all users with emails via admin RPC (admin/superadmin only).
  * Returns { users: [...], total: number }
  */
+export async function fetchUserManagementKPIs() {
+  const supabase = getSupabase();
+  const { data, error } = await supabase.rpc('get_user_management_kpis');
+
+  if (error) throw new Error(`Failed to fetch KPIs: ${error.message}`);
+  return data;
+}
+
 export async function fetchAllUsersWithEmail({ search, role, page = 1, pageSize = 20 } = {}) {
   const supabase = getSupabase();
   const { data, error } = await supabase.rpc('get_all_users_admin', {
