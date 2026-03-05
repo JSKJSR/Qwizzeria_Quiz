@@ -262,3 +262,16 @@
 .free-quiz__cta-btn:hover {
   opacity: 0.85;
 }
+
+/* Grid page watermark */
+.fq-watermark {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  width: 120px;
+  opacity: 0.08;
+  pointer-events: none;
+  user-select: none;
+  z-index: 10;
+  filter: grayscale(1) brightness(2);
+}
