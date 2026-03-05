@@ -296,6 +296,14 @@ export default function FreeQuiz({ resumeData } = {}) {
               <button className="free-quiz__cta-btn free-quiz__cta-btn--primary" onClick={loadQuiz}>
                 Play Again
               </button>
+              {!user && (
+                <button
+                  className="free-quiz__cta-btn free-quiz__cta-btn--primary"
+                  onClick={() => navigate('/')}
+                >
+                  Sign Up Free
+                </button>
+              )}
               <button
                 className="free-quiz__cta-btn free-quiz__cta-btn--secondary"
                 onClick={() => navigate('/')}
@@ -364,6 +372,14 @@ export default function FreeQuiz({ resumeData } = {}) {
   // --- GRID VIEW ---
   return (
     <div className="free-quiz">
+      {!user && (
+        <div className="free-quiz__signup-cta">
+          <p>Sign up to track scores, unlock packs &amp; compete on leaderboards!</p>
+          <button className="free-quiz__signup-btn" onClick={() => navigate('/')}>
+            Sign Up Free
+          </button>
+        </div>
+      )}
       <div className="free-quiz__header">
         <img
           src="/qwizzeria-logo.png"

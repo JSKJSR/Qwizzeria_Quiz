@@ -124,12 +124,13 @@ a:focus-visible {
   margin-top: 2.5rem;
   padding-top: 1.5rem;
   border-top: 1px solid var(--border-color, #2a1520);
-  opacity: 0.4;
+  opacity: 0.5;
 }
 
 .results-watermark__logo {
   height: 36px;
   width: auto;
+  mix-blend-mode: screen;
 }
 
 .results-watermark__tagline {

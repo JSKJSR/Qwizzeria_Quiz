@@ -269,9 +269,43 @@
   bottom: 24px;
   right: 24px;
   width: 120px;
-  opacity: 0.08;
+  opacity: 0.18;
   pointer-events: none;
   user-select: none;
   z-index: 10;
-  filter: grayscale(1) brightness(2);
+  mix-blend-mode: screen;
+}
+
+/* Sign-up CTA banner */
+.free-quiz__signup-cta {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  padding: 0.75rem 1.5rem;
+  background: linear-gradient(90deg, rgba(232, 92, 26, 0.15), rgba(232, 92, 26, 0.05));
+  border-bottom: 1px solid rgba(232, 92, 26, 0.2);
+}
+
+.free-quiz__signup-cta p {
+  font-size: 0.9rem;
+  color: #ccc;
+  margin: 0;
+}
+
+.free-quiz__signup-btn {
+  padding: 0.4rem 1.2rem;
+  background: var(--accent-primary, #e85c1a);
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: opacity 0.2s;
+}
+
+.free-quiz__signup-btn:hover {
+  opacity: 0.85;
 }

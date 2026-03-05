@@ -16,6 +16,12 @@ export default function FreeAnswerView({ question, onSelfAssess, onReturn }) {
 
   return (
     <div className="answer-view">
+      <img
+        src="/qwizzeria-logo.png"
+        alt=""
+        aria-hidden="true"
+        className="av-watermark"
+      />
       <div className="answer-view__content">
         <div className="answer-view__label">Answer</div>
         <div className="answer-view__text">{question.answer}</div>

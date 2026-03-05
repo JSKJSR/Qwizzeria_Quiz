@@ -122,3 +122,16 @@
   border-color: var(--text-secondary);
   color: var(--text-primary);
 }
+
+/* Answer view watermark */
+.av-watermark {
+  position: absolute;
+  bottom: 24px;
+  right: 24px;
+  width: 110px;
+  opacity: 0.15;
+  pointer-events: none;
+  user-select: none;
+  z-index: 1;
+  mix-blend-mode: screen;
+}
