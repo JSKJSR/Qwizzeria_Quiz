@@ -392,6 +392,13 @@ export default function FreeQuiz({ resumeData } = {}) {
         completedQuestionIds={completedQuestionIds}
         onSelectQuestion={handleSelectQuestion}
       />
+
+      <img
+        src="/qwizzeria-logo.png"
+        alt=""
+        aria-hidden="true"
+        className="fq-watermark"
+      />
     </div>
   );
 }

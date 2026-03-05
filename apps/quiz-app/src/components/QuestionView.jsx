@@ -22,6 +22,12 @@ export default function QuestionView({ question, onRevealAnswer, onBack, onSkip 
 
   return (
     <div className="question-view">
+      <img
+        src="/qwizzeria-logo.png"
+        alt=""
+        aria-hidden="true"
+        className="qv-watermark"
+      />
       <div className="question-view__content">
         <div className="question-view__topic">{question.topic}</div>
         <div className="question-view__points">{question.points} pts</div>
