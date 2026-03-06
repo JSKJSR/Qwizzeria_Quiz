@@ -15,7 +15,7 @@ export async function createBuzzerRoom(hostUserId, sessionType, sessionRef = nul
   const supabase = getSupabase();
 
   // Close any stale rooms first (non-blocking)
-  supabase.rpc('close_stale_buzzer_rooms').catch(() => {});
+  supabase.rpc('close_stale_buzzer_rooms').then(() => {}, () => {});
 
   const { data, error } = await supabase
     .from('buzzer_rooms')
