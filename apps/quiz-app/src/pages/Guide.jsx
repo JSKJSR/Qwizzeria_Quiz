@@ -293,6 +293,116 @@ function TrophyVisual() {
   );
 }
 
+function BuzzerButtonVisual() {
+  return (
+    <svg viewBox="0 0 200 120" aria-hidden="true" className="guide__svg">
+      {/* Big buzzer button */}
+      <circle cx="100" cy="55" r="40" fill="#1a1015" stroke="#2ecc71" strokeWidth="3" />
+      <circle cx="100" cy="55" r="32" fill="rgba(46, 204, 113, 0.15)" />
+      <text x="100" y="60" textAnchor="middle" fill="#2ecc71" fontSize="14" fontWeight="bold">BUZZ!</text>
+      {/* Pulse rings */}
+      <circle cx="100" cy="55" r="45" fill="none" stroke="#2ecc71" strokeWidth="1" opacity="0.4">
+        <animate attributeName="r" values="45;55" dur="1.5s" repeatCount="indefinite" />
+        <animate attributeName="opacity" values="0.4;0" dur="1.5s" repeatCount="indefinite" />
+      </circle>
+      <text x="100" y="108" textAnchor="middle" fill="#b0a0a5" fontSize="8">Tap to buzz in!</text>
+    </svg>
+  );
+}
+
+function BuzzerRoomVisual() {
+  return (
+    <svg viewBox="0 0 200 120" aria-hidden="true" className="guide__svg">
+      {/* Room code box */}
+      <rect x="40" y="20" width="120" height="40" rx="8" fill="#1a1015" stroke="#e85c1a" strokeWidth="2" />
+      <text x="100" y="35" textAnchor="middle" fill="#b0a0a5" fontSize="7">ROOM CODE</text>
+      <text x="100" y="52" textAnchor="middle" fill="#e85c1a" fontSize="16" fontWeight="bold" fontFamily="monospace">A3KX7P</text>
+      {/* Participants joining */}
+      {[0, 1, 2].map(i => (
+        <g key={i}>
+          <circle cx={55 + i * 45} cy="85" r="12" fill="#1a1015" stroke="#2a1520" strokeWidth="1.5" />
+          <text x={55 + i * 45} y="89" textAnchor="middle" fill="#f0f0f0" fontSize="8">{['P1', 'P2', 'P3'][i]}</text>
+        </g>
+      ))}
+      <text x="100" y="112" textAnchor="middle" fill="#b0a0a5" fontSize="7">Players join with room code</text>
+    </svg>
+  );
+}
+
+function BuzzerRankVisual() {
+  return (
+    <svg viewBox="0 0 200 120" aria-hidden="true" className="guide__svg">
+      {/* Ranked results */}
+      <rect x="25" y="15" width="150" height="28" rx="5" fill="rgba(241, 196, 15, 0.1)" stroke="rgba(241, 196, 15, 0.3)" strokeWidth="1" />
+      <text x="42" y="33" textAnchor="middle" fill="#e85c1a" fontSize="10" fontWeight="bold">#1</text>
+      <text x="85" y="33" textAnchor="middle" fill="#f0f0f0" fontSize="9">Alice</text>
+      <text x="155" y="33" textAnchor="middle" fill="#b0a0a5" fontSize="8" fontFamily="monospace">320ms</text>
+      <rect x="25" y="48" width="150" height="28" rx="5" fill="rgba(255,255,255,0.03)" />
+      <text x="42" y="66" textAnchor="middle" fill="#e85c1a" fontSize="10" fontWeight="bold">#2</text>
+      <text x="85" y="66" textAnchor="middle" fill="#f0f0f0" fontSize="9">Bob</text>
+      <text x="155" y="66" textAnchor="middle" fill="#b0a0a5" fontSize="8" fontFamily="monospace">480ms</text>
+      <rect x="25" y="81" width="150" height="28" rx="5" fill="rgba(255,255,255,0.03)" />
+      <text x="42" y="99" textAnchor="middle" fill="#e85c1a" fontSize="10" fontWeight="bold">#3</text>
+      <text x="85" y="99" textAnchor="middle" fill="#f0f0f0" fontSize="9">Charlie</text>
+      <text x="155" y="99" textAnchor="middle" fill="#b0a0a5" fontSize="8" fontFamily="monospace">650ms</text>
+    </svg>
+  );
+}
+
+function BuzzerHostFlowVisual() {
+  return (
+    <svg viewBox="0 0 200 120" aria-hidden="true" className="guide__svg">
+      {/* Open button */}
+      <rect x="10" y="45" width="50" height="30" rx="6" fill="rgba(46, 204, 113, 0.15)" stroke="#2ecc71" strokeWidth="1.5" />
+      <text x="35" y="64" textAnchor="middle" fill="#2ecc71" fontSize="7" fontWeight="bold">OPEN</text>
+      {/* Arrow */}
+      <line x1="65" y1="60" x2="80" y2="60" stroke="#b0a0a5" strokeWidth="1.5" markerEnd="url(#buzzArrow)" />
+      {/* Buzzes arrive */}
+      <circle cx="105" cy="60" r="18" fill="#1a1015" stroke="#e85c1a" strokeWidth="2" />
+      <text x="105" y="56" textAnchor="middle" fill="#e85c1a" fontSize="14">!</text>
+      <text x="105" y="67" textAnchor="middle" fill="#b0a0a5" fontSize="5">buzzes</text>
+      {/* Arrow */}
+      <line x1="128" y1="60" x2="143" y2="60" stroke="#b0a0a5" strokeWidth="1.5" markerEnd="url(#buzzArrow)" />
+      {/* Award */}
+      <rect x="148" y="45" width="42" height="30" rx="6" fill="rgba(46, 204, 113, 0.15)" stroke="#2ecc71" strokeWidth="1.5" />
+      <text x="169" y="64" textAnchor="middle" fill="#2ecc71" fontSize="7" fontWeight="bold">AWARD</text>
+      <defs>
+        <marker id="buzzArrow" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+          <polygon points="0 0, 8 3, 0 6" fill="#b0a0a5" />
+        </marker>
+      </defs>
+      <text x="35" y="90" textAnchor="middle" fill="#b0a0a5" fontSize="6">Host opens</text>
+      <text x="35" y="99" textAnchor="middle" fill="#b0a0a5" fontSize="6">buzzer</text>
+      <text x="105" y="92" textAnchor="middle" fill="#b0a0a5" fontSize="6">Players</text>
+      <text x="105" y="101" textAnchor="middle" fill="#b0a0a5" fontSize="6">buzz in</text>
+      <text x="169" y="92" textAnchor="middle" fill="#b0a0a5" fontSize="6">Host awards</text>
+      <text x="169" y="101" textAnchor="middle" fill="#b0a0a5" fontSize="6">points</text>
+    </svg>
+  );
+}
+
+function BuzzerTournamentVisual() {
+  return (
+    <svg viewBox="0 0 200 120" aria-hidden="true" className="guide__svg">
+      {/* Two active players */}
+      <circle cx="55" cy="40" r="16" fill="#1a1015" stroke="#2ecc71" strokeWidth="2" />
+      <text x="55" y="44" textAnchor="middle" fill="#2ecc71" fontSize="8" fontWeight="bold">A</text>
+      <circle cx="145" cy="40" r="16" fill="#1a1015" stroke="#2ecc71" strokeWidth="2" />
+      <text x="145" y="44" textAnchor="middle" fill="#2ecc71" fontSize="8" fontWeight="bold">B</text>
+      <text x="100" y="44" textAnchor="middle" fill="#e85c1a" fontSize="10" fontWeight="bold">VS</text>
+      {/* Spectators */}
+      {[0, 1, 2].map(i => (
+        <g key={i}>
+          <circle cx={55 + i * 45} cy="90" r="10" fill="#1a1015" stroke="#2a1520" strokeWidth="1" strokeDasharray="3 2" />
+          <text x={55 + i * 45} y="93" textAnchor="middle" fill="#b0a0a5" fontSize="7">{['C', 'D', 'E'][i]}</text>
+        </g>
+      ))}
+      <text x="100" y="25" textAnchor="middle" fill="#f0f0f0" fontSize="8">Active match</text>
+      <text x="100" y="112" textAnchor="middle" fill="#b0a0a5" fontSize="7">Others spectate</text>
+    </svg>
+  );
+}
+
 function FormatSelectVisual() {
   return (
     <svg viewBox="0 0 200 120" aria-hidden="true" className="guide__svg">
@@ -335,7 +445,7 @@ export default function Guide() {
       <SEO title="How to Play | Qwizzeria" />
       <h1 className="guide__title">How to Play</h1>
       <p className="guide__subtitle">
-        Learn how to host quizzes and run tournaments with Qwizzeria.
+        Learn how to host quizzes, use the buzzer, and run tournaments with Qwizzeria.
       </p>
 
       <GuideSection title="Host a Quiz" icon={'\uD83C\uDFAE'} defaultOpen>
@@ -383,6 +493,48 @@ export default function Guide() {
         />
         <GuideTip>
           You can pause the timer at any time. The timer beeps 3 times when it expires!
+        </GuideTip>
+      </GuideSection>
+
+      <GuideSection title="Buzzer Mode" icon={'🔔'}>
+        <GuideStep
+          number={1}
+          title="Enable Buzzer (Host)"
+          description="When setting up a Host Quiz or Tournament, check 'Enable Buzzer' before starting. A unique room code is generated automatically."
+          visual={<BuzzerRoomVisual />}
+        />
+        <GuideStep
+          number={2}
+          title="Players Join"
+          description="Share the room code or join link with participants. Players must be logged in — go to /buzz/ROOMCODE to join. Names are pulled from your account automatically."
+          visual={<ParticipantsVisual />}
+        />
+        <GuideStep
+          number={3}
+          title="Host Opens the Buzzer"
+          description="For each question, the host clicks 'Open Buzzer'. Players see a green BUZZ button appear on their device. The host can lock the buzzer at any time."
+          visual={<BuzzerHostFlowVisual />}
+        />
+        <GuideStep
+          number={4}
+          title="Buzz In!"
+          description="Tap the buzzer as fast as you can! Your phone vibrates on press. Buzzes under 100ms are rejected (no bots allowed). The system measures your reaction time precisely."
+          visual={<BuzzerButtonVisual />}
+        />
+        <GuideStep
+          number={5}
+          title="Ranked Results"
+          description="The host sees all buzzes ranked by speed. If two players buzz within 50ms of each other, it's flagged as a tie and the host decides the winner."
+          visual={<BuzzerRankVisual />}
+        />
+        <GuideStep
+          number={6}
+          title="Tournament Buzzer"
+          description="In tournament mode, only the two players in the current match can buzz. Everyone else watches as a spectator until their match comes up."
+          visual={<BuzzerTournamentVisual />}
+        />
+        <GuideTip>
+          The buzzer uses real-time broadcasting for near-instant response. Each player's buzz time is measured from when they received the question — no unfair advantage from network speed!
         </GuideTip>
       </GuideSection>
 
