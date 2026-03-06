@@ -23,31 +23,6 @@ Developed using **Turborepo** and npm workspaces, the codebase is split into ind
 
 ---
 
-## 🛡️ Security Model: Two-Gate RBAC
-
-Qwizzeria implements a robust **Two-Gate security model** adapted from enterprise asset management patterns.
-
-### Gate 1: Feature Access
-Controls whether a user is allowed to enter a specific functional module. Examples include:
-- `host_quiz`: Permission to start a live multiplayer session.
-- `admin_cms`: Permission to access the administrative interface.
-- `pack_premium`: Permission to browse and play premium content.
-
-### Gate 2: Content Permissions
-Controls granular access levels for specific resources (Quiz Packs or Categories). Levels include:
-- `read`: Can view/play.
-- `write`: Can edit content.
-- `manage`: Can delete or grant permissions to others.
-
-### Role Hierarchy
-1. **`superadmin`**: Bypasses all gates, full system control, and **user role assignment via the User Management UI**.
-2. **`admin`**: Bypasses Gate 1 and has platform-wide management permissions.
-3. **`editor`**: Granted access to `admin_cms` and specific content folders/categories.
-4. **`premium`**: Granted access to `pack_premium` features.
-5. **`user`**: Base role with access to free quizzes and public packs.
-
----
-
 ## 🎮 Quiz Engine
 
 Each quiz mode (Free Quiz, Pack Play, Host Quiz) is powered by a **state-machine-driven engine** implemented with React's `useReducer` and `useContext`.
@@ -101,26 +76,6 @@ The landing page (`LandingPageB`) serves as the public-facing marketing page:
 - **Footer**: Social links (Patreon, Instagram, email).
 
 Pack metadata (title, image, category) is visible to anonymous users via RLS. Playing is gated by app-layer role checks after login.
-
----
-
-## 💳 Subscription & Billing
-
-Qwizzeria integrates **Stripe** for subscription management with a **14-day free trial** for all new users.
-
-### Tier Model
-- **Free**: Free Quiz, Dashboard, Profile/Guide only.
-- **Basic** (~$5/mo): Adds Quiz Packs, History, Leaderboard.
-- **Pro** (~$10/mo): Adds Host Quiz (multiplayer) and Tournaments.
-
-### Architecture
-- **`subscriptions` table**: Tracks Stripe customer/subscription IDs, tier, status, billing period.
-- **`get_subscription_state()` RPC**: Single source of truth — computes trial from `user_profiles.created_at + 14 days`, returns status/tier/gating for the frontend.
-- **Staff bypass**: Editor/admin/superadmin roles skip all subscription checks.
-- **Vercel Serverless API**: `api/stripe/create-checkout.js`, `api/stripe/create-portal.js`, `api/stripe/webhook.js` handle Stripe integration.
-- **Frontend gating**: `TierRoute` (route-level) and `SubscriptionGate` (inline) components check `hasTier()` from AuthContext.
-- **Sidebar trial widget**: SVG circular progress ring showing trial days remaining, UPGRADE button, subscription status label.
-- **Grace period**: 3-day access window for `past_due` subscriptions before full gating.
 
 ---
 

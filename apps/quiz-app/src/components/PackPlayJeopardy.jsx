@@ -112,14 +112,13 @@ export default function PackPlayJeopardy({ pack, questions, user, resumeData }) 
       grouped[cat].push(q);
     }
 
-    const pointValues = [10, 20, 30];
     const topicEntries = Object.entries(grouped).slice(0, 6);
     const topics = topicEntries.map(([categoryName, qs]) => ({
       name: categoryName,
-      questions: qs.slice(0, 3).map((q, i) => ({
+      questions: qs.map((q, i) => ({
         id: q.id,
         topic: q.display_title || categoryName,
-        points: q.points != null ? q.points : (pointValues[i] || (i + 1) * 10),
+        points: q.points != null ? q.points : ((i + 1) * 10),
         question: q.question_text,
         answer: q.answer_text,
         answerExplanation: q.answer_explanation,

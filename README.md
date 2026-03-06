@@ -89,12 +89,10 @@ npm install
 
 For more detailed information, please refer to the following guides:
 
-- [**Architecture Guide**](docs/architecture.md) — Deep dive into the monorepo and security model.
-- [**Database & Security**](docs/database.md) — Schema documentation and RLS policies.
-- [**Development Workflow**](docs/development.md) — Guidelines for contributing and building new features.
-- [**Admin CMS Guide**](docs/admin-cms.md) — Details on management modules and analytics.
-- [**Supabase Client Docs**](docs/supabase-client.md) — Shared data access layer and RPC reference.
-- [**RBAC Reference**](file:///Users/shobha/Downloads/RBAC-Reference.md) — The original design document for the security model.
+- [**Product Manual**](docs/product-manual.md) — How the product works, user flows, and Admin operations.
+- [**Architecture Guide**](docs/architecture.md) — Technical overview of the frontend, state machines, and UI performance.
+- [**Backend & Security**](docs/backend-and-security.md) — Database schema, the Two-Gate RBAC model, and RPC APIs.
+- [**Development Workflow**](docs/development.md) — Guidelines for local setup, testing, and deployment.
 
 ---
 

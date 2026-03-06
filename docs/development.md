@@ -7,7 +7,7 @@ This guide covers the standards and processes for contributing to the Qwizzeria 
 ## 🛠️ Local Setup
 
 ### Environment Variables
-Both `apps/quiz-app` and `apps/admin-cms` require a `.env.local` file with the following variables:
+`apps/quiz-app` requires a `.env.local` file with the following variables:
 
 ```env
 VITE_SUPABASE_URL=your_supabase_project_url

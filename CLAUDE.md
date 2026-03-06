@@ -168,7 +168,7 @@ Access restricted via role checks (editor, admin, superadmin).
 ## Full Documentation
 
 For detailed guides, see the `docs/` directory:
-- [Architecture Guide](docs/architecture.md)
-- [Database & Security](docs/database.md)
-- [Development Workflow](docs/development.md)
-- [README.md](README.md)
+- [Product Manual](docs/product-manual.md) (Features, flows, Admin CMS)
+- [Architecture Guide](docs/architecture.md) (Frontend UI, React state)
+- [Backend & Security](docs/backend-and-security.md) (Supabase, Roles, DB Schema)
+- [Development Workflow](docs/development.md) (Tests, local setup, CI/CD)
