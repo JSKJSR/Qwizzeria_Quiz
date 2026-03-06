@@ -384,14 +384,186 @@
   --text-primary: #1a1015;
   --text-secondary: #5a5055;
   --text-muted: #8a8085;
+  --accent-primary: #d4521a;
+  --accent-secondary: #d4521a;
 }
 
-.host-light-theme .scoreboard {
+/* Scoreboard */
+.host-light-theme .scoreboard,
+.host-light-theme .scoreboard__drawer {
   background: #e8e0d8;
   border-bottom-color: #d0c8c0;
 }
 
-.host-light-theme .scoreboard__drawer {
+/* Fullscreen host quiz container */
+.host-light-theme .host-quiz--fullscreen {
+  background: #f5f0eb;
+}
+
+/* Grid cards */
+.host-light-theme .host-grid__cell {
+  background: #ffffff;
+  border-color: #d0c8c0;
+}
+
+.host-light-theme .host-grid__cell:hover:not(.host-grid__cell--completed):not(.host-grid__cell--skipped) {
+  background: #f0e8e0;
+  border-color: #d4521a;
+  box-shadow: 0 4px 20px rgba(212, 82, 26, 0.15);
+}
+
+.host-light-theme .host-grid__cell--completed {
+  background: #e0d8d0;
+  opacity: 0.4;
+}
+
+.host-light-theme .host-grid__cell--skipped {
+  background: #e0d8d0;
+  border-color: rgba(212, 82, 26, 0.3);
+}
+
+.host-light-theme .host-grid__topic {
+  color: #1a1015;
+}
+
+.host-light-theme .host-grid__category-tag {
+  background: rgba(0, 0, 0, 0.06);
+  color: #5a5055;
+}
+
+/* Score cards */
+.host-light-theme .scoreboard__team {
+  background: #ffffff;
+  border-color: #d0c8c0;
+}
+
+.host-light-theme .scoreboard__team--leader {
+  border-color: #e8a825;
+  background: rgba(232, 168, 37, 0.08);
+}
+
+.host-light-theme .scoreboard__score {
+  color: #1a1015;
+}
+
+.host-light-theme .scoreboard__name {
+  color: #5a5055;
+}
+
+/* Timer */
+.host-light-theme .timer__display {
+  color: #1a1015;
+}
+
+.host-light-theme .timer__input {
+  background: #ffffff;
+  border-color: #d0c8c0;
+  color: #1a1015;
+}
+
+.host-light-theme .timer__btn {
+  color: #1a1015;
+}
+
+/* End button */
+.host-light-theme .scoreboard__end-btn {
+  background: #ffffff;
+  border-color: #d4521a;
+  color: #d4521a;
+}
+
+.host-light-theme .scoreboard__end-btn:hover {
+  background: #d4521a;
+  color: #fff;
+}
+
+/* Answer view */
+.host-light-theme .host-answer__answer-section {
+  background: #ffffff;
+  border-color: #d0c8c0;
+}
+
+.host-light-theme .host-answer__question-text {
+  color: #3a3035;
+}
+
+.host-light-theme .host-answer__award-btn {
+  background: #ffffff;
+  border-color: #d0c8c0;
+  color: #1a1015;
+}
+
+.host-light-theme .host-answer__award-btn:hover {
+  border-color: #4caf50;
+  background: rgba(76, 175, 80, 0.08);
+}
+
+.host-light-theme .host-answer__no-points-btn {
+  border-color: #d0c8c0;
+  color: #5a5055;
+}
+
+.host-light-theme .host-answer__skip-btn {
+  border-color: #d0c8c0;
+  color: #8a8085;
+}
+
+/* Question view */
+.host-light-theme .question-view,
+.host-light-theme .question-view__card {
+  background: #ffffff;
+  border-color: #d0c8c0;
+  color: #1a1015;
+}
+
+/* Buzzer FAB */
+.host-light-theme .buzzer-fab {
+  background: #ffffff;
+  border-color: #d0c8c0;
+  color: #1a1015;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.host-light-theme .buzzer-fab__panel {
+  background: #ffffff;
+  border-color: #d0c8c0;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+}
+
+.host-light-theme .buzzer-fab__participant-chip {
+  background: rgba(0, 0, 0, 0.05);
+  color: #1a1015;
+}
+
+.host-light-theme .buzzer-fab__buzz-row {
+  background: rgba(0, 0, 0, 0.03);
+}
+
+.host-light-theme .buzzer-fab__buzz-name {
+  color: #1a1015;
+}
+
+/* Adjust popover */
+.host-light-theme .scoreboard__adjust-popover {
+  background: #ffffff;
+  border-color: #d0c8c0;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+}
+
+.host-light-theme .scoreboard__adjust-option {
+  background: #f5f0eb;
+  border-color: #d0c8c0;
+}
+
+/* Drawer button */
+.host-light-theme .scoreboard__drawer-btn {
+  background: #ffffff;
+  border-color: #d0c8c0;
+  color: #1a1015;
+}
+
+/* Tournament toolbar */
+.host-light-theme .tournament-toolbar {
   background: #e8e0d8;
   border-bottom-color: #d0c8c0;
 }
