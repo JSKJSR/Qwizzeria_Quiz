@@ -1,116 +1,121 @@
+/* ============================================================
+   TimerControl — Hero-sized countdown timer
+   Layout: [MIN/SEC inputs] → [Large display] → [PLAY/RESET buttons]
+   ============================================================ */
+
 .timer {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 0.75rem;
-  padding: 0.5rem 1rem;
-  background: var(--bg-card, #1a1015);
-  border-radius: var(--radius-sm, 8px);
-  border: 2px solid var(--border-color, #2a1520);
-  transition: border-color 0.3s ease;
+  gap: 0.25rem;
+  transition: all 0.3s ease;
+}
+
+/* ---- Input row ---- */
+.timer__inputs {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
 }
 
 .timer__input-group {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 0.25rem;
+  gap: 0.1rem;
+}
+
+.timer__label {
+  font-size: 0.65rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-secondary, #b0a0a5);
 }
 
 .timer__input {
-  width: 3rem;
-  padding: 0.25rem 0.5rem;
-  background: var(--bg-secondary, #0d0d0d);
+  width: 3.5rem;
+  padding: 0.2rem 0.4rem;
+  background: var(--bg-card, #1a1015);
   border: 1px solid var(--border-color, #2a1520);
   border-radius: var(--radius-sm, 8px);
   color: var(--text-primary, #f0f0f0);
-  font-size: var(--font-size-xs, 0.75rem);
+  font-size: 0.85rem;
   text-align: center;
   font-variant-numeric: tabular-nums;
 }
 
 .timer__input:disabled {
-  opacity: 0.5;
+  opacity: 0.4;
   cursor: not-allowed;
 }
 
-.timer__label {
-  font-size: var(--font-size-xs, 0.75rem);
-  color: var(--text-secondary, #b0a0a5);
-  font-weight: 500;
-}
-
+/* ---- Large time display ---- */
 .timer__display {
-  font-size: 2.5rem;
+  font-size: 4.5rem;
   font-weight: 900;
   font-variant-numeric: tabular-nums;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.03em;
   color: var(--text-primary, #f0f0f0);
-  min-width: 6rem;
+  line-height: 1;
   text-align: center;
   transition: color 0.3s ease;
 }
 
+/* ---- Control buttons ---- */
 .timer__controls {
   display: flex;
-  gap: 0.5rem;
+  gap: 1.5rem;
 }
 
 .timer__btn {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: center;
-  width: 2rem;
-  height: 2rem;
-  padding: 0;
-  background: var(--bg-secondary, #0d0d0d);
-  border: 2px solid var(--border-color, #2a1520);
-  border-radius: var(--radius-sm, 8px);
+  gap: 0.15rem;
+  padding: 0.3rem 0.6rem;
+  background: transparent;
+  border: none;
   color: var(--text-primary, #f0f0f0);
-  transition: all 0.2s ease;
   cursor: pointer;
+  transition: all 0.15s ease;
 }
 
 .timer__btn:hover {
-  background: var(--bg-card-hover, #251520);
-  border-color: var(--accent-primary, #e85c1a);
+  color: var(--accent-primary, #e85c1a);
 }
 
-.timer__btn--primary:hover {
-  border-color: var(--accent-success, #4caf50);
+.timer__btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
 }
 
 .timer__btn svg {
   flex-shrink: 0;
 }
 
-/* Timer states */
-.timer--running {
-  border-color: var(--accent-success, #4caf50);
-  box-shadow: 0 0 12px rgba(76, 175, 80, 0.3);
+.timer__btn-label {
+  font-size: 0.6rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  color: var(--text-secondary, #b0a0a5);
 }
 
+.timer__btn:hover .timer__btn-label {
+  color: var(--accent-primary, #e85c1a);
+}
+
+/* ---- Timer states ---- */
 .timer--running .timer__display {
-  text-shadow: 0 0 8px rgba(240, 240, 240, 0.3);
-}
-
-.timer--warning {
-  border-color: var(--accent-warning, #e8a825);
+  text-shadow: 0 0 12px rgba(240, 240, 240, 0.2);
 }
 
 .timer--warning .timer__display {
   color: var(--accent-warning, #e8a825);
 }
 
-.timer--critical {
-  border-color: var(--accent-primary, #e85c1a);
-}
-
 .timer--critical .timer__display {
   color: var(--accent-primary, #e85c1a);
-}
-
-.timer--expired {
-  border-color: var(--accent-primary, #e85c1a);
-  animation: timerExpiredBorder 1s ease-in-out infinite;
 }
 
 .timer--expired .timer__display {
@@ -132,34 +137,28 @@
   }
 }
 
-@keyframes timerExpiredBorder {
-  0%, 100% {
-    border-color: var(--accent-primary, #e85c1a);
-  }
-  50% {
-    border-color: var(--accent-primary-hover, #d4163a);
+/* ---- Responsive ---- */
+@media (max-width: 1024px) {
+  .timer__display {
+    font-size: 3rem;
   }
 }
 
-/* Responsive */
 @media (max-width: 768px) {
-  .timer {
-    gap: 0.5rem;
-    padding: 0.4rem 0.75rem;
-  }
-
   .timer__display {
-    font-size: var(--font-size-lg, 1.25rem);
-    min-width: 4rem;
+    font-size: 2rem;
   }
 
-  .timer__btn {
-    width: 2.75rem;
-    height: 2.75rem;
+  .timer__inputs {
+    gap: 0.75rem;
   }
 
   .timer__btn svg {
-    width: 14px;
-    height: 14px;
+    width: 16px;
+    height: 16px;
+  }
+
+  .timer__controls {
+    gap: 1rem;
   }
 }

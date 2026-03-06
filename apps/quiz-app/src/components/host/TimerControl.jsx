@@ -80,7 +80,7 @@ export default function TimerControl() {
   function handleReset() {
     stopInterval();
     setIsRunning(false);
-    setTimeLeft(null); // Back to using input values
+    setTimeLeft(null);
   }
 
   function handleMinutesChange(e) {
@@ -103,36 +103,40 @@ export default function TimerControl() {
 
   return (
     <div className={`timer ${getColorClass()}`}>
-      <div className="timer__input-group">
-        <input
-          type="number"
-          className="timer__input"
-          value={minutes}
-          onChange={handleMinutesChange}
-          disabled={isRunning || timeLeft !== null}
-          min="0"
-          max="99"
-        />
-        <span className="timer__label">min</span>
+      {/* Input row: MIN / SEC labels + fields */}
+      <div className="timer__inputs">
+        <div className="timer__input-group">
+          <span className="timer__label">MIN</span>
+          <input
+            type="number"
+            className="timer__input"
+            value={minutes}
+            onChange={handleMinutesChange}
+            disabled={isRunning || timeLeft !== null}
+            min="0"
+            max="99"
+          />
+        </div>
+        <div className="timer__input-group">
+          <span className="timer__label">SEC</span>
+          <input
+            type="number"
+            className="timer__input"
+            value={seconds}
+            onChange={handleSecondsChange}
+            disabled={isRunning || timeLeft !== null}
+            min="0"
+            max="59"
+          />
+        </div>
       </div>
 
-      <div className="timer__input-group">
-        <input
-          type="number"
-          className="timer__input"
-          value={seconds}
-          onChange={handleSecondsChange}
-          disabled={isRunning || timeLeft !== null}
-          min="0"
-          max="59"
-        />
-        <span className="timer__label">sec</span>
-      </div>
-
+      {/* Large time display */}
       <div className={`timer__display ${displayTime === 0 && timeLeft !== null ? 'timer__display--pulse' : ''}`}>
         {timeDisplay}
       </div>
 
+      {/* Control buttons with labels */}
       <div className="timer__controls">
         <button
           className="timer__btn timer__btn--primary"
@@ -141,15 +145,16 @@ export default function TimerControl() {
           disabled={displayTime === 0 && timeLeft !== null}
         >
           {isRunning ? (
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
               <rect x="6" y="4" width="4" height="16" />
               <rect x="14" y="4" width="4" height="16" />
             </svg>
           ) : (
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
               <path d="M8 5v14l11-7z" />
             </svg>
           )}
+          <span className="timer__btn-label">{isRunning ? 'PAUSE' : 'PLAY'}</span>
         </button>
 
         <button
@@ -157,10 +162,11 @@ export default function TimerControl() {
           onClick={handleReset}
           title="Reset"
         >
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
             <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
             <path d="M3 3v5h5" />
           </svg>
+          <span className="timer__btn-label">RESET</span>
         </button>
       </div>
     </div>

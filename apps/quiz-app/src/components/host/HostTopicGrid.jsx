@@ -31,9 +31,24 @@ export default function HostTopicGrid({ topics, completedQuestionIds, skippedQue
                 className={cellClass}
                 onClick={() => !isCompleted && onSelectQuestion(q)}
               >
+                {/* Status badge */}
+                {isCompleted && (
+                  <span className="host-grid__status-badge host-grid__status-badge--done" title="Answered">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+                  </span>
+                )}
+                {isSkipped && (
+                  <span className="host-grid__status-badge host-grid__status-badge--skipped" title="Skipped">?</span>
+                )}
+
                 <div className="host-grid__topic">{q.topic}</div>
                 <div className="host-grid__points">{q.points}</div>
-                {isSkipped && <div className="host-grid__skipped-badge">?</div>}
+
+                {/* Category tag */}
+                {q.category && (
+                  <span className="host-grid__category-tag">{q.category}</span>
+                )}
+
                 {q.mediaType !== 'none' && (
                   <div className="host-grid__media-icons">
                     <span className="host-grid__media-icon">

@@ -607,6 +607,7 @@ export default function HostQuiz() {
   const restoredRef = useRef(false);
   const [showTieBreaker, setShowTieBreaker] = useState(false);
   const [buzzerEnabled, setBuzzerEnabled] = useState(false);
+  const [buzzerCopied, setBuzzerCopied] = useState(false);
 
   // Buzzer hook (only active when buzzerEnabled)
   const buzzer = useBuzzerHost({
@@ -615,6 +616,15 @@ export default function HostQuiz() {
     sessionRef: state.tournamentId || null,
     enabled: buzzerEnabled,
   });
+
+  const handleCopyBuzzerLink = useCallback(() => {
+    if (!buzzer.roomCode) return;
+    const url = `${window.location.origin}/buzz/${buzzer.roomCode}`;
+    navigator.clipboard.writeText(url).then(() => {
+      setBuzzerCopied(true);
+      setTimeout(() => setBuzzerCopied(false), 2000);
+    }).catch(() => {});
+  }, [buzzer.roomCode]);
 
   // Attempt session restore on mount
   useEffect(() => {
@@ -1055,23 +1065,25 @@ export default function HostQuiz() {
           showEndQuiz={phase === 'matchGrid'}
           endButtonLabel="END MATCH"
           matchLabel={matchLabel}
+          buzzerRoomCode={buzzerEnabled ? buzzer.roomCode : null}
+          buzzerPlayerCount={buzzer.participants.length}
+          onCopyBuzzerLink={buzzerEnabled ? handleCopyBuzzerLink : null}
+          buzzerCopied={buzzerCopied}
         />
 
         {buzzerEnabled && buzzer.roomCode && (
-          <div style={{ padding: '0 1.5rem' }}>
-            <BuzzerOverlay
-              roomCode={buzzer.roomCode}
-              participants={buzzer.participants}
-              buzzes={buzzer.buzzes}
+          <BuzzerOverlay
+            roomCode={buzzer.roomCode}
+            participants={buzzer.participants}
+            buzzes={buzzer.buzzes}
             buzzResult={buzzer.buzzResult}
-              isOpen={buzzer.isOpen}
-              isCreating={buzzer.isCreating}
-              onOpenBuzzer={buzzer.openBuzzer}
-              onLockBuzzer={buzzer.lockBuzzer}
-              onAnnounceBuzzResult={buzzer.announceBuzzResult}
-              onResetBuzzer={buzzer.resetBuzzer}
-            />
-          </div>
+            isOpen={buzzer.isOpen}
+            isCreating={buzzer.isCreating}
+            onOpenBuzzer={buzzer.openBuzzer}
+            onLockBuzzer={buzzer.lockBuzzer}
+            onAnnounceBuzzResult={buzzer.announceBuzzResult}
+            onResetBuzzer={buzzer.resetBuzzer}
+          />
         )}
 
         {phase === 'matchGrid' && (
@@ -1121,23 +1133,25 @@ export default function HostQuiz() {
         onEndQuiz={handleEndQuiz}
         onAdjustScore={handleAdjustScore}
         showEndQuiz={phase === 'grid'}
+        buzzerRoomCode={buzzerEnabled ? buzzer.roomCode : null}
+        buzzerPlayerCount={buzzer.participants.length}
+        onCopyBuzzerLink={buzzerEnabled ? handleCopyBuzzerLink : null}
+        buzzerCopied={buzzerCopied}
       />
 
       {buzzerEnabled && buzzer.roomCode && (
-        <div style={{ padding: '0 1.5rem' }}>
-          <BuzzerOverlay
-            roomCode={buzzer.roomCode}
-            participants={buzzer.participants}
-            buzzes={buzzer.buzzes}
-            buzzResult={buzzer.buzzResult}
-            isOpen={buzzer.isOpen}
-            isCreating={buzzer.isCreating}
-            onOpenBuzzer={buzzer.openBuzzer}
-            onLockBuzzer={buzzer.lockBuzzer}
-            onAnnounceBuzzResult={buzzer.announceBuzzResult}
-            onResetBuzzer={buzzer.resetBuzzer}
-          />
-        </div>
+        <BuzzerOverlay
+          roomCode={buzzer.roomCode}
+          participants={buzzer.participants}
+          buzzes={buzzer.buzzes}
+          buzzResult={buzzer.buzzResult}
+          isOpen={buzzer.isOpen}
+          isCreating={buzzer.isCreating}
+          onOpenBuzzer={buzzer.openBuzzer}
+          onLockBuzzer={buzzer.lockBuzzer}
+          onAnnounceBuzzResult={buzzer.announceBuzzResult}
+          onResetBuzzer={buzzer.resetBuzzer}
+        />
       )}
 
       {phase === 'grid' && (

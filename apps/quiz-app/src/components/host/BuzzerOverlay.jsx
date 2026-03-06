@@ -2,25 +2,13 @@ import { useState, useCallback } from 'react';
 import '../../styles/BuzzerOverlay.css';
 
 /**
- * BuzzerOverlay — shown on the host screen during buzzer-enabled quizzes.
+ * BuzzerOverlay — floating buzzer controls (bottom-right).
  *
- * Modes:
- * - lobby: Show room code + join URL + participant count
- * - active: "Open Buzzer" button + incoming buzz results
- * - results: Ranked buzz list with winner highlighted
- *
- * @param {object} props
- * @param {string} props.roomCode - 6-char room code
- * @param {Array} props.participants - [{ userId, displayName }]
- * @param {Array} props.buzzes - [{ userId, displayName, buzzOffset, rank, isTied }] ranked
- * @param {object} [props.buzzResult] - { winner, isTied, tiedBuzzes } from determineBuzzWinner
- * @param {boolean} props.isOpen - Whether buzzer is currently accepting presses
- * @param {boolean} props.isCreating - Whether room is being created
- * @param {string[]} [props.allowedUserIds] - Current match participants (for tournament)
- * @param {function} props.onOpenBuzzer - (allowedUserIds?) => void
- * @param {function} props.onLockBuzzer - () => void
- * @param {function} props.onAnnounceBuzzResult - (winnerId, winnerName) => void
- * @param {function} props.onResetBuzzer - () => void
+ * Shows a compact FAB that expands to reveal:
+ * - Open/Lock buzzer button
+ * - Ranked buzz results
+ * - Award buttons
+ * - Connected participants list
  */
 export default function BuzzerOverlay({
   roomCode,
@@ -35,18 +23,7 @@ export default function BuzzerOverlay({
   onAnnounceBuzzResult,
   onResetBuzzer,
 }) {
-  const [copied, setCopied] = useState(false);
-
-  const joinUrl = typeof window !== 'undefined'
-    ? `${window.location.origin}/buzz/${roomCode}`
-    : '';
-
-  const handleCopyUrl = useCallback(() => {
-    navigator.clipboard.writeText(joinUrl).then(() => {
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    }).catch(() => {});
-  }, [joinUrl]);
+  const [expanded, setExpanded] = useState(false);
 
   const handleOpenBuzzer = useCallback(() => {
     onOpenBuzzer(allowedUserIds || null);
@@ -56,106 +33,118 @@ export default function BuzzerOverlay({
     onAnnounceBuzzResult(buzz.userId, buzz.displayName);
   }, [onAnnounceBuzzResult]);
 
-  // --- CREATING ---
-  if (isCreating) {
-    return (
-      <div className="buzzer-overlay">
-        <div className="buzzer-overlay__status">Setting up buzzer room...</div>
-      </div>
-    );
-  }
+  if (isCreating || !roomCode) return null;
 
-  // --- NO ROOM ---
-  if (!roomCode) {
-    return null;
-  }
+  const hasBuzzes = buzzes.length > 0;
+  const statusLabel = isOpen ? 'ACTIVE' : hasBuzzes ? 'RESULTS' : 'READY';
+  const statusClass = isOpen ? 'buzzer-fab--active' : hasBuzzes ? 'buzzer-fab--results' : '';
 
   return (
-    <div className="buzzer-overlay">
-      {/* Room code + join info */}
-      <div className="buzzer-overlay__room">
-        <div className="buzzer-overlay__code-section">
-          <span className="buzzer-overlay__label">Buzzer Room</span>
-          <span className="buzzer-overlay__code">{roomCode}</span>
-        </div>
-        <div className="buzzer-overlay__join-section">
-          <button className="buzzer-overlay__copy-btn" onClick={handleCopyUrl}>
-            {copied ? 'Copied!' : 'Copy Join Link'}
-          </button>
-          <span className="buzzer-overlay__participants">
-            {participants.length} player{participants.length !== 1 ? 's' : ''} connected
-          </span>
-        </div>
-      </div>
-
-      {/* Participant list */}
-      {participants.length > 0 && (
-        <div className="buzzer-overlay__participant-list">
-          {participants.map(p => (
-            <span key={p.userId} className="buzzer-overlay__participant-chip">
-              {p.displayName}
-            </span>
-          ))}
-        </div>
-      )}
-
-      {/* Buzzer controls — always available */}
-      <div className="buzzer-overlay__controls">
-          {!isOpen && buzzes.length === 0 && (
-            <button className="buzzer-overlay__open-btn" onClick={handleOpenBuzzer}>
-              Open Buzzer
-            </button>
-          )}
-
-          {isOpen && (
-            <div className="buzzer-overlay__live">
-              <span className="buzzer-overlay__live-badge">BUZZER OPEN</span>
-              <span className="buzzer-overlay__live-count">
-                {buzzes.length} buzz{buzzes.length !== 1 ? 'es' : ''}
-              </span>
-              <button className="buzzer-overlay__lock-btn" onClick={onLockBuzzer}>
-                Lock
-              </button>
+    <div className="buzzer-fab-container">
+      {/* Expanded panel */}
+      {expanded && (
+        <div className="buzzer-fab__panel">
+          {/* Connected participants */}
+          <div className="buzzer-fab__section">
+            <div className="buzzer-fab__section-label">
+              Connected ({participants.length})
             </div>
-          )}
+            {participants.length > 0 ? (
+              <div className="buzzer-fab__participant-list">
+                {participants.map(p => (
+                  <span key={p.userId} className="buzzer-fab__participant-chip">
+                    {p.displayName}
+                  </span>
+                ))}
+              </div>
+            ) : (
+              <div className="buzzer-fab__empty">Waiting for players...</div>
+            )}
+          </div>
+
+          {/* Buzzer action */}
+          <div className="buzzer-fab__section">
+            {!isOpen && buzzes.length === 0 && (
+              <button className="buzzer-fab__open-btn" onClick={handleOpenBuzzer}>
+                Open Buzzer
+              </button>
+            )}
+
+            {isOpen && (
+              <div className="buzzer-fab__live-row">
+                <span className="buzzer-fab__live-badge">BUZZER OPEN</span>
+                <span className="buzzer-fab__live-count">
+                  {buzzes.length} buzz{buzzes.length !== 1 ? 'es' : ''}
+                </span>
+                <button className="buzzer-fab__lock-btn" onClick={onLockBuzzer}>
+                  Lock
+                </button>
+              </div>
+            )}
+          </div>
 
           {/* Tie indicator */}
           {buzzResult?.isTied && !isOpen && (
-            <div className="buzzer-overlay__tie-notice">
+            <div className="buzzer-fab__tie-notice">
               TIE — Host decides who gets the point
             </div>
           )}
 
           {/* Buzz results */}
-          {buzzes.length > 0 && (
-            <div className="buzzer-overlay__buzz-list">
-              {buzzes.map((b) => (
-                <div key={b.userId} className={`buzzer-overlay__buzz-row ${b.isTied ? 'buzzer-overlay__buzz-row--tied' : ''}`}>
-                  <span className="buzzer-overlay__buzz-rank">
-                    #{b.rank || 1}{b.isTied ? ' ≈' : ''}
-                  </span>
-                  <span className="buzzer-overlay__buzz-name">{b.displayName}</span>
-                  <span className="buzzer-overlay__buzz-time">{b.buzzOffset}ms</span>
-                  {!isOpen && (
-                    <button
-                      className="buzzer-overlay__award-btn"
-                      onClick={() => handleSelectWinner(b)}
-                      title={`Award to ${b.displayName}`}
-                    >
-                      Award
-                    </button>
-                  )}
-                </div>
-              ))}
+          {hasBuzzes && (
+            <div className="buzzer-fab__section">
+              <div className="buzzer-fab__buzz-list">
+                {buzzes.map((b) => (
+                  <div key={b.userId} className={`buzzer-fab__buzz-row ${b.isTied ? 'buzzer-fab__buzz-row--tied' : ''}`}>
+                    <span className="buzzer-fab__buzz-rank">
+                      #{b.rank || 1}{b.isTied ? ' \u2248' : ''}
+                    </span>
+                    <span className="buzzer-fab__buzz-name">{b.displayName}</span>
+                    <span className="buzzer-fab__buzz-time">{b.buzzOffset}ms</span>
+                    {!isOpen && (
+                      <button
+                        className="buzzer-fab__award-btn"
+                        onClick={() => handleSelectWinner(b)}
+                        title={`Award to ${b.displayName}`}
+                      >
+                        Award
+                      </button>
+                    )}
+                  </div>
+                ))}
+              </div>
+              {!isOpen && (
+                <button className="buzzer-fab__reset-btn" onClick={onResetBuzzer}>
+                  Reset Buzzer
+                </button>
+              )}
             </div>
           )}
+        </div>
+      )}
 
-          {!isOpen && buzzes.length > 0 && (
-            <button className="buzzer-overlay__reset-btn" onClick={onResetBuzzer}>
-              Reset Buzzer
-            </button>
+      {/* FAB button */}
+      <button
+        className={`buzzer-fab ${statusClass}`}
+        onClick={() => setExpanded(e => !e)}
+        title="Buzzer controls"
+      >
+        <span className="buzzer-fab__icon">
+          {isOpen ? (
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 2C8.14 2 5 5.14 5 9c0 2.38 1.19 4.47 3 5.74V17c0 .55.45 1 1 1h6c.55 0 1-.45 1-1v-2.26c1.81-1.27 3-3.36 3-5.74 0-3.86-3.14-7-7-7zm2 14h-4v-1h4v1zm0-2h-4v-1h4v1zm-1.5-3.41V14h-1v-3.41l-2.29-2.3.7-.7L12 9.67l2.09-2.08.7.7-2.29 2.3zM9 20v1c0 .55.45 1 1 1h4c.55 0 1-.45 1-1v-1H9z"/>
+            </svg>
+          ) : (
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 2C8.14 2 5 5.14 5 9c0 2.38 1.19 4.47 3 5.74V17c0 .55.45 1 1 1h6c.55 0 1-.45 1-1v-2.26c1.81-1.27 3-3.36 3-5.74 0-3.86-3.14-7-7-7zM9 20v1c0 .55.45 1 1 1h4c.55 0 1-.45 1-1v-1H9z"/>
+            </svg>
           )}
-      </div>
+        </span>
+        <span className="buzzer-fab__text">
+          BUZZER ({statusLabel})
+        </span>
+        {isOpen && <span className="buzzer-fab__pulse" />}
+      </button>
     </div>
   );
 }
