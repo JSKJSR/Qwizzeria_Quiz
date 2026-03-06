@@ -138,7 +138,7 @@ function ScorebarVisual() {
       <rect x="85" y="45" width="40" height="22" rx="4" fill="#2a1520" />
       <text x="105" y="60" textAnchor="middle" fill="#f0f0f0" fontSize="8">Alice: 30</text>
       <rect x="130" y="45" width="40" height="22" rx="4" fill="#2a1520" />
-      <text x="150" y="60" textAnchor="middle" fill="#f0f0f0" fontSize="8">Bob: 20</text>
+      <text x="150" y="60" textAnchor="middle" fill="#f0f0f0" fontSize="8">Lily: 20</text>
       <text x="100" y="100" textAnchor="middle" fill="#b0a0a5" fontSize="8">Live scores + countdown timer</text>
     </svg>
   );
@@ -339,11 +339,11 @@ function BuzzerRankVisual() {
       <text x="155" y="33" textAnchor="middle" fill="#b0a0a5" fontSize="8" fontFamily="monospace">320ms</text>
       <rect x="25" y="48" width="150" height="28" rx="5" fill="rgba(255,255,255,0.03)" />
       <text x="42" y="66" textAnchor="middle" fill="#e85c1a" fontSize="10" fontWeight="bold">#2</text>
-      <text x="85" y="66" textAnchor="middle" fill="#f0f0f0" fontSize="9">Bob</text>
+      <text x="85" y="66" textAnchor="middle" fill="#f0f0f0" fontSize="9">Lily</text>
       <text x="155" y="66" textAnchor="middle" fill="#b0a0a5" fontSize="8" fontFamily="monospace">480ms</text>
       <rect x="25" y="81" width="150" height="28" rx="5" fill="rgba(255,255,255,0.03)" />
       <text x="42" y="99" textAnchor="middle" fill="#e85c1a" fontSize="10" fontWeight="bold">#3</text>
-      <text x="85" y="99" textAnchor="middle" fill="#f0f0f0" fontSize="9">Charlie</text>
+      <text x="85" y="99" textAnchor="middle" fill="#f0f0f0" fontSize="9">Arjun</text>
       <text x="155" y="99" textAnchor="middle" fill="#b0a0a5" fontSize="8" fontFamily="monospace">650ms</text>
     </svg>
   );
