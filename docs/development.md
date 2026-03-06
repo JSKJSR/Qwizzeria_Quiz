@@ -60,8 +60,8 @@ Qwizzeria uses **Vanilla CSS** with a design-token-driven approach.
 
 ### Guidelines
 1. **No Ad-hoc Utilities**: Use variables from `global.css`.
-2. **Dark Mode First**: Ensure contrast is high; use OLED black for backgrounds.
-3. **Animations**: Use subtle transitions (0.15s - 0.3s) for hover states.
+2. **Theming**: The app defaults to high-contrast Dark Mode (OLED black). The Host Dashboard features a toggleable Light Mode implemented via CSS variable overrides (`.host-light-theme` class).
+3. **Animations**: Use subtle transitions (0.15s - 0.3s) for hover states and UI reveals (e.g. scoreboard drawer).
 
 ---
 

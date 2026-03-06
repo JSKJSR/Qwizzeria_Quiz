@@ -21,6 +21,8 @@ This document provides a comprehensive map of the user flow, product features, a
 
 ### 3. Host & Tournament Flow
 - **Host Quiz**: Real-time multiplayer sessions (2-8 players/teams) with a dedicated teacher/host view and participant scoring.
+    - **Host UI Controls**: Features a responsive, hero-sized timer with precise countdown controls.
+    - **Scoreboard & Theme**: The host dashboard utilizes a collapsible Scoreboard drawer for better space management and includes a Light/Dark Mode toggle to accommodate different classroom/presentation environments.
 - **Real-Time Buzzer System**: Hosts can activate a live buzzer overlay. Participants join via the `/buzzer` route using a generated room code. The system features sub-millisecond precision, sound effects, and a dynamic host overlay to determine who buzzed first.
 - **Tournaments**:
     - Auto-generated single-elimination brackets for 2-16 teams.

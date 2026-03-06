@@ -34,8 +34,9 @@ Each quiz mode (Free Quiz, Pack Play, Host Quiz) is powered by a **state-machine
 - **`answer`**: Result reveal and point awarding.
 - **`results`**: Final score tally and medals.
 
-### Real-time Buzzer
-The Host Quiz features a live **Buzzer Overlay** synchronized via Supabase Realtime using the `useBuzzerHost` hook. Participants join a session via the `/buzzer` route using a host-generated room code.
+### Real-time Buzzer & Host UI
+The Host Quiz features a redesigned **Host UI** with responsive layouts, collapsible scoreboards (Drawers), hero-sized Timer Controls, and a high-contrast Light/Dark mode toggle implementation.
+Additionally, it supports a live **Buzzer Overlay** synchronized via Supabase Realtime using the `useBuzzerHost` hook. Participants join a session via the `/buzzer` route using a host-generated room code.
 - **Precision Logging**: Utilizes sub-millisecond timestamps (`buzzerTimestamp.js`) to determine the exact order of player buzzes.
 - **Feedback**: Provides immediate auditory (`buzzerSound.js`) and visual cues on both the player device and host screen.
 
