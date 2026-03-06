@@ -1,6 +1,7 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
+import { HelmetProvider } from 'react-helmet-async';
 import { initSupabase } from '@qwizzeria/supabase-client';
 import ErrorBoundary from './components/ErrorBoundary';
 import App from './components/App';
@@ -16,10 +17,12 @@ if (supabaseUrl && supabaseAnonKey) {
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <ErrorBoundary>
-      <BrowserRouter>
-        <App />
-      </BrowserRouter>
-    </ErrorBoundary>
+    <HelmetProvider>
+      <ErrorBoundary>
+        <BrowserRouter>
+          <App />
+        </BrowserRouter>
+      </ErrorBoundary>
+    </HelmetProvider>
   </StrictMode>
 );

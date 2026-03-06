@@ -1,3 +1,5 @@
+import { Helmet } from 'react-helmet-async';
+
 const SITE_NAME = 'Qwizzeria';
 const BASE_URL = 'https://qwizzeria.com';
 const DEFAULT_DESCRIPTION = 'Turn any gathering into a smart game night. Play beautifully designed quizzes, compete with friends, and host unforgettable quiz sessions.';
@@ -14,7 +16,7 @@ export default function SEO({
   const canonicalUrl = `${BASE_URL}${path}`;
 
   return (
-    <>
+    <Helmet>
       <title>{fullTitle}</title>
       <meta name="description" content={description} />
       <link rel="canonical" href={canonicalUrl} />
@@ -33,6 +35,6 @@ export default function SEO({
       <meta name="twitter:title" content={fullTitle} />
       <meta name="twitter:description" content={description} />
       <meta name="twitter:image" content={DEFAULT_IMAGE} />
-    </>
+    </Helmet>
   );
 }
