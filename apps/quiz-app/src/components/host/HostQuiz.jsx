@@ -1070,7 +1070,6 @@ export default function HostQuiz() {
               onLockBuzzer={buzzer.lockBuzzer}
               onAnnounceBuzzResult={buzzer.announceBuzzResult}
               onResetBuzzer={buzzer.resetBuzzer}
-              mode={phase === 'matchGrid' ? 'lobby' : 'question'}
             />
           </div>
         )}
@@ -1137,7 +1136,6 @@ export default function HostQuiz() {
             onLockBuzzer={buzzer.lockBuzzer}
             onAnnounceBuzzResult={buzzer.announceBuzzResult}
             onResetBuzzer={buzzer.resetBuzzer}
-            mode={phase === 'grid' ? 'lobby' : 'question'}
           />
         </div>
       )}

@@ -21,7 +21,6 @@ import '../../styles/BuzzerOverlay.css';
  * @param {function} props.onLockBuzzer - () => void
  * @param {function} props.onAnnounceBuzzResult - (winnerId, winnerName) => void
  * @param {function} props.onResetBuzzer - () => void
- * @param {'lobby'|'question'} [props.mode='lobby']
  */
 export default function BuzzerOverlay({
   roomCode,
@@ -35,7 +34,6 @@ export default function BuzzerOverlay({
   onLockBuzzer,
   onAnnounceBuzzResult,
   onResetBuzzer,
-  mode = 'lobby',
 }) {
   const [copied, setCopied] = useState(false);
 
@@ -90,8 +88,8 @@ export default function BuzzerOverlay({
         </div>
       </div>
 
-      {/* Participant list (lobby mode) */}
-      {mode === 'lobby' && participants.length > 0 && (
+      {/* Participant list */}
+      {participants.length > 0 && (
         <div className="buzzer-overlay__participant-list">
           {participants.map(p => (
             <span key={p.userId} className="buzzer-overlay__participant-chip">
@@ -101,9 +99,8 @@ export default function BuzzerOverlay({
         </div>
       )}
 
-      {/* Question mode — buzzer controls */}
-      {mode === 'question' && (
-        <div className="buzzer-overlay__controls">
+      {/* Buzzer controls — always available */}
+      <div className="buzzer-overlay__controls">
           {!isOpen && buzzes.length === 0 && (
             <button className="buzzer-overlay__open-btn" onClick={handleOpenBuzzer}>
               Open Buzzer
@@ -158,8 +155,7 @@ export default function BuzzerOverlay({
               Reset Buzzer
             </button>
           )}
-        </div>
-      )}
+      </div>
     </div>
   );
 }
