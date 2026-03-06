@@ -121,8 +121,10 @@ export default function DashboardLayout() {
               className={`dashboard__nav-link ${isActive('/pricing') ? 'dashboard__nav-link--active' : ''}`}
               onClick={handleCloseSidebar}
             >
-              <span className="dashboard__nav-icon">{NAV_ICONS.pricing}</span>
-              Pricing
+              <div className="dashboard__nav-link-content">
+                <span className="dashboard__nav-icon">{NAV_ICONS.pricing}</span>
+                Pricing
+              </div>
             </NavLink>
           )}
           {isEditor && (
@@ -131,8 +133,10 @@ export default function DashboardLayout() {
               className={`dashboard__nav-link ${isActive(ADMIN_NAV_ITEM.to) ? 'dashboard__nav-link--active' : ''}`}
               onClick={handleCloseSidebar}
             >
-              <span className="dashboard__nav-icon">{ADMIN_NAV_ITEM.icon}</span>
-              {ADMIN_NAV_ITEM.label}
+              <div className="dashboard__nav-link-content">
+                <span className="dashboard__nav-icon">{ADMIN_NAV_ITEM.icon}</span>
+                {ADMIN_NAV_ITEM.label}
+              </div>
             </NavLink>
           )}
         </nav>
