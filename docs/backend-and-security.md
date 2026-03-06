@@ -11,6 +11,9 @@ This document covers data storage, access control, and the shared backend utilit
 - **`quiz_packs`**: Curated collections of questions (is_premium, is_public, statuses).
 - **`quiz_sessions`**: Tracks player progress for resumable usage (score, status, metadata JSONB).
 
+### Real-time Buzzer
+- **`buzzer_rooms`**: Manages volatile state for the real-time Buzzer System. Tracks open rooms, connected participants, and sub-millisecond buzzer timestamps.
+
 ### Tournaments
 - **`host_tournaments`**: Bracket state and participants (JSONB).
 - **`host_tournament_matches`**: Isolated individual match states. Uses `claimed_by` for optimistic locking in multi-tab play.
@@ -61,5 +64,6 @@ The monorepo includes a shared SDK wrapper package (`packages/supabase-client`) 
 - **`packs.js` / `questions.js`**: Content CRUD.
 - **`tournaments.js` / `realtime.js`**: Bracket logic, match claiming, and Phoenix-style channel subscriptions for instant UI sync.
 - **`users.js` / `leaderboard.js`**: Profiles and RPC endpoints.
+- **`buzzer.js`**: Manages real-time room creation, presence syncing, and fast-insert operations for buzzer timestamps.
 
 *Note: SQL Migrations live inside this package at `packages/supabase-client/migrations` and must be applied sequentially via Supabase SQL Editor.*

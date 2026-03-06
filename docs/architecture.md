@@ -34,6 +34,11 @@ Each quiz mode (Free Quiz, Pack Play, Host Quiz) is powered by a **state-machine
 - **`answer`**: Result reveal and point awarding.
 - **`results`**: Final score tally and medals.
 
+### Real-time Buzzer
+The Host Quiz features a live **Buzzer Overlay** synchronized via Supabase Realtime using the `useBuzzerHost` hook. Participants join a session via the `/buzzer` route using a host-generated room code.
+- **Precision Logging**: Utilizes sub-millisecond timestamps (`buzzerTimestamp.js`) to determine the exact order of player buzzes.
+- **Feedback**: Provides immediate auditory (`buzzerSound.js`) and visual cues on both the player device and host screen.
+
 ### Tournament Mode
 Host Quiz supports a **Tournament Mode** for single-elimination bracket competitions:
 - **Bracket Generation**: Auto-generated single-elimination brackets for 2–16 teams, randomized seeding.
@@ -61,7 +66,7 @@ Host Quiz supports a **Tournament Mode** for single-elimination bracket competit
 
 ## 🧪 Quality & Accessibility
 
-- **Test Coverage**: 53 tests across 5 files (Vitest + jsdom) — tournament bracket logic, session persistence, media detection, auth, supabase client.
+- **Test Coverage**: 66 tests across 6 files (Vitest + jsdom) — tournament bracket logic, session persistence, media detection, auth, supabase client, and sub-millisecond buzzer resolution.
 - **Error Handling**: All data-fetching pages display error UI with retry buttons (no silent failures).
 - **WCAG Compliance**: focus-visible states, WCAG-AA contrast ratios, 44px minimum touch targets, `prefers-reduced-motion` support, semantic ARIA labels on interactive elements.
 - **CI/CD**: GitHub Actions pipeline (lint → build → test) on every push/PR; Vercel deployment config.

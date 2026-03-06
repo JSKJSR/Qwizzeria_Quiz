@@ -78,12 +78,13 @@ npm run test
 cd apps/quiz-app && npx vitest run
 ```
 
-### Current Coverage (53 tests, 5 files)
+### Current Coverage (66 tests, 6 files)
 - `mediaDetector.test.js` — Media URL detection (7 tests)
 - `tournamentBracket.test.js` — Bracket generation, seeding, advancement (36 tests)
 - `hostSessionPersistence.test.js` — localStorage save/load/clear (7 tests)
 - `AuthContext.test.js` — Auth provider initialization (1 test)
 - `supabaseClient.test.js` — Supabase client configuration (2 tests)
+- `buzzerTimestamp.test.js` — Sub-millisecond buzzer resolution (13 tests)
 
 ### Coverage Goals
 - Core state machines (`useReducer`).
@@ -97,14 +98,14 @@ cd apps/quiz-app && npx vitest run
 ### Database Migrations
 Migrations are stored in `packages/supabase-client/migrations`.
 **Note**: Migrations must be run manually via the Supabase SQL Editor in order:
-1. `001_initial_schema.sql` through `016_subscriptions.sql`
+1. `001_initial_schema.sql` through `020_buzzer_rooms.sql`
 
 ### CI/CD
 The project includes a GitHub Actions pipeline (`.github/workflows/ci.yml`) that runs on every push/PR to `main`:
 1. `npm ci` — Install dependencies
 2. `npm run lint` — Lint all packages
 3. `npm run build` — Build all packages
-4. `npm run test` — Run test suite (53 tests)
+4. `npm run test` — Run test suite (66 tests)
 
 Production deployment is configured for **Vercel** via `vercel.json` (output: `apps/quiz-app/dist`). Set `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` as environment variables in the Vercel dashboard.
 
