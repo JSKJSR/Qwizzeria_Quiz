@@ -1,0 +1,258 @@
+/* ============================================================
+   BuzzerOverlay — Host-side buzzer controls
+   ============================================================ */
+
+.buzzer-overlay {
+  background: var(--bg-card, #1a1015);
+  border: 1px solid var(--border-color, #2a1520);
+  border-radius: var(--radius-md, 12px);
+  padding: 1rem 1.25rem;
+  margin-bottom: 1rem;
+}
+
+.buzzer-overlay__status {
+  color: var(--text-secondary, #b0a0a5);
+  font-size: 0.9rem;
+  text-align: center;
+}
+
+/* ---- Room info ---- */
+
+.buzzer-overlay__room {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.buzzer-overlay__code-section {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.buzzer-overlay__label {
+  font-size: 0.8rem;
+  color: var(--text-secondary, #b0a0a5);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.buzzer-overlay__code {
+  font-family: monospace;
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: var(--accent-primary, #e85c1a);
+  letter-spacing: 0.2em;
+}
+
+.buzzer-overlay__join-section {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.buzzer-overlay__copy-btn {
+  padding: 0.35rem 0.75rem;
+  background: rgba(232, 92, 26, 0.15);
+  color: var(--accent-primary, #e85c1a);
+  border: 1px solid var(--accent-primary, #e85c1a);
+  border-radius: var(--radius-sm, 8px);
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.buzzer-overlay__copy-btn:hover {
+  background: rgba(232, 92, 26, 0.25);
+}
+
+.buzzer-overlay__participants {
+  font-size: 0.85rem;
+  color: var(--text-secondary, #b0a0a5);
+}
+
+/* ---- Participant chips (lobby) ---- */
+
+.buzzer-overlay__participant-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--border-color, #2a1520);
+}
+
+.buzzer-overlay__participant-chip {
+  padding: 0.25rem 0.6rem;
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 20px;
+  font-size: 0.8rem;
+  color: var(--text-primary, #f0f0f0);
+}
+
+/* ---- Buzzer controls (question mode) ---- */
+
+.buzzer-overlay__controls {
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--border-color, #2a1520);
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.buzzer-overlay__open-btn {
+  padding: 0.6rem 1.25rem;
+  background: linear-gradient(145deg, #2ecc71, #27ae60);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-sm, 8px);
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: opacity 0.15s ease;
+  align-self: center;
+}
+
+.buzzer-overlay__open-btn:hover {
+  opacity: 0.9;
+}
+
+/* Live indicator */
+
+.buzzer-overlay__live {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.buzzer-overlay__live-badge {
+  padding: 0.2rem 0.5rem;
+  background: rgba(46, 204, 113, 0.2);
+  color: #2ecc71;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  animation: buzzer-live-pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes buzzer-live-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+
+.buzzer-overlay__live-count {
+  font-size: 0.9rem;
+  color: var(--text-secondary, #b0a0a5);
+  flex: 1;
+}
+
+.buzzer-overlay__lock-btn {
+  padding: 0.35rem 0.75rem;
+  background: rgba(231, 76, 60, 0.15);
+  color: #e74c3c;
+  border: 1px solid #e74c3c;
+  border-radius: var(--radius-sm, 8px);
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.buzzer-overlay__lock-btn:hover {
+  background: rgba(231, 76, 60, 0.25);
+}
+
+/* Buzz results list */
+
+.buzzer-overlay__buzz-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.buzzer-overlay__buzz-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.4rem 0.6rem;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: var(--radius-sm, 8px);
+}
+
+.buzzer-overlay__buzz-row:first-child {
+  background: rgba(241, 196, 15, 0.1);
+  border: 1px solid rgba(241, 196, 15, 0.3);
+}
+
+.buzzer-overlay__buzz-rank {
+  font-weight: 700;
+  font-size: 0.85rem;
+  color: var(--accent-primary, #e85c1a);
+  min-width: 2rem;
+}
+
+.buzzer-overlay__buzz-name {
+  flex: 1;
+  font-size: 0.9rem;
+  color: var(--text-primary, #f0f0f0);
+}
+
+.buzzer-overlay__buzz-time {
+  font-family: monospace;
+  font-size: 0.8rem;
+  color: var(--text-secondary, #b0a0a5);
+}
+
+.buzzer-overlay__award-btn {
+  padding: 0.25rem 0.5rem;
+  background: rgba(46, 204, 113, 0.15);
+  color: #2ecc71;
+  border: 1px solid #2ecc71;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.buzzer-overlay__award-btn:hover {
+  background: rgba(46, 204, 113, 0.3);
+}
+
+.buzzer-overlay__reset-btn {
+  padding: 0.4rem 0.75rem;
+  background: transparent;
+  color: var(--text-secondary, #b0a0a5);
+  border: 1px solid var(--border-color, #2a1520);
+  border-radius: var(--radius-sm, 8px);
+  font-size: 0.85rem;
+  cursor: pointer;
+  align-self: center;
+}
+
+.buzzer-overlay__reset-btn:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+/* Tie notice */
+
+.buzzer-overlay__tie-notice {
+  padding: 0.5rem 0.75rem;
+  background: rgba(243, 156, 18, 0.15);
+  color: #f39c12;
+  border: 1px solid rgba(243, 156, 18, 0.3);
+  border-radius: var(--radius-sm, 8px);
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-align: center;
+}
+
+/* Tied buzz row */
+
+.buzzer-overlay__buzz-row--tied {
+  background: rgba(243, 156, 18, 0.08);
+  border: 1px solid rgba(243, 156, 18, 0.25);
+}

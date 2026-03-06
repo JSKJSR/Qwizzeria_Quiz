@@ -26,8 +26,10 @@ import HostScoreboard from './HostScoreboard';
 import HostAnswerView from './HostAnswerView';
 import HostResultsView from './HostResultsView';
 import HostQuestionReview from './HostQuestionReview';
+import BuzzerOverlay from './BuzzerOverlay';
 import TournamentBracket from './TournamentBracket';
 import QuestionView from '../QuestionView';
+import useBuzzerHost from '../../hooks/useBuzzerHost';
 import '../../styles/HostQuiz.css';
 import '../../styles/MatchPackSelect.css';
 
@@ -604,6 +606,15 @@ export default function HostQuiz() {
   const saveTimerRef = useRef(null);
   const restoredRef = useRef(false);
   const [showTieBreaker, setShowTieBreaker] = useState(false);
+  const [buzzerEnabled, setBuzzerEnabled] = useState(false);
+
+  // Buzzer hook (only active when buzzerEnabled)
+  const buzzer = useBuzzerHost({
+    hostUserId: user?.id,
+    sessionType: state.mode === 'tournament' ? 'tournament_match' : 'host_quiz',
+    sessionRef: state.tournamentId || null,
+    enabled: buzzerEnabled,
+  });
 
   // Attempt session restore on mount
   useEffect(() => {
@@ -704,7 +715,8 @@ export default function HostQuiz() {
     dispatch({ type: ACTIONS.SELECT_PACK, pack, questions });
   }, []);
 
-  const handleStartQuiz = useCallback((participants, mode, questionsPerMatch, perMatchPacks) => {
+  const handleStartQuiz = useCallback((participants, mode, questionsPerMatch, perMatchPacks, enableBuzzer) => {
+    setBuzzerEnabled(!!enableBuzzer);
     if (mode === 'tournament') {
       dispatch({ type: ACTIONS.START_TOURNAMENT, participants, questionsPerMatch, perMatchPacks: !!perMatchPacks });
       // DB persistence happens after state update via effect
@@ -760,7 +772,8 @@ export default function HostQuiz() {
     }
     dispatch({ type: ACTIONS.CONFIRM_END_QUIZ });
     clearHostSession();
-  }, [user, state.pack, state.participants, state.completedQuestionIds]);
+    if (buzzerEnabled) buzzer.closeRoom();
+  }, [user, state.pack, state.participants, state.completedQuestionIds, buzzerEnabled, buzzer]);
 
   const handlePlayAgain = useCallback(() => {
     dispatch({ type: ACTIONS.PLAY_AGAIN });
@@ -769,7 +782,9 @@ export default function HostQuiz() {
   const handleNewQuiz = useCallback(() => {
     dispatch({ type: ACTIONS.RESET_QUIZ });
     clearHostSession();
-  }, []);
+    if (buzzerEnabled) buzzer.closeRoom();
+    setBuzzerEnabled(false);
+  }, [buzzerEnabled, buzzer]);
 
   // --- Tournament mode handlers ---
   const handleSelectMatch = useCallback((roundIndex, matchIndex) => {
@@ -1042,6 +1057,24 @@ export default function HostQuiz() {
           matchLabel={matchLabel}
         />
 
+        {buzzerEnabled && buzzer.roomCode && (
+          <div style={{ padding: '0 1.5rem' }}>
+            <BuzzerOverlay
+              roomCode={buzzer.roomCode}
+              participants={buzzer.participants}
+              buzzes={buzzer.buzzes}
+            buzzResult={buzzer.buzzResult}
+              isOpen={buzzer.isOpen}
+              isCreating={buzzer.isCreating}
+              onOpenBuzzer={buzzer.openBuzzer}
+              onLockBuzzer={buzzer.lockBuzzer}
+              onAnnounceBuzzResult={buzzer.announceBuzzResult}
+              onResetBuzzer={buzzer.resetBuzzer}
+              mode={phase === 'matchGrid' ? 'lobby' : 'question'}
+            />
+          </div>
+        )}
+
         {phase === 'matchGrid' && (
           <HostTopicGrid
             topics={mTopics}
@@ -1090,6 +1123,24 @@ export default function HostQuiz() {
         onAdjustScore={handleAdjustScore}
         showEndQuiz={phase === 'grid'}
       />
+
+      {buzzerEnabled && buzzer.roomCode && (
+        <div style={{ padding: '0 1.5rem' }}>
+          <BuzzerOverlay
+            roomCode={buzzer.roomCode}
+            participants={buzzer.participants}
+            buzzes={buzzer.buzzes}
+            buzzResult={buzzer.buzzResult}
+            isOpen={buzzer.isOpen}
+            isCreating={buzzer.isCreating}
+            onOpenBuzzer={buzzer.openBuzzer}
+            onLockBuzzer={buzzer.lockBuzzer}
+            onAnnounceBuzzResult={buzzer.announceBuzzResult}
+            onResetBuzzer={buzzer.resetBuzzer}
+            mode={phase === 'grid' ? 'lobby' : 'question'}
+          />
+        </div>
+      )}
 
       {phase === 'grid' && (
         <HostTopicGrid

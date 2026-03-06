@@ -20,6 +20,7 @@ import Guide from '../pages/Guide';
 import Pricing from '../pages/Pricing';
 import TournamentBracketPage from '../pages/TournamentBracketPage';
 import TournamentMatchPage from '../pages/TournamentMatchPage';
+import BuzzerPage from '../pages/BuzzerPage';
 
 // Admin pages
 import AdminDashboard from '../pages/admin/Dashboard';
@@ -72,6 +73,9 @@ export default function App() {
             <Route path="/host/tournament/:tournamentId" element={<TournamentBracketPage />} />
             <Route path="/host/tournament/:tournamentId/match/:matchId" element={<TournamentMatchPage />} />
           </Route>
+
+          {/* Buzzer page (full-screen, no sidebar, any logged-in user) */}
+          <Route path="/buzz/:roomCode" element={<BuzzerPage />} />
 
           {/* Admin CMS routes (editor+ only) */}
           <Route path="/admin" element={<AdminRoute />}>

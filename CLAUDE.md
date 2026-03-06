@@ -41,6 +41,7 @@ Authenticated routes use `ProtectedRoute` + `DashboardLayout` (sidebar). Unauthe
 | `/leaderboard`             | Leaderboard         | Global leaderboard with time filters (requires login, sidebar) |
 | `/host`                    | HostQuizPage        | Host multiplayer quiz: pack select → setup → grid → score → results |
 | `/guide`                   | Guide               | How to Play guide |
+| `/buzz/:roomCode`          | BuzzerPage          | Real-time buzzer for participants (auth required, full-screen) |
 
 ## Admin CMS Routes (apps/quiz-app/src/pages/admin)
 
@@ -133,7 +134,7 @@ Access restricted via role checks (editor, admin, superadmin).
 - `npm run dev` — Start all dev servers (quiz-app :5173, admin-cms :5174)
 - `npm run build` — Build all packages
 - `npm run lint` — Lint all packages
-- `cd apps/quiz-app && npx vitest run` — Run tests (53 tests across 5 files)
+- `cd apps/quiz-app && npx vitest run` — Run tests (66 tests across 6 files)
 
 ## Key Component Files
 
@@ -152,6 +153,12 @@ Access restricted via role checks (editor, admin, superadmin).
 - `apps/quiz-app/src/pages/DashboardHome.jsx` — Welcome, quick actions, resumable sessions
 - `apps/quiz-app/src/components/LandingPageB.jsx` — Landing page with hero + pack carousel
 - `packages/supabase-client/src/packs.js` — Pack CRUD, browsing, play, showcase, admin analytics RPCs
+- `packages/supabase-client/src/buzzer.js` — Buzzer room CRUD + Supabase Broadcast channel
+- `apps/quiz-app/src/pages/BuzzerPage.jsx` — Participant buzzer page (full-screen, auth required)
+- `apps/quiz-app/src/hooks/useBuzzerHost.js` — Host-side buzzer hook (room lifecycle, buzz ranking)
+- `apps/quiz-app/src/components/host/BuzzerOverlay.jsx` — Host buzzer controls overlay
+- `apps/quiz-app/src/utils/buzzerTimestamp.js` — Buzz ranking, tie detection, validation
+- `apps/quiz-app/src/utils/buzzerSound.js` — Web Audio buzzer sound effects
 
 ## Completed Phases
 

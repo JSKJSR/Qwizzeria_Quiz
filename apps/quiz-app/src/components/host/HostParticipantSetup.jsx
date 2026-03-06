@@ -10,6 +10,7 @@ export default function HostParticipantSetup({ pack, questionCount, onStart, onC
   const [mode, setMode] = useState('standard');
   const [questionsPerMatch, setQuestionsPerMatch] = useState(DEFAULT_QUESTIONS_PER_MATCH);
   const [perMatchPacks, setPerMatchPacks] = useState(false);
+  const [buzzerEnabled, setBuzzerEnabled] = useState(false);
 
   const isTournament = mode === 'tournament';
   const effectiveMax = MAX_PLAYERS;
@@ -42,11 +43,11 @@ export default function HostParticipantSetup({ pack, questionCount, onStart, onC
     if (!allNamesFilled || !hasEnoughPlayers) return;
     const trimmedNames = names.map(n => n.trim());
     if (isTournament) {
-      onStart(trimmedNames, 'tournament', questionsPerMatch, perMatchPacks);
+      onStart(trimmedNames, 'tournament', questionsPerMatch, perMatchPacks, buzzerEnabled);
     } else {
-      onStart(trimmedNames);
+      onStart(trimmedNames, 'standard', undefined, undefined, buzzerEnabled);
     }
-  }, [allNamesFilled, hasEnoughPlayers, names, onStart, isTournament, questionsPerMatch, perMatchPacks]);
+  }, [allNamesFilled, hasEnoughPlayers, names, onStart, isTournament, questionsPerMatch, perMatchPacks, buzzerEnabled]);
 
   const handleModeChange = useCallback((newMode) => {
     setMode(newMode);
@@ -174,6 +175,25 @@ export default function HostParticipantSetup({ pack, questionCount, onStart, onC
           </button>
         )}
       </div>
+
+      {/* Buzzer toggle */}
+      <div className="host-setup__setting-row" style={{ marginTop: '1rem' }}>
+        <label className="host-setup__setting-label" htmlFor="buzzer-toggle">
+          Enable Buzzer
+        </label>
+        <input
+          id="buzzer-toggle"
+          className="host-setup__setting-checkbox"
+          type="checkbox"
+          checked={buzzerEnabled}
+          onChange={e => setBuzzerEnabled(e.target.checked)}
+        />
+      </div>
+      {buzzerEnabled && (
+        <p className="host-setup__tournament-info">
+          Participants join via a room code on their devices and buzz in when ready.
+        </p>
+      )}
 
       <button
         className="host-setup__start-btn"

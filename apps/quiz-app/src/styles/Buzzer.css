@@ -1,0 +1,291 @@
+/* ============================================================
+   Buzzer Page — Full-screen mobile-optimized buzzer UI
+   ============================================================ */
+
+.buzzer-page {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  background: var(--bg-primary, #0a0a0a);
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  overflow-y: auto;
+}
+
+.buzzer-page__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid var(--border-color, #2a1520);
+}
+
+.buzzer-page__logo {
+  height: 36px;
+  width: auto;
+}
+
+.buzzer-page__room-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.15rem;
+}
+
+.buzzer-page__room-code {
+  font-family: monospace;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--accent-primary, #e85c1a);
+  letter-spacing: 0.15em;
+}
+
+.buzzer-page__player-name {
+  font-size: 0.8rem;
+  color: var(--text-secondary, #b0a0a5);
+}
+
+.buzzer-page__body {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+}
+
+.buzzer-page__center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+  width: 100%;
+  max-width: 400px;
+}
+
+.buzzer-page__title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text-primary, #f0f0f0);
+}
+
+.buzzer-page__status-text {
+  font-size: 1rem;
+  color: var(--text-secondary, #b0a0a5);
+  text-align: center;
+}
+
+.buzzer-page__error-text {
+  font-size: 0.95rem;
+  color: var(--accent-error, #e74c3c);
+  text-align: center;
+}
+
+.buzzer-page__spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid rgba(255, 255, 255, 0.1);
+  border-top-color: var(--accent-primary, #e85c1a);
+  border-radius: 50%;
+  animation: buzzer-spin 0.8s linear infinite;
+}
+
+@keyframes buzzer-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ---- Buzzer Button ---- */
+
+.buzzer-btn {
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  cursor: pointer;
+  transition: transform 0.1s ease, box-shadow 0.2s ease;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.buzzer-btn__label {
+  font-size: 1.8rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  color: #fff;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+/* Waiting — gray, disabled */
+.buzzer-btn--waiting {
+  background: linear-gradient(145deg, #3a3a3a, #2a2a2a);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  cursor: default;
+}
+
+.buzzer-btn--waiting .buzzer-btn__label {
+  font-size: 1.2rem;
+  color: #888;
+}
+
+/* Ready — green, pulsing */
+.buzzer-btn--ready {
+  background: linear-gradient(145deg, #2ecc71, #27ae60);
+  box-shadow: 0 0 40px rgba(46, 204, 113, 0.4), 0 4px 20px rgba(0, 0, 0, 0.3);
+  animation: buzzer-pulse 1.5s ease-in-out infinite;
+}
+
+.buzzer-btn--ready:active {
+  transform: scale(0.92);
+  box-shadow: 0 0 20px rgba(46, 204, 113, 0.6);
+}
+
+@keyframes buzzer-pulse {
+  0%, 100% { box-shadow: 0 0 40px rgba(46, 204, 113, 0.4), 0 4px 20px rgba(0, 0, 0, 0.3); }
+  50% { box-shadow: 0 0 60px rgba(46, 204, 113, 0.6), 0 4px 20px rgba(0, 0, 0, 0.3); }
+}
+
+/* Buzzed — amber, waiting */
+.buzzer-btn--buzzed {
+  background: linear-gradient(145deg, #f39c12, #e67e22);
+  box-shadow: 0 0 30px rgba(243, 156, 18, 0.4);
+  cursor: default;
+  animation: buzzer-buzzed-pulse 0.8s ease-in-out infinite;
+}
+
+@keyframes buzzer-buzzed-pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.03); }
+}
+
+/* Won — gold */
+.buzzer-btn--won {
+  background: linear-gradient(145deg, #f1c40f, #f39c12);
+  box-shadow: 0 0 50px rgba(241, 196, 15, 0.5);
+  cursor: default;
+  animation: buzzer-won 0.5s ease-out;
+}
+
+@keyframes buzzer-won {
+  0% { transform: scale(0.9); }
+  50% { transform: scale(1.1); }
+  100% { transform: scale(1); }
+}
+
+/* Lost — red */
+.buzzer-btn--lost {
+  background: linear-gradient(145deg, #e74c3c, #c0392b);
+  box-shadow: 0 0 30px rgba(231, 76, 60, 0.3);
+  cursor: default;
+}
+
+.buzzer-btn--lost .buzzer-btn__label {
+  font-size: 1.2rem;
+}
+
+/* Spectating — dark, muted */
+.buzzer-btn--spectating {
+  background: linear-gradient(145deg, #2c2c3a, #1e1e2a);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  border: 2px dashed rgba(255, 255, 255, 0.15);
+  cursor: default;
+}
+
+.buzzer-btn--spectating .buzzer-btn__label {
+  font-size: 1rem;
+  color: #666;
+}
+
+/* ---- Results list ---- */
+
+.buzzer-page__results-list {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.buzzer-page__result-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.6rem 1rem;
+  background: var(--bg-card, #1a1015);
+  border-radius: var(--radius-sm, 8px);
+  border: 1px solid var(--border-color, #2a1520);
+}
+
+.buzzer-page__result-row--self {
+  border-color: var(--accent-primary, #e85c1a);
+  background: rgba(232, 92, 26, 0.1);
+}
+
+.buzzer-page__result-rank {
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: var(--accent-primary, #e85c1a);
+  min-width: 2rem;
+}
+
+.buzzer-page__result-name {
+  flex: 1;
+  font-size: 0.95rem;
+  color: var(--text-primary, #f0f0f0);
+}
+
+.buzzer-page__result-time {
+  font-family: monospace;
+  font-size: 0.85rem;
+  color: var(--text-secondary, #b0a0a5);
+}
+
+/* ---- Back button ---- */
+
+.buzzer-page__btn {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: var(--radius-sm, 8px);
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.buzzer-page__btn--back {
+  background: var(--accent-primary, #e85c1a);
+  color: #fff;
+}
+
+.buzzer-page__btn--back:hover {
+  opacity: 0.9;
+}
+
+/* ---- Mobile optimizations ---- */
+
+@media (max-width: 480px) {
+  .buzzer-page__header {
+    padding: 0.75rem 1rem;
+  }
+
+  .buzzer-page__body {
+    padding: 1rem;
+  }
+
+  .buzzer-btn {
+    width: 220px;
+    height: 220px;
+  }
+
+  .buzzer-btn__label {
+    font-size: 2rem;
+  }
+}
+
+@media (min-width: 481px) {
+  .buzzer-btn {
+    width: 240px;
+    height: 240px;
+  }
+}
