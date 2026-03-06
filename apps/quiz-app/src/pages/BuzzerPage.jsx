@@ -26,7 +26,6 @@ export default function BuzzerPage() {
   const [error, setError] = useState(null);
   const [buzzResult, setBuzzResult] = useState(null); // { winnerId, winnerName, buzzes }
   const [isAllowed, setIsAllowed] = useState(false); // whether current user can buzz this round
-  const [participantCount, setParticipantCount] = useState(0);
 
   const channelRef = useRef(null);
   const questionReceivedRef = useRef(null); // timestamp when question_open was received
@@ -46,8 +45,6 @@ export default function BuzzerPage() {
         if (cancelled) return;
 
         setRoom(roomData);
-        setParticipantCount(roomData.buzzer_participants?.length || 0);
-
         // Join as participant
         await joinBuzzerRoom(roomData.id, user.id, displayName);
         if (cancelled) return;
@@ -71,7 +68,7 @@ export default function BuzzerPage() {
     if (!room || !user) return;
 
     const channel = subscribeBuzzerChannel(room.room_code, {
-      onQuestionOpen: ({ allowedUserIds, hostTimestamp }) => {
+      onQuestionOpen: ({ allowedUserIds }) => {
         questionReceivedRef.current = Date.now();
         hasBuzzedRef.current = false;
         setBuzzResult(null);
@@ -87,9 +84,7 @@ export default function BuzzerPage() {
       },
 
       onBuzzLock: () => {
-        if (phase === 'ready') {
-          setPhase('waiting');
-        }
+        setPhase(prev => prev === 'ready' ? 'waiting' : prev);
       },
 
       onBuzzReset: () => {
@@ -102,13 +97,6 @@ export default function BuzzerPage() {
         setPhase('closed');
       },
 
-      onParticipantJoined: () => {
-        setParticipantCount(prev => prev + 1);
-      },
-
-      onParticipantLeft: () => {
-        setParticipantCount(prev => Math.max(0, prev - 1));
-      },
     });
 
     channelRef.current = channel;
