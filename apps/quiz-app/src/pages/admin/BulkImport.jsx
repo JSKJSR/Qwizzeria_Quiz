@@ -1,6 +1,7 @@
-import { useState, useRef, useCallback } from 'react';
+import { useState, useRef, useCallback, useEffect } from 'react';
 import { bulkCreateQuestions } from '@qwizzeria/supabase-client/src/questions.js';
 import { parseExcelFile, generateTemplate } from '../../utils/adminExcelParser';
+import { fetchAllPacks, createPack, bulkAddQuestionsToPack } from '@qwizzeria/supabase-client/src/packs.js';
 
 export default function BulkImport() {
   const [parsed, setParsed] = useState(null);
@@ -9,7 +10,20 @@ export default function BulkImport() {
   const [importing, setImporting] = useState(false);
   const [result, setResult] = useState(null);
   const [dragActive, setDragActive] = useState(false);
+  const [importedIds, setImportedIds] = useState([]);
+  const [packMode, setPackMode] = useState('none'); // 'none' | 'new' | 'existing'
+  const [newPackTitle, setNewPackTitle] = useState('');
+  const [selectedPackId, setSelectedPackId] = useState('');
+  const [existingPacks, setExistingPacks] = useState([]);
+  const [packAssigning, setPackAssigning] = useState(false);
+  const [packResult, setPackResult] = useState(null);
   const fileInputRef = useRef(null);
+
+  useEffect(() => {
+    fetchAllPacks({ pageSize: 200 })
+      .then(({ data }) => setExistingPacks(data || []))
+      .catch(() => {});
+  }, []);
 
   const processFile = useCallback(async (file) => {
     setParsed(null);
@@ -76,6 +90,7 @@ export default function BulkImport() {
       });
       const data = await bulkCreateQuestions(cleanQuestions);
       setResult({ success: data.length, failed: 0 });
+      setImportedIds(data.map(q => q.id));
       setParsed(null);
       setWarnings([]);
     } catch (err) {
@@ -149,6 +164,88 @@ export default function BulkImport() {
           {result.error
             ? `Import failed: ${result.error}`
             : `Successfully imported ${result.success} question${result.success !== 1 ? 's' : ''}.`}
+        </div>
+      )}
+
+      {importedIds.length > 0 && !packResult && (
+        <div style={{ marginTop: '1.5rem', padding: '1.25rem', background: 'rgba(99, 102, 241, 0.08)', border: '1px solid rgba(99, 102, 241, 0.25)', borderRadius: '8px' }}>
+          <h3 style={{ fontSize: 'var(--font-size-md)', marginBottom: '0.75rem' }}>
+            Add {importedIds.length} questions to a Quiz Pack
+          </h3>
+
+          <div style={{ display: 'flex', gap: '0.75rem', marginBottom: '1rem' }}>
+            <label style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', cursor: 'pointer' }}>
+              <input type="radio" name="packMode" value="new" checked={packMode === 'new'} onChange={() => setPackMode('new')} />
+              Create new pack
+            </label>
+            <label style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', cursor: 'pointer' }}>
+              <input type="radio" name="packMode" value="existing" checked={packMode === 'existing'} onChange={() => setPackMode('existing')} />
+              Add to existing pack
+            </label>
+            <label style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', cursor: 'pointer' }}>
+              <input type="radio" name="packMode" value="none" checked={packMode === 'none'} onChange={() => setPackMode('none')} />
+              Skip
+            </label>
+          </div>
+
+          {packMode === 'new' && (
+            <input
+              type="text"
+              placeholder="Pack title (e.g. January 2024 Qwizzeria Challenge)"
+              value={newPackTitle}
+              onChange={(e) => setNewPackTitle(e.target.value)}
+              style={{ width: '100%', padding: '0.5rem 0.75rem', borderRadius: '6px', border: '1px solid var(--border-color)', background: 'var(--bg-secondary)', color: 'var(--text-primary)', fontSize: '0.9rem' }}
+            />
+          )}
+
+          {packMode === 'existing' && (
+            <select
+              value={selectedPackId}
+              onChange={(e) => setSelectedPackId(e.target.value)}
+              style={{ width: '100%', padding: '0.5rem 0.75rem', borderRadius: '6px', border: '1px solid var(--border-color)', background: 'var(--bg-secondary)', color: 'var(--text-primary)', fontSize: '0.9rem' }}
+            >
+              <option value="">Select a pack...</option>
+              {existingPacks.map(p => (
+                <option key={p.id} value={p.id}>{p.title} ({p.question_count || 0} questions)</option>
+              ))}
+            </select>
+          )}
+
+          {packMode !== 'none' && (
+            <button
+              className="btn btn-primary"
+              style={{ marginTop: '0.75rem' }}
+              disabled={packAssigning || (packMode === 'new' && !newPackTitle.trim()) || (packMode === 'existing' && !selectedPackId)}
+              onClick={async () => {
+                setPackAssigning(true);
+                setPackResult(null);
+                try {
+                  let packId = selectedPackId;
+                  if (packMode === 'new') {
+                    const pack = await createPack({ title: newPackTitle.trim(), status: 'draft', is_public: false });
+                    packId = pack.id;
+                  }
+                  await bulkAddQuestionsToPack(packId, importedIds);
+                  setPackResult({ success: true, packId });
+                  setImportedIds([]);
+                } catch (err) {
+                  setPackResult({ success: false, error: err.message });
+                } finally {
+                  setPackAssigning(false);
+                }
+              }}
+            >
+              {packAssigning ? 'Assigning...' : `Add ${importedIds.length} Questions to Pack`}
+            </button>
+          )}
+        </div>
+      )}
+
+      {packResult && (
+        <div className={`alert ${packResult.success ? 'alert--success' : 'alert--error'}`} style={{ marginTop: '1rem' }}>
+          {packResult.success
+            ? `Successfully added all questions to the pack! You can manage it in Admin → Packs.`
+            : `Failed to assign to pack: ${packResult.error}`}
         </div>
       )}
 

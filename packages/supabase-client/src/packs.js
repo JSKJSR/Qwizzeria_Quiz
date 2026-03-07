@@ -174,6 +174,45 @@ export async function addQuestionToPack(packId, questionId, sortOrder = 0) {
 }
 
 /**
+ * Bulk add questions to a pack.
+ * @param {string} packId
+ * @param {string[]} questionIds - Array of question IDs to add
+ */
+export async function bulkAddQuestionsToPack(packId, questionIds) {
+  const supabase = getSupabase();
+
+  const rows = questionIds.map((qId, i) => ({
+    pack_id: packId,
+    question_id: qId,
+    sort_order: i + 1,
+  }));
+
+  const { data, error } = await supabase
+    .from('pack_questions')
+    .insert(rows)
+    .select();
+
+  if (error) {
+    throw new Error(`Failed to bulk add questions to pack: ${error.message}`);
+  }
+
+  // Update question_count on the pack
+  try {
+    await supabase.rpc('update_pack_question_count', { target_pack_id: packId });
+  } catch {
+    const { count } = await supabase
+      .from('pack_questions')
+      .select('id', { count: 'exact', head: true })
+      .eq('pack_id', packId);
+    if (count != null) {
+      await supabase.from('quiz_packs').update({ question_count: count }).eq('id', packId);
+    }
+  }
+
+  return data;
+}
+
+/**
  * Remove a question from a pack.
  */
 export async function removeQuestionFromPack(packQuestionId, packId) {
