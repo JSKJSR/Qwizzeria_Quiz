@@ -19,7 +19,7 @@ This document covers data storage, access control, and the shared backend utilit
 - **`host_tournament_matches`**: Isolated individual match states. Uses `claimed_by` for optimistic locking in multi-tab play.
 
 ### Billing
-- **`subscriptions`**: Stripe subscription states mapped to user UUIDs.
+- **`subscriptions`**: Stripe subscription states mapped to user UUIDs. Supports `player`, `host`, and `pass` tier structures.
 
 ---
 
@@ -37,7 +37,7 @@ Controls granular access. Examples: `read`, `write`, `manage` specific categorie
 1. **`superadmin`**: Full system control. Manages roles via the UI.
 2. **`admin`**: Bypasses Gate 1, platform-wide management.
 3. **`editor`**: Gate 1 access. Gate 2 specifies their content.
-4. **`premium`**: Gate 1 access to premium features.
+4. **`player` / `host`**: Gate 1 access to premium features depending on subscription plan or purchased passes.
 5. **`user`**: Base role.
 
 ### Row-Level Security (RLS)

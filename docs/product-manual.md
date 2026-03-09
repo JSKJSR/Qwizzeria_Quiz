@@ -40,7 +40,7 @@ The Admin CMS is integrated into the application and accessible at `/admin` for 
 1. **Dashboard (`/admin`)**: Subscription analytics (trial conversion, active subscribers), pack performance metrics, and hardest questions.
 2. **Question Management (`/admin/questions`)**: 
    - Full CRUD for questions (media URLs, point values). 
-   - **Bulk Import (`/admin/import`)**: High-speed Excel (.xlsx) ingestion.
+   - **Bulk Import (`/admin/import`)**: High-speed Excel (.xlsx) ingestion with immediate Pack assignment capabilities.
 3. **Pack Management (`/admin/packs`)**: Manage curated collections, adjust premium/public visibility, and reorder questions.
 4. **User Management (`/admin/users`)**: Restricted to `superadmin`. Lists users and provides the ability to update roles (e.g., promote `user` to `premium` or `admin`).
 
@@ -48,11 +48,13 @@ The Admin CMS is integrated into the application and accessible at `/admin` for 
 
 ## 💳 Billing & Subscriptions
 
-Qwizzeria implements a 3-tier subscription model powered by Stripe.
+Qwizzeria implements a hybrid SaaS and One-Time Purchase model powered by Stripe.
 
-- **14-Day Free Trial**: All new users get 14 days of full access.
+- **3-Day Free Trial**: Short trial with restricted Host mode limits (up to 3 connected players).
 - **Free**: $0. Access to Daily Free Quiz and Profile/Dashboard.
-- **Basic**: ~$5/mo. Adds Pack Library, Play History, and Leaderboards.
-- **Pro**: ~$10/mo. Adds Host Quiz (multiplayer) and Tournaments.
+- **Player Tier (formerly Basic)**: $3.99/mo. Unlocks the entire Quiz Pack library, History, and Global Leaderboards.
+- **Host / Game Master Tier (formerly Pro)**: $12.99/mo. Unlocks local/party Game Hosting, Real-Time Buzzer, and Tournament brackets for up to 16 teams.
+- **Game Night Pass**: A $4.99 one-time purchase granting 48-hour access to the Host Tier features, designed for impulse event buyers.
+- **Premium Packs Upsell**: Individually branded quiz packs available for $2.99 a la carte.
 
 *Grace Period*: 3-day access window for `past_due` subscriptions before full gating. Editors/Admins bypass these checks automatically.

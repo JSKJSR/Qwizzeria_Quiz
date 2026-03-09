@@ -11,7 +11,7 @@ Developed using **Turborepo** and npm workspaces, the codebase is split into ind
 ### `apps/`
 - **`quiz-app/`**: The primary product (Vite + React 19). It handles:
   - **Player App**: Landing (with pack showcase carousel), browsing, playing quizzes in **Jeopardy (grid-based)** or **Sequential (linear)** formats, and user profiles.
-  - **Admin CMS**: Integrated management layer accessible at `/admin`. Provides authorized editors and admins with tools to manage the question bank and quiz packs. Includes a **User Management** interface for superadmins.
+  - **Admin CMS**: Integrated management layer accessible at `/admin`. Provides authorized editors and admins with tools to manage the question bank and quiz packs (including direct pack creation via Bulk Import). Includes a **User Management** interface for superadmins.
 
 ### `packages/`
 - **`supabase-client/`**: A centralized package wrapping the Supabase SDK. It manages:
