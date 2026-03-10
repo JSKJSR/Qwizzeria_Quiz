@@ -1,0 +1,141 @@
+/* ---- Inline QR (scoreboard left zone) ---- */
+.buzzer-qr__inline {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(232, 92, 26, 0.25);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+  flex-shrink: 0;
+}
+
+.buzzer-qr__inline:hover {
+  border-color: var(--accent-primary, #e85c1a);
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* Hide inline QR on small screens */
+@media (max-width: 768px) {
+  .buzzer-qr__inline {
+    display: none;
+  }
+}
+
+/* ---- Full-screen modal overlay ---- */
+.buzzer-qr__overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 300;
+  padding: 1rem;
+  animation: buzzerQrFadeIn 0.2s ease-out;
+}
+
+@keyframes buzzerQrFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.buzzer-qr__modal {
+  background: var(--bg-card, #1a1015);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius, 12px);
+  padding: 2.5rem 3rem;
+  text-align: center;
+  position: relative;
+  max-width: 420px;
+  width: 100%;
+  animation: buzzerQrScaleIn 0.2s ease-out;
+}
+
+@keyframes buzzerQrScaleIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.buzzer-qr__close {
+  position: absolute;
+  top: 0.75rem;
+  right: 1rem;
+  background: none;
+  border: none;
+  color: #999;
+  font-size: 1.75rem;
+  cursor: pointer;
+  padding: 0.25rem;
+  line-height: 1;
+}
+
+.buzzer-qr__close:hover {
+  color: #fff;
+}
+
+.buzzer-qr__title {
+  margin: 0 0 0.25rem;
+  font-size: 1.5rem;
+  color: #fff;
+}
+
+.buzzer-qr__subtitle {
+  margin: 0 0 1.5rem;
+  font-size: 0.9rem;
+  color: var(--text-secondary, #aaa);
+}
+
+.buzzer-qr__code-wrapper {
+  display: inline-block;
+  padding: 12px;
+  background: #ffffff;
+  border-radius: 12px;
+  margin-bottom: 1.25rem;
+}
+
+.buzzer-qr__room-code {
+  font-family: monospace;
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--accent-primary, #e85c1a);
+  letter-spacing: 0.2em;
+  margin-bottom: 0.5rem;
+}
+
+.buzzer-qr__url {
+  font-size: 0.8rem;
+  color: var(--text-secondary, #aaa);
+  word-break: break-all;
+  line-height: 1.4;
+}
+
+/* ---- Light mode ---- */
+.host-light-theme .buzzer-qr__inline {
+  background: rgba(0, 0, 0, 0.04);
+  border-color: rgba(212, 82, 26, 0.2);
+}
+
+.host-light-theme .buzzer-qr__inline:hover {
+  background: rgba(0, 0, 0, 0.08);
+  border-color: var(--accent-primary, #d4521a);
+}
+
+.host-light-theme .buzzer-qr__modal {
+  background: #ffffff;
+  border-color: #d0c8c0;
+}
+
+.host-light-theme .buzzer-qr__title {
+  color: #1a1015;
+}
+
+.host-light-theme .buzzer-qr__subtitle {
+  color: #5a5055;
+}
+
+.host-light-theme .buzzer-qr__url {
+  color: #5a5055;
+}

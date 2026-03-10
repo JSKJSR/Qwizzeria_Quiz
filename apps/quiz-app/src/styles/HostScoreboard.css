@@ -28,6 +28,12 @@
   flex-shrink: 0;
 }
 
+.scoreboard__buzzer-section {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
 .scoreboard__buzzer-info {
   display: flex;
   flex-direction: column;

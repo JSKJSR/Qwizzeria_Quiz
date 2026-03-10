@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import '../../styles/HostScoreboard.css';
 import TimerControl from './TimerControl';
+import BuzzerQRCode from './BuzzerQRCode';
 
 function useHostTheme() {
   const [light, setLight] = useState(false);
@@ -111,17 +112,20 @@ export default function HostScoreboard({
             onError={(e) => { e.target.src = '/qwizzeria-logo.svg'; }}
           />
           {buzzerRoomCode && (
-            <div className="scoreboard__buzzer-info">
-              <span className="scoreboard__buzzer-label">BUZZER ROOM</span>
-              <span className="scoreboard__buzzer-code">{buzzerRoomCode}</span>
-              <span className="scoreboard__buzzer-count">
-                {buzzerPlayerCount || 0} player{buzzerPlayerCount !== 1 ? 's' : ''} connected
-              </span>
-              {onCopyBuzzerLink && (
-                <button className="scoreboard__buzzer-copy" onClick={onCopyBuzzerLink}>
-                  {buzzerCopied ? 'Copied!' : 'Copy Link'}
-                </button>
-              )}
+            <div className="scoreboard__buzzer-section">
+              <BuzzerQRCode roomCode={buzzerRoomCode} />
+              <div className="scoreboard__buzzer-info">
+                <span className="scoreboard__buzzer-label">BUZZER ROOM</span>
+                <span className="scoreboard__buzzer-code">{buzzerRoomCode}</span>
+                <span className="scoreboard__buzzer-count">
+                  {buzzerPlayerCount || 0} player{buzzerPlayerCount !== 1 ? 's' : ''} connected
+                </span>
+                {onCopyBuzzerLink && (
+                  <button className="scoreboard__buzzer-copy" onClick={onCopyBuzzerLink}>
+                    {buzzerCopied ? 'Copied!' : 'Copy Link'}
+                  </button>
+                )}
+              </div>
             </div>
           )}
           {matchLabel && (
