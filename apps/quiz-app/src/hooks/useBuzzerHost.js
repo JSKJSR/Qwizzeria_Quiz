@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import {
   createBuzzerRoom,
   closeBuzzerRoom,
+  getBuzzerRoom,
   updateBuzzerRoomStatus,
   getBuzzerParticipants,
   subscribeBuzzerChannel,
@@ -20,9 +21,11 @@ import { playBuzzSound, playBuzzerOpenSound, playTieSound } from '../utils/buzze
  * @param {'host_quiz'|'tournament_match'} options.sessionType
  * @param {string} [options.sessionRef] - Optional FK to quiz session or tournament
  * @param {boolean} [options.enabled=false] - Whether buzzer is enabled
+ * @param {string} [options.restoreRoomCode] - Room code to reconnect to on restore
+ * @param {string} [options.restoreRoomId] - Room ID to reconnect to on restore
  * @returns {object} Buzzer host controls
  */
-export default function useBuzzerHost({ hostUserId, sessionType, sessionRef, enabled = false }) {
+export default function useBuzzerHost({ hostUserId, sessionType, sessionRef, enabled = false, restoreRoomCode = null, restoreRoomId = null }) {
   const [roomCode, setRoomCode] = useState(null);
   const [roomId, setRoomId] = useState(null);
   const [participants, setParticipants] = useState([]);
@@ -34,16 +37,37 @@ export default function useBuzzerHost({ hostUserId, sessionType, sessionRef, ena
 
   const channelRef = useRef(null);
   const buzzesRef = useRef([]); // mutable ref for collecting buzzes in callbacks
+  const restoreAttemptedRef = useRef(false);
 
-  // Create room when enabled
+  // Reconnect to existing room OR create new room when enabled
   useEffect(() => {
     if (!enabled || !hostUserId || roomId) return;
 
     let cancelled = false;
 
-    async function create() {
+    async function initRoom() {
       setIsCreating(true);
       try {
+        // Try reconnecting to a saved room first (only once)
+        if (!restoreAttemptedRef.current && restoreRoomCode && restoreRoomId) {
+          restoreAttemptedRef.current = true;
+          try {
+            const existing = await getBuzzerRoom(restoreRoomCode);
+            // Verify the room belongs to this host and is still active
+            if (existing && existing.host_user_id === hostUserId) {
+              if (!cancelled) {
+                setRoomCode(existing.room_code);
+                setRoomId(existing.id);
+              }
+              return;
+            }
+          } catch {
+            // Room not found or closed — fall through to create new
+          }
+        }
+        restoreAttemptedRef.current = true;
+
+        // Create a new room
         const room = await createBuzzerRoom(hostUserId, sessionType, sessionRef);
         if (cancelled) return;
         setRoomCode(room.room_code);
@@ -55,10 +79,10 @@ export default function useBuzzerHost({ hostUserId, sessionType, sessionRef, ena
       }
     }
 
-    create();
+    initRoom();
 
     return () => { cancelled = true; };
-  }, [enabled, hostUserId, sessionType, sessionRef, roomId]);
+  }, [enabled, hostUserId, sessionType, sessionRef, roomId, restoreRoomCode, restoreRoomId]);
 
   // Subscribe to broadcast channel
   useEffect(() => {

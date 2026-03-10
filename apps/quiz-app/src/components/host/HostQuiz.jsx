@@ -2,7 +2,7 @@ import { useReducer, useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 import { detectMediaType } from '../../utils/mediaDetector';
-import { saveHostSession, loadHostSession, clearHostSession } from '../../utils/hostSessionPersistence';
+import { saveHostSession, loadHostSession, clearHostSession, saveBuzzerState, loadBuzzerState, clearBuzzerState } from '../../utils/hostSessionPersistence';
 import { saveHostQuizSession } from '@qwizzeria/supabase-client/src/questions.js';
 import {
   createTournament as dbCreateTournament,
@@ -608,6 +608,7 @@ export default function HostQuiz() {
   const [showTieBreaker, setShowTieBreaker] = useState(false);
   const [buzzerEnabled, setBuzzerEnabled] = useState(false);
   const [buzzerCopied, setBuzzerCopied] = useState(false);
+  const [buzzerRestore, setBuzzerRestore] = useState({ roomCode: null, roomId: null });
 
   // Buzzer hook (only active when buzzerEnabled)
   const buzzer = useBuzzerHost({
@@ -615,6 +616,8 @@ export default function HostQuiz() {
     sessionType: state.mode === 'tournament' ? 'tournament_match' : 'host_quiz',
     sessionRef: state.tournamentId || null,
     enabled: buzzerEnabled,
+    restoreRoomCode: buzzerRestore.roomCode,
+    restoreRoomId: buzzerRestore.roomId,
   });
 
   const handleCopyBuzzerLink = useCallback(() => {
@@ -641,14 +644,22 @@ export default function HostQuiz() {
           navigate(`/host/tournament/${saved.tournamentId}`);
         } else {
           clearHostSession();
+          clearBuzzerState();
         }
         return;
       }
       const resume = window.confirm('You have an unfinished host quiz session. Resume where you left off?');
       if (resume) {
         dispatch({ type: ACTIONS.RESTORE_SESSION, savedState: saved });
+        // Restore buzzer state if it was active
+        const savedBuzzer = loadBuzzerState();
+        if (savedBuzzer?.buzzerEnabled && savedBuzzer.roomCode && savedBuzzer.roomId) {
+          setBuzzerRestore({ roomCode: savedBuzzer.roomCode, roomId: savedBuzzer.roomId });
+          setBuzzerEnabled(true);
+        }
       } else {
         clearHostSession();
+        clearBuzzerState();
       }
     }
   }, [navigate]);
@@ -670,12 +681,18 @@ export default function HostQuiz() {
       } else {
         saveHostSession(state);
       }
+      // Persist buzzer state alongside quiz state
+      saveBuzzerState({
+        buzzerEnabled,
+        roomCode: buzzer.roomCode,
+        roomId: buzzer.roomId,
+      });
     }, 300);
 
     return () => {
       if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
     };
-  }, [state]);
+  }, [state, buzzerEnabled, buzzer.roomCode, buzzer.roomId]);
 
   // Persist new tournament to DB when bracket phase starts without a DB ID
   useEffect(() => {
@@ -782,6 +799,7 @@ export default function HostQuiz() {
     }
     dispatch({ type: ACTIONS.CONFIRM_END_QUIZ });
     clearHostSession();
+    clearBuzzerState();
     if (buzzerEnabled) buzzer.closeRoom();
   }, [user, state.pack, state.participants, state.completedQuestionIds, buzzerEnabled, buzzer]);
 
@@ -792,6 +810,7 @@ export default function HostQuiz() {
   const handleNewQuiz = useCallback(() => {
     dispatch({ type: ACTIONS.RESET_QUIZ });
     clearHostSession();
+    clearBuzzerState();
     if (buzzerEnabled) buzzer.closeRoom();
     setBuzzerEnabled(false);
   }, [buzzerEnabled, buzzer]);
