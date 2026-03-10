@@ -42,7 +42,12 @@ export default function LoginModal({ onClose, onSuccess, initialMode }) {
         navigate(EDITOR_ROLES.includes(result.role) ? '/admin' : '/dashboard');
       }
     } catch (err) {
-      setError(err.message);
+      const msg = err.message || '';
+      if (mode === 'forgot' && (msg.toLowerCase().includes('rate') || msg.toLowerCase().includes('limit') || msg.toLowerCase().includes('429'))) {
+        setError('Too many reset requests. Please wait a few minutes before trying again.');
+      } else {
+        setError(msg);
+      }
     } finally {
       setLoading(false);
     }

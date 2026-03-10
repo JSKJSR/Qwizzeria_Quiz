@@ -62,4 +62,43 @@ describe('hostSessionPersistence', () => {
       expect(localStorage.getItem('qwizzeria_host_session')).toBeNull();
     });
   });
+
+  describe('buzzerStatePersistence', () => {
+    const { saveBuzzerState, loadBuzzerState, clearBuzzerState } = require('./hostSessionPersistence.js');
+
+    it('saves buzzer state correctly', () => {
+      saveBuzzerState({ buzzerEnabled: true, roomCode: 'RESCUE', roomId: '123' });
+      const stored = JSON.parse(localStorage.getItem('qwizzeria_host_buzzer'));
+      expect(stored.buzzerEnabled).toBe(true);
+      expect(stored.roomCode).toBe('RESCUE');
+      expect(stored.roomId).toBe('123');
+      expect(typeof stored.savedAt).toBe('number');
+    });
+
+    it('removes buzzer state if disabled', () => {
+      localStorage.setItem('qwizzeria_host_buzzer', '{"roomCode":"OLD"}');
+      saveBuzzerState({ buzzerEnabled: false });
+      expect(localStorage.getItem('qwizzeria_host_buzzer')).toBeNull();
+    });
+
+    it('loads valid buzzer state', () => {
+      const data = { buzzerEnabled: true, roomCode: 'RESCUE', roomId: '123', savedAt: Date.now() };
+      localStorage.setItem('qwizzeria_host_buzzer', JSON.stringify(data));
+      const loaded = loadBuzzerState();
+      expect(loaded.roomCode).toBe('RESCUE');
+    });
+
+    it('returns null and clears if expired', () => {
+      const expired = { buzzerEnabled: true, savedAt: Date.now() - 25 * 60 * 60 * 1000 };
+      localStorage.setItem('qwizzeria_host_buzzer', JSON.stringify(expired));
+      expect(loadBuzzerState()).toBeNull();
+      expect(localStorage.getItem('qwizzeria_host_buzzer')).toBeNull();
+    });
+
+    it('clears buzzer state', () => {
+      localStorage.setItem('qwizzeria_host_buzzer', '{"roomCode":"BYE"}');
+      clearBuzzerState();
+      expect(localStorage.getItem('qwizzeria_host_buzzer')).toBeNull();
+    });
+  });
 });

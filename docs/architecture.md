@@ -39,6 +39,7 @@ The Host Quiz features a redesigned **Host UI** with responsive layouts, collaps
 Additionally, it supports a live **Buzzer Overlay** synchronized via Supabase Realtime using the `useBuzzerHost` hook. Participants join a session via the `/buzzer` route using a host-generated room code.
 - **Precision Logging**: Utilizes sub-millisecond timestamps (`buzzerTimestamp.js`) to determine the exact order of player buzzes.
 - **Feedback**: Provides immediate auditory (`buzzerSound.js`) and visual cues on both the player device and host screen.
+- **State Restoration**: The host's buzzer state (`qwizzeria_host_buzzer`) is persisted alongside the host quiz session in `localStorage`, enabling robust recovery from accidental tab closures without dropping connected players.
 
 ### Tournament Mode
 Host Quiz supports a **Tournament Mode** for single-elimination bracket competitions:
