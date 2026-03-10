@@ -292,7 +292,7 @@ export async function fetchShowcasePacks() {
 
   const { data, error } = await supabase
     .from('quiz_packs')
-    .select('id, title, cover_image_url, category, question_count')
+    .select('id, title, cover_image_url, category, question_count, pack_questions(count)')
     .eq('status', 'active')
     .order('play_count', { ascending: false });
 
@@ -300,7 +300,10 @@ export async function fetchShowcasePacks() {
     throw new Error(`Failed to fetch showcase packs: ${error.message}`);
   }
 
-  return data || [];
+  return (data || []).map(({ pack_questions, ...rest }) => ({
+    ...rest,
+    question_count: pack_questions?.[0]?.count ?? rest.question_count,
+  }));
 }
 
 // ============================================================
