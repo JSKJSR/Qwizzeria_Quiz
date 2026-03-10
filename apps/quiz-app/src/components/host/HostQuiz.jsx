@@ -606,9 +606,18 @@ export default function HostQuiz() {
   const saveTimerRef = useRef(null);
   const restoredRef = useRef(false);
   const [showTieBreaker, setShowTieBreaker] = useState(false);
-  const [buzzerEnabled, setBuzzerEnabled] = useState(false);
+  const [buzzerEnabled, setBuzzerEnabled] = useState(() => {
+    const saved = loadBuzzerState();
+    return !!(saved?.buzzerEnabled && saved.roomCode && saved.roomId);
+  });
   const [buzzerCopied, setBuzzerCopied] = useState(false);
-  const [buzzerRestore, setBuzzerRestore] = useState({ roomCode: null, roomId: null });
+  const [buzzerRestore] = useState(() => {
+    const saved = loadBuzzerState();
+    if (saved?.buzzerEnabled && saved.roomCode && saved.roomId) {
+      return { roomCode: saved.roomCode, roomId: saved.roomId };
+    }
+    return { roomCode: null, roomId: null };
+  });
 
   // Buzzer hook (only active when buzzerEnabled)
   const buzzer = useBuzzerHost({
@@ -651,15 +660,11 @@ export default function HostQuiz() {
       const resume = window.confirm('You have an unfinished host quiz session. Resume where you left off?');
       if (resume) {
         dispatch({ type: ACTIONS.RESTORE_SESSION, savedState: saved });
-        // Restore buzzer state if it was active
-        const savedBuzzer = loadBuzzerState();
-        if (savedBuzzer?.buzzerEnabled && savedBuzzer.roomCode && savedBuzzer.roomId) {
-          setBuzzerRestore({ roomCode: savedBuzzer.roomCode, roomId: savedBuzzer.roomId });
-          setBuzzerEnabled(true);
-        }
+        // Buzzer state already restored via lazy useState initializers
       } else {
         clearHostSession();
         clearBuzzerState();
+        setBuzzerEnabled(false);
       }
     }
   }, [navigate]);

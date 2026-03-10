@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { saveHostSession, loadHostSession, clearHostSession } from './hostSessionPersistence.js';
+import { saveHostSession, loadHostSession, clearHostSession, saveBuzzerState, loadBuzzerState, clearBuzzerState } from './hostSessionPersistence.js';
 
 describe('hostSessionPersistence', () => {
   beforeEach(() => {
@@ -64,8 +64,6 @@ describe('hostSessionPersistence', () => {
   });
 
   describe('buzzerStatePersistence', () => {
-    const { saveBuzzerState, loadBuzzerState, clearBuzzerState } = require('./hostSessionPersistence.js');
-
     it('saves buzzer state correctly', () => {
       saveBuzzerState({ buzzerEnabled: true, roomCode: 'RESCUE', roomId: '123' });
       const stored = JSON.parse(localStorage.getItem('qwizzeria_host_buzzer'));
