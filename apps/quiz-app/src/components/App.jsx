@@ -21,6 +21,7 @@ import Pricing from '../pages/Pricing';
 import TournamentBracketPage from '../pages/TournamentBracketPage';
 import TournamentMatchPage from '../pages/TournamentMatchPage';
 import BuzzerPage from '../pages/BuzzerPage';
+import ResetPassword from '../pages/ResetPassword';
 
 // Admin pages
 import AdminDashboard from '../pages/admin/Dashboard';
@@ -41,6 +42,7 @@ export default function App() {
 
         {/* Public routes: accessible without login */}
         <Route path="/play/free" element={<FreeQuizPage />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
 
         {/* All protected routes */}
         <Route element={<ProtectedRoute />}>

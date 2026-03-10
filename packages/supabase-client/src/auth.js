@@ -83,6 +83,21 @@ export async function getCurrentUser() {
 }
 
 /**
+ * Send a password reset email to the given address.
+ * Supabase sends a magic link that redirects to the provided URL.
+ */
+export async function resetPasswordForEmail(email) {
+  const supabase = getSupabase();
+  const { error } = await supabase.auth.resetPasswordForEmail(email, {
+    redirectTo: `${window.location.origin}/reset-password`,
+  });
+
+  if (error) {
+    throw new Error(error.message);
+  }
+}
+
+/**
  * Update the current user's password.
  */
 export async function updatePassword(newPassword) {
