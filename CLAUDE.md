@@ -80,7 +80,7 @@ Access restricted via role checks (editor, admin, superadmin).
   - Timer: Self-contained component with editable min/sec inputs, MM:SS display, play/pause/reset SVG buttons, Web Audio API beeps (3× 800Hz), color states (green running → yellow ≤30s → red ≤10s → red pulse expired)
   - Flat card grid for question selection (same visual style as pack play)
   - Answer view with participant point-awarding buttons
-  - Session persistence in localStorage (24h expiry)
+  - Session persistence in localStorage (24h expiry) for quiz state and buzzer rooms
   - Full-screen overlay (`position: fixed; inset: 0; z-index: 200`)
 - **Landing page**: LandingPageB with hero section + pack carousel (fetches all active packs via `fetchShowcasePacks`)
 - **Pack visibility**: Packs default to `is_public=false, status='draft'`. Must set `status='active'` (via Admin CMS) for packs to be visible. RLS allows all active packs to be read by everyone (including anonymous); app-layer role checks control who can actually play (premium/host gating).
@@ -134,7 +134,7 @@ Access restricted via role checks (editor, admin, superadmin).
 - `npm run dev` — Start all dev servers (quiz-app :5173, admin-cms :5174)
 - `npm run build` — Build all packages
 - `npm run lint` — Lint all packages
-- `cd apps/quiz-app && npx vitest run` — Run tests (66 tests across 6 files)
+- `cd apps/quiz-app && npx vitest run` — Run tests (71 tests across 6 files)
 
 ## Key Component Files
 
