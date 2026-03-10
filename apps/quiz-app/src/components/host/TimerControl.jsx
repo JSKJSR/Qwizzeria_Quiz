@@ -2,8 +2,8 @@ import { useState, useRef, useCallback } from 'react';
 import '../../styles/TimerControl.css';
 
 export default function TimerControl() {
-  const [minutes, setMinutes] = useState(5);
-  const [seconds, setSeconds] = useState(0);
+  const [minutes, setMinutes] = useState(0);
+  const [seconds, setSeconds] = useState(30);
   const [timeLeft, setTimeLeft] = useState(null); // null = use input values; number = countdown active/done
   const [isRunning, setIsRunning] = useState(false);
   const intervalRef = useRef(null);
