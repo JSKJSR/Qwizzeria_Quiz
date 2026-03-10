@@ -13,6 +13,8 @@ const COLLAPSE_KEY = 'qwizzeria_resume_collapsed';
 export default function DashboardHome() {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const [roomCode, setRoomCode] = useState('');
+  const [roomError, setRoomError] = useState(null);
   const [resumable, setResumable] = useState([]);
   const [stats, setStats] = useState(null);
   const [weeklyRank, setWeeklyRank] = useState(null);
@@ -69,6 +71,17 @@ export default function DashboardHome() {
     setDismissing(null);
   }, []);
 
+  const handleJoinRoom = useCallback((e) => {
+    e.preventDefault();
+    setRoomError(null);
+    const code = roomCode.trim().toUpperCase();
+    if (!code || code.length < 4) {
+      setRoomError('Please enter a valid room code.');
+      return;
+    }
+    navigate(`/buzz/${code}`);
+  }, [roomCode, navigate]);
+
   const displayName = user?.user_metadata?.display_name || user?.email?.split('@')[0] || 'Quizzer';
 
   return (
@@ -107,6 +120,27 @@ export default function DashboardHome() {
           <span className="dash-home__action-title">Browse Quiz Packs</span>
           <span className="dash-home__action-desc">Curated quiz packs by category and difficulty</span>
         </Link>
+        <div className="dash-home__action-card dash-home__join-card">
+          <span className="dash-home__action-icon">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4" /><polyline points="10 17 15 12 10 7" /><line x1="15" y1="12" x2="3" y2="12" /></svg>
+          </span>
+          <span className="dash-home__action-title">Join a Room</span>
+          <span className="dash-home__action-desc">Enter a room code to join a live buzzer session</span>
+          <form className="dash-home__join-form" onSubmit={handleJoinRoom}>
+            <input
+              type="text"
+              className="dash-home__join-input"
+              placeholder="Room code"
+              value={roomCode}
+              onChange={(e) => { setRoomCode(e.target.value.toUpperCase()); setRoomError(null); }}
+              maxLength={8}
+              autoComplete="off"
+              spellCheck="false"
+            />
+            <button type="submit" className="dash-home__join-btn">Join</button>
+          </form>
+          {roomError && <span className="dash-home__join-error">{roomError}</span>}
+        </div>
       </div>
 
       {stats && (

@@ -70,6 +70,72 @@
   color: var(--text-secondary, #b0a0a5);
 }
 
+/* Join room card */
+.dash-home__join-card {
+  cursor: default;
+}
+
+.dash-home__join-card:hover {
+  border-color: var(--accent-primary, #e85c1a);
+  box-shadow: 0 4px 20px rgba(232, 92, 26, 0.2);
+}
+
+.dash-home__join-form {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.25rem;
+}
+
+.dash-home__join-input {
+  flex: 1;
+  padding: 0.5rem 0.75rem;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid var(--border-color, #2a1520);
+  border-radius: var(--radius-sm, 8px);
+  color: var(--text-primary, #f0f0f0);
+  font-size: 1rem;
+  font-family: monospace;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  transition: border-color 0.2s;
+}
+
+.dash-home__join-input::placeholder {
+  font-family: inherit;
+  font-weight: 400;
+  letter-spacing: normal;
+  text-transform: none;
+  color: var(--text-muted, #665555);
+}
+
+.dash-home__join-input:focus {
+  outline: none;
+  border-color: var(--accent-primary, #e85c1a);
+}
+
+.dash-home__join-btn {
+  padding: 0.5rem 1.25rem;
+  background: var(--accent-primary, #e85c1a);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-sm, 8px);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.2s;
+  white-space: nowrap;
+}
+
+.dash-home__join-btn:hover {
+  opacity: 0.85;
+}
+
+.dash-home__join-error {
+  font-size: 0.8rem;
+  color: #f44336;
+}
+
 /* Stats section */
 .dash-home__stats-section {
   margin-bottom: 2.5rem;

@@ -79,10 +79,10 @@ npm run test
 cd apps/quiz-app && npx vitest run
 ```
 
-### Current Coverage (66 tests, 6 files)
+### Current Coverage (71 tests, 6 files)
 - `mediaDetector.test.js` — Media URL detection (7 tests)
 - `tournamentBracket.test.js` — Bracket generation, seeding, advancement (36 tests)
-- `hostSessionPersistence.test.js` — localStorage save/load/clear (7 tests)
+- `hostSessionPersistence.test.js` — localStorage save/load/clear (12 tests)
 - `AuthContext.test.js` — Auth provider initialization (1 test)
 - `supabaseClient.test.js` — Supabase client configuration (2 tests)
 - `buzzerTimestamp.test.js` — Sub-millisecond buzzer resolution (13 tests)
@@ -106,7 +106,7 @@ The project includes a GitHub Actions pipeline (`.github/workflows/ci.yml`) that
 1. `npm ci` — Install dependencies
 2. `npm run lint` — Lint all packages
 3. `npm run build` — Build all packages
-4. `npm run test` — Run test suite (66 tests)
+4. `npm run test` — Run test suite (71 tests)
 
 Production deployment is configured for **Vercel** via `vercel.json` (output: `apps/quiz-app/dist`). Set `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` as environment variables in the Vercel dashboard.
 
