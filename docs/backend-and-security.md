@@ -12,7 +12,8 @@ This document covers data storage, access control, and the shared backend utilit
 - **`quiz_sessions`**: Tracks player progress for resumable usage (score, status, metadata JSONB).
 
 ### Real-time Buzzer
-- **`buzzer_rooms`**: Manages volatile state for the real-time Buzzer System. Tracks open rooms, connected participants, and sub-millisecond buzzer timestamps.
+- **`buzzer_rooms`**: Manages volatile state for the real-time Buzzer System. Tracks open rooms, status (`waiting` / `active` / `closed`), host user, and session reference.
+- **`buzzer_participants`**: Tracks who has joined a buzzer room. One row per `(room_id, user_id)`. Deleted when a participant leaves or closes the browser. **Not** deleted on host reset — participants stay in the room across the full session.
 
 ### Tournaments
 - **`host_tournaments`**: Bracket state and participants (JSONB).
@@ -42,7 +43,22 @@ Controls granular access. Examples: `read`, `write`, `manage` specific categorie
 
 ### Row-Level Security (RLS)
 - **Pack Visibility**: App layer gating handles playback. Active pack *metadata* is public for the landing page carousel.
-- **Admin Bypass**: Policies utilize custom Postgres functions `is_admin()` and `is_superadmin()`. 
+- **Admin Bypass**: Policies utilize custom Postgres functions `is_admin()` and `is_superadmin()`.
+
+#### Buzzer RLS Policies (`buzzer_participants`)
+
+Migration `021_buzzer_rls_fix.sql` corrected a missing `UPDATE` policy that caused the error:
+> *"new row violates row-level security policy (USING expression) for table buzzer_participants"*
+
+| Operation | Policy | Rule |
+|---|---|---|
+| `SELECT` | `buzzer_participants_select` | User is authenticated AND room is `waiting`/`active` or owned by user |
+| `INSERT` | `buzzer_participants_insert` | `user_id = auth.uid()` AND room is `waiting`/`active` |
+| `UPDATE` | `buzzer_participants_update_own` *(added 021)* | `user_id = auth.uid()` AND room is `waiting`/`active` |
+| `DELETE` | `buzzer_participants_delete` | Own row OR host of the room |
+| `ALL` | `buzzer_participants_admin` | `is_admin()` |
+
+> **Note:** `joinBuzzerRoom()` in `buzzer.js` uses INSERT-or-fetch (not upsert) to avoid triggering the UPDATE path unnecessarily. See [`docs/buzzer-bugfixes.md`](./buzzer-bugfixes.md) for the full fix history.
 
 ---
 
@@ -64,6 +80,6 @@ The monorepo includes a shared SDK wrapper package (`packages/supabase-client`) 
 - **`packs.js` / `questions.js`**: Content CRUD.
 - **`tournaments.js` / `realtime.js`**: Bracket logic, match claiming, and Phoenix-style channel subscriptions for instant UI sync.
 - **`users.js` / `leaderboard.js`**: Profiles and RPC endpoints.
-- **`buzzer.js`**: Manages real-time room creation, presence syncing, and fast-insert operations for buzzer timestamps.
+- **`buzzer.js`**: Room creation, participant join (insert-or-fetch pattern), broadcast channel subscription, and event helpers for the real-time buzzer feature.
 
 *Note: SQL Migrations live inside this package at `packages/supabase-client/migrations` and must be applied sequentially via Supabase SQL Editor.*

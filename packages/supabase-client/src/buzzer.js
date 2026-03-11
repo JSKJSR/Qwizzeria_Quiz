@@ -15,7 +15,7 @@ export async function createBuzzerRoom(hostUserId, sessionType, sessionRef = nul
   const supabase = getSupabase();
 
   // Close any stale rooms first (non-blocking)
-  supabase.rpc('close_stale_buzzer_rooms').then(() => {}, () => {});
+  supabase.rpc('close_stale_buzzer_rooms').then(() => { }, () => { });
 
   const { data, error } = await supabase
     .from('buzzer_rooms')
@@ -58,6 +58,15 @@ export async function getBuzzerRoom(roomCode) {
 
 /**
  * Join a buzzer room as a participant.
+ *
+ * Uses INSERT ... ON CONFLICT DO NOTHING instead of upsert to avoid
+ * triggering an implicit UPDATE path, which would fail the RLS USING
+ * expression when no UPDATE policy was defined (the root cause of:
+ * "new row violates row-level security policy for table buzzer_participants").
+ *
+ * If the user already has a participant row (returning after reset),
+ * we fetch their existing record instead of re-inserting.
+ *
  * @param {string} roomId - Room UUID
  * @param {string} userId - Participant's auth user ID
  * @param {string} displayName - Participant's display name
@@ -66,20 +75,51 @@ export async function getBuzzerRoom(roomCode) {
 export async function joinBuzzerRoom(roomId, userId, displayName) {
   const supabase = getSupabase();
 
-  const { data, error } = await supabase
+  // Step 1: Attempt a clean INSERT. If the row already exists (duplicate
+  // room_id+user_id), Supabase returns null data with no error when using
+  // ignoreDuplicates:true — we handle that in Step 2.
+  const { data: inserted, error: insertError } = await supabase
     .from('buzzer_participants')
-    .upsert(
-      { room_id: roomId, user_id: userId, display_name: displayName },
-      { onConflict: 'room_id,user_id' }
-    )
+    .insert({ room_id: roomId, user_id: userId, display_name: displayName })
     .select()
     .single();
 
-  if (error) {
-    throw new Error(`Failed to join room: ${error.message}`);
+  // Row inserted successfully — done.
+  if (!insertError && inserted) {
+    return inserted;
   }
 
-  return data;
+  // If the error is a duplicate key violation (code 23505), the participant
+  // already exists — fetch and return their existing record.
+  if (insertError?.code === '23505') {
+    const { data: existing, error: fetchError } = await supabase
+      .from('buzzer_participants')
+      .select()
+      .eq('room_id', roomId)
+      .eq('user_id', userId)
+      .single();
+
+    if (fetchError) {
+      throw new Error(`Failed to re-join room: ${fetchError.message}`);
+    }
+    return existing;
+  }
+
+  // Any other error (e.g. RLS, room closed, network) — surface a clear message.
+  if (insertError) {
+    // Provide a friendlier message for common RLS / room-state errors
+    const isRlsError =
+      insertError.message?.includes('row-level security') ||
+      insertError.code === '42501';
+    if (isRlsError) {
+      throw new Error(
+        'The room is no longer accepting new participants. Please ask the host to check the room status.'
+      );
+    }
+    throw new Error(`Failed to join room: ${insertError.message}`);
+  }
+
+  throw new Error('Failed to join room: unknown error.');
 }
 
 /**
@@ -182,6 +222,7 @@ export async function getBuzzerParticipants(roomId) {
  * @param {function} [handlers.onRoomClosed] - () => void
  * @param {function} [handlers.onParticipantJoined] - ({ userId, displayName }) => void
  * @param {function} [handlers.onParticipantLeft] - ({ userId }) => void
+ * @param {function} [handlers.onStatusChange] - (status: 'SUBSCRIBED'|'TIMED_OUT'|'CLOSED'|'CHANNEL_ERROR') => void
  * @returns {object} Supabase Broadcast channel
  */
 export function subscribeBuzzerChannel(roomCode, handlers = {}) {
@@ -240,7 +281,11 @@ export function subscribeBuzzerChannel(roomCode, handlers = {}) {
     });
   }
 
-  channel.subscribe();
+  channel.subscribe((status) => {
+    if (handlers.onStatusChange) {
+      handlers.onStatusChange(status);
+    }
+  });
 
   return channel;
 }

@@ -1,3 +1,12 @@
+## ✅ Resolved Fixes
+
+| Date | Fix | Files Changed |
+|---|---|---|
+| 2026-03-11 | **Buzzer: Users could not buzz in after host reset** — 6 bugs fixed across RLS policies, `joinBuzzerRoom()` (upsert → insert-or-fetch), and `BuzzerPage.jsx` lifecycle. See [`docs/buzzer-bugfixes.md`](./buzzer-bugfixes.md). **Run `021_buzzer_rls_fix.sql` in Supabase SQL Editor.** | `migrations/021_buzzer_rls_fix.sql`, `buzzer.js`, `BuzzerPage.jsx` |
+
+---
+
+## 🗂️ Feature Backlog
 
 Feature: We want a feature that when a quiz is hosted, there is a read only url generated which only shows the questions and nothing else, there will be a provision to have a QR code attched with this URL
 Feature: in tournament mode, allow each bracket to choose a quiz pack,
@@ -24,22 +33,3 @@ Questions migration:
     └───────────────────┴─────────────┴─────────────────────────────────────────────────┘
 
 ## FEATURE: reveal all questions at the end of quiz before end quiz.
-
-
-Tools I actually use daily:
-
-• Google Trends for niche research
-• Namelix for page names
-• ChatGPT for content + bios
-• Nano Banana for logos
-• ViralFindr for proven content
-• Canva AI for post creation
-• CapCut for video content
-• Later(.com) for scheduling
-
-Total cost: $100-200/month for everything.
-
-Your Stats
-
-Try AI Studio
-Convert any document into a quiz instantly

@@ -33,6 +33,38 @@
   gap: 0.15rem;
 }
 
+.buzzer-page__room-code-row {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.buzzer-page__status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.buzzer-page__status-dot--connecting {
+  background: #f39c12;
+  animation: buzzer-dot-pulse 1.2s ease-in-out infinite;
+}
+
+.buzzer-page__status-dot--connected {
+  background: #2ecc71;
+}
+
+.buzzer-page__status-dot--disconnected {
+  background: #e74c3c;
+  animation: buzzer-dot-pulse 1s ease-in-out infinite;
+}
+
+@keyframes buzzer-dot-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
 .buzzer-page__room-code {
   font-family: monospace;
   font-size: 1rem;
@@ -63,6 +95,11 @@
   max-width: 400px;
 }
 
+.buzzer-page__closed-icon {
+  color: var(--accent-error, #e74c3c);
+  opacity: 0.8;
+}
+
 .buzzer-page__title {
   font-size: 1.5rem;
   font-weight: 700;
@@ -91,7 +128,9 @@
 }
 
 @keyframes buzzer-spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 /* ---- Buzzer Button ---- */
@@ -143,8 +182,15 @@
 }
 
 @keyframes buzzer-pulse {
-  0%, 100% { box-shadow: 0 0 40px rgba(46, 204, 113, 0.4), 0 4px 20px rgba(0, 0, 0, 0.3); }
-  50% { box-shadow: 0 0 60px rgba(46, 204, 113, 0.6), 0 4px 20px rgba(0, 0, 0, 0.3); }
+
+  0%,
+  100% {
+    box-shadow: 0 0 40px rgba(46, 204, 113, 0.4), 0 4px 20px rgba(0, 0, 0, 0.3);
+  }
+
+  50% {
+    box-shadow: 0 0 60px rgba(46, 204, 113, 0.6), 0 4px 20px rgba(0, 0, 0, 0.3);
+  }
 }
 
 /* Buzzed — amber, waiting */
@@ -156,8 +202,15 @@
 }
 
 @keyframes buzzer-buzzed-pulse {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.03); }
+
+  0%,
+  100% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.03);
+  }
 }
 
 /* Won — gold */
@@ -169,9 +222,17 @@
 }
 
 @keyframes buzzer-won {
-  0% { transform: scale(0.9); }
-  50% { transform: scale(1.1); }
-  100% { transform: scale(1); }
+  0% {
+    transform: scale(0.9);
+  }
+
+  50% {
+    transform: scale(1.1);
+  }
+
+  100% {
+    transform: scale(1);
+  }
 }
 
 /* Lost — red */
@@ -260,6 +321,24 @@
 
 .buzzer-page__btn--back:hover {
   opacity: 0.9;
+}
+
+.buzzer-page__btn--retry {
+  background: transparent;
+  color: var(--accent-primary, #e85c1a);
+  border: 2px solid var(--accent-primary, #e85c1a);
+}
+
+.buzzer-page__btn--retry:hover {
+  background: rgba(232, 92, 26, 0.12);
+}
+
+.buzzer-page__error-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  width: 100%;
+  align-items: center;
 }
 
 /* ---- Mobile optimizations ---- */
