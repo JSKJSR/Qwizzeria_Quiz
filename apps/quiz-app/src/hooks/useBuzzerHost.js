@@ -33,7 +33,12 @@ export default function useBuzzerHost({ hostUserId, sessionType, sessionRef, ena
   const [buzzResult, setBuzzResult] = useState({ winner: null, isTied: false, tiedBuzzes: [] });
   const [isOpen, setIsOpen] = useState(false);
   const [isCreating, setIsCreating] = useState(false);
+  const [interactionMode, setInteractionMode] = useState('buzzer'); // 'buzzer' | 'input'
+  const [allResponses, setAllResponses] = useState({}); // {questionId: [{userId, displayName, text, receivedAt}]}
+  const [currentInputQuestionId, setCurrentInputQuestionId] = useState(null);
+  const [inputRevealed, setInputRevealed] = useState({}); // {questionId: boolean}
   const allowedUserIdsRef = useRef(null);
+  const allResponsesRef = useRef({});
 
   const channelRef = useRef(null);
   const buzzesRef = useRef([]); // mutable ref for collecting buzzes in callbacks
@@ -116,6 +121,18 @@ export default function useBuzzerHost({ hostUserId, sessionType, sessionRef, ena
         if (result.isTied) playTieSound();
       },
 
+      onResponse: ({ userId, displayName, text, questionId }) => {
+        const allowed = allowedUserIdsRef.current;
+        if (allowed && !allowed.includes(userId)) return;
+
+        const current = allResponsesRef.current[questionId] || [];
+        // Replace existing from same user (edit) or add new
+        const updated = current.filter(r => r.userId !== userId);
+        updated.push({ userId, displayName, text, receivedAt: Date.now() });
+        allResponsesRef.current = { ...allResponsesRef.current, [questionId]: updated };
+        setAllResponses({ ...allResponsesRef.current });
+      },
+
       onParticipantJoined: ({ userId, displayName }) => {
         setParticipants(prev => {
           if (prev.some(p => p.userId === userId)) return prev;
@@ -169,7 +186,13 @@ export default function useBuzzerHost({ hostUserId, sessionType, sessionRef, ena
   const openBuzzer = useCallback((allowedUserIds = null) => {
     if (!channelRef.current) return;
 
-    // Reset buzzes and store allowed users
+    // Auto-reset participant state from any previous round before opening.
+    // This eliminates the need for a separate "Reset" step between rounds.
+    if (buzzesRef.current.length > 0) {
+      sendBuzzerEvent(channelRef.current, 'buzz_reset', {});
+    }
+
+    // Clear host-side state
     buzzesRef.current = [];
     allowedUserIdsRef.current = allowedUserIds;
     setBuzzes([]);
@@ -225,8 +248,74 @@ export default function useBuzzerHost({ hostUserId, sessionType, sessionRef, ena
     setBuzzes([]);
     setBuzzResult({ winner: null, isTied: false, tiedBuzzes: [] });
     setIsOpen(false);
+    setInteractionMode('buzzer');
+    setCurrentInputQuestionId(null);
 
     sendBuzzerEvent(channelRef.current, 'buzz_reset', {});
+  }, []);
+
+  /**
+   * Open input mode for a question.
+   * @param {string} questionId
+   * @param {string} questionText
+   * @param {string[]} [allowedUserIds]
+   */
+  const openInput = useCallback((questionId, questionText, allowedUserIds = null) => {
+    if (!channelRef.current) return;
+
+    // Auto-reset buzzer state if switching from buzzer mode
+    if (buzzesRef.current.length > 0) {
+      sendBuzzerEvent(channelRef.current, 'buzz_reset', {});
+    }
+    buzzesRef.current = [];
+    setBuzzes([]);
+    setBuzzResult({ winner: null, isTied: false, tiedBuzzes: [] });
+
+    allowedUserIdsRef.current = allowedUserIds;
+    setInteractionMode('input');
+    setCurrentInputQuestionId(questionId);
+    setIsOpen(true);
+
+    sendBuzzerEvent(channelRef.current, 'input_open', {
+      questionId,
+      questionText,
+      allowedUserIds,
+      hostTimestamp: Date.now(),
+    });
+  }, []);
+
+  /**
+   * Lock input (stop accepting edits).
+   */
+  const lockInput = useCallback(() => {
+    if (!channelRef.current) return;
+
+    setIsOpen(false);
+    sendBuzzerEvent(channelRef.current, 'input_lock', {});
+  }, []);
+
+  /**
+   * Reveal responses for a question (local-only, no broadcast).
+   * @param {string} questionId
+   */
+  const revealResponses = useCallback((questionId) => {
+    setInputRevealed(prev => ({ ...prev, [questionId]: true }));
+  }, []);
+
+  /**
+   * Reset all input state and clear responses.
+   */
+  const resetInput = useCallback(() => {
+    if (!channelRef.current) return;
+
+    allResponsesRef.current = {};
+    setAllResponses({});
+    setInputRevealed({});
+    setCurrentInputQuestionId(null);
+    setInteractionMode('buzzer');
+    setIsOpen(false);
+
+    sendBuzzerEvent(channelRef.current, 'input_reset', {});
   }, []);
 
   /**
@@ -244,6 +333,11 @@ export default function useBuzzerHost({ hostUserId, sessionType, sessionRef, ena
     setParticipants([]);
     setBuzzes([]);
     setIsOpen(false);
+    allResponsesRef.current = {};
+    setAllResponses({});
+    setInputRevealed({});
+    setCurrentInputQuestionId(null);
+    setInteractionMode('buzzer');
   }, [roomId]);
 
   return {
@@ -255,10 +349,18 @@ export default function useBuzzerHost({ hostUserId, sessionType, sessionRef, ena
     isOpen,
     isCreating,
     enabled,
+    interactionMode,
+    allResponses,
+    currentInputQuestionId,
+    inputRevealed,
     openBuzzer,
     lockBuzzer,
     announceBuzzResult,
     resetBuzzer,
     closeRoom,
+    openInput,
+    lockInput,
+    revealResponses,
+    resetInput,
   };
 }

@@ -1107,6 +1107,21 @@ export default function HostQuiz() {
             onLockBuzzer={buzzer.lockBuzzer}
             onAnnounceBuzzResult={buzzer.announceBuzzResult}
             onResetBuzzer={buzzer.resetBuzzer}
+            interactionMode={buzzer.interactionMode}
+            allResponses={buzzer.allResponses}
+            currentInputQuestionId={buzzer.currentInputQuestionId}
+            inputRevealed={buzzer.inputRevealed}
+            onOpenInput={(allowedUserIds) => {
+              if (!state.selectedQuestion) return;
+              buzzer.openInput(
+                state.selectedQuestion.id,
+                state.selectedQuestion.question || state.selectedQuestion.question_text,
+                allowedUserIds
+              );
+            }}
+            onLockInput={buzzer.lockInput}
+            onRevealResponses={buzzer.revealResponses}
+            onResetInput={buzzer.resetInput}
           />
         )}
 
@@ -1175,6 +1190,21 @@ export default function HostQuiz() {
           onLockBuzzer={buzzer.lockBuzzer}
           onAnnounceBuzzResult={buzzer.announceBuzzResult}
           onResetBuzzer={buzzer.resetBuzzer}
+          interactionMode={buzzer.interactionMode}
+          allResponses={buzzer.allResponses}
+          currentInputQuestionId={buzzer.currentInputQuestionId}
+          inputRevealed={buzzer.inputRevealed}
+          onOpenInput={(allowedUserIds) => {
+            if (!state.selectedQuestion) return;
+            buzzer.openInput(
+              state.selectedQuestion.id,
+              state.selectedQuestion.question || state.selectedQuestion.question_text,
+              allowedUserIds
+            );
+          }}
+          onLockInput={buzzer.lockInput}
+          onRevealResponses={buzzer.revealResponses}
+          onResetInput={buzzer.resetInput}
         />
       )}
 

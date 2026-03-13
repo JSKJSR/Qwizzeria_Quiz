@@ -200,10 +200,14 @@ export async function getBuzzerParticipants(roomId) {
  *   'buzz_result'    { winnerId, winnerName, buzzes: [{userId, displayName, offset}] }
  *   'buzz_lock'      {}
  *   'buzz_reset'     {}
+ *   'input_open'     { questionId, questionText, allowedUserIds, hostTimestamp }
+ *   'input_lock'     {}
+ *   'input_reset'    {}
  *   'room_closed'    {}
  *
  * Participant → Host:
  *   'buzz'           { userId, displayName, buzzOffset }
+ *   'response'       { userId, displayName, text, questionId }
  *
  * System:
  *   'participant_joined'  { userId, displayName }
@@ -219,6 +223,10 @@ export async function getBuzzerParticipants(roomId) {
  * @param {function} [handlers.onBuzzResult] - ({ winnerId, winnerName, buzzes }) => void
  * @param {function} [handlers.onBuzzLock] - () => void
  * @param {function} [handlers.onBuzzReset] - () => void
+ * @param {function} [handlers.onInputOpen] - ({ questionId, questionText, allowedUserIds, hostTimestamp }) => void
+ * @param {function} [handlers.onResponse] - ({ userId, displayName, text, questionId }) => void
+ * @param {function} [handlers.onInputLock] - () => void
+ * @param {function} [handlers.onInputReset] - () => void
  * @param {function} [handlers.onRoomClosed] - () => void
  * @param {function} [handlers.onParticipantJoined] - ({ userId, displayName }) => void
  * @param {function} [handlers.onParticipantLeft] - ({ userId }) => void
@@ -260,6 +268,30 @@ export function subscribeBuzzerChannel(roomCode, handlers = {}) {
   if (handlers.onBuzzReset) {
     channel.on('broadcast', { event: 'buzz_reset' }, () => {
       handlers.onBuzzReset();
+    });
+  }
+
+  if (handlers.onInputOpen) {
+    channel.on('broadcast', { event: 'input_open' }, (payload) => {
+      handlers.onInputOpen(payload.payload);
+    });
+  }
+
+  if (handlers.onResponse) {
+    channel.on('broadcast', { event: 'response' }, (payload) => {
+      handlers.onResponse(payload.payload);
+    });
+  }
+
+  if (handlers.onInputLock) {
+    channel.on('broadcast', { event: 'input_lock' }, () => {
+      handlers.onInputLock();
+    });
+  }
+
+  if (handlers.onInputReset) {
+    channel.on('broadcast', { event: 'input_reset' }, () => {
+      handlers.onInputReset();
     });
   }
 

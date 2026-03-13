@@ -69,6 +69,7 @@ async function withRetry(fn, maxAttempts = 3, baseDelayMs = 800) {
  *
  * State machine (driven by host broadcast events):
  *   loading → waiting → ready ⇄ buzzed → result → waiting (reset) → ... → closed
+ *   loading → waiting → input_ready → ... → waiting (input_reset) → ... → closed
  *
  * Lifecycle contract:
  *  ① DB join   — runs once on mount; manual retry only re-runs if it failed.
@@ -95,12 +96,23 @@ export default function BuzzerPage() {
   const [retryCount, setRetryCount] = useState(0);
   const [connectionStatus, setConnectionStatus] = useState('connecting'); // connecting | connected | disconnected
 
+  // Input mode state
+  const [myResponses, setMyResponses] = useState({}); // {questionId: text}
+  const [currentQuestionId, setCurrentQuestionId] = useState(null);
+  const [currentQuestionText, setCurrentQuestionText] = useState('');
+  const [inputText, setInputText] = useState('');
+  const [inputLocked, setInputLocked] = useState(false);
+  const [viewingQuestionId, setViewingQuestionId] = useState(null);
+  const [questionHistory, setQuestionHistory] = useState([]); // [{id, text}]
+  const [savedFlash, setSavedFlash] = useState(false);
+
   // Stable refs — never cause re-renders, survive all phase changes
   const roomRef = useRef(null);             // set once on successful join
   const channelRef = useRef(null);          // set once after joined=true
   const hasBuzzedRef = useRef(false);       // reset per round by onBuzzReset / onQuestionOpen
   const isAllowedRef = useRef(false);       // set by onQuestionOpen, cleared by onBuzzReset
   const questionOpenedAtRef = useRef(null); // timestamp for buzz-offset calc
+  const myResponsesRef = useRef({});        // mutable ref for responses in callbacks
 
   const displayName =
     user?.user_metadata?.display_name ||
@@ -196,6 +208,45 @@ export default function BuzzerPage() {
         setPhase('waiting');
       },
 
+      // ── Input mode handlers ──
+
+      onInputOpen: ({ questionId, questionText, allowedUserIds }) => {
+        setCurrentQuestionId(questionId);
+        setCurrentQuestionText(questionText || '');
+        setViewingQuestionId(questionId);
+        setInputLocked(false);
+
+        // Add to question history if new
+        setQuestionHistory(prev => {
+          if (prev.some(q => q.id === questionId)) return prev;
+          return [...prev, { id: questionId, text: questionText || '' }];
+        });
+
+        // Pre-fill if already answered this question
+        setInputText(myResponsesRef.current[questionId] || '');
+
+        const allowed = !allowedUserIds || allowedUserIds.includes(user.id);
+        isAllowedRef.current = allowed;
+        setPhase(allowed ? 'input_ready' : 'spectating');
+      },
+
+      onInputLock: () => {
+        setInputLocked(true);
+      },
+
+      onInputReset: () => {
+        myResponsesRef.current = {};
+        setMyResponses({});
+        setCurrentQuestionId(null);
+        setCurrentQuestionText('');
+        setInputText('');
+        setInputLocked(false);
+        setViewingQuestionId(null);
+        setQuestionHistory([]);
+        isAllowedRef.current = false;
+        setPhase('waiting');
+      },
+
       // Host closed the room entirely
       onRoomClosed: () => {
         setConnectionStatus('disconnected');
@@ -248,9 +299,6 @@ export default function BuzzerPage() {
 
   // ── ④ ROOM HEALTH CHECK ────────────────────────────────────────────────────
   // Polls room status to catch missed room_closed broadcasts.
-  // Broadcast is fire-and-forget — if the participant misses the event,
-  // this ensures they still transition to the closed/disconnected state.
-  // First check runs immediately, then every 10s.
   useEffect(() => {
     if (!joined || !roomRef.current) return;
     let cancelled = false;
@@ -258,19 +306,15 @@ export default function BuzzerPage() {
 
     async function checkRoom() {
       try {
-        // getBuzzerRoom filters by status IN ('waiting','active') —
-        // if the room is closed, it throws "Room not found or closed"
         await getBuzzerRoom(roomRef.current.room_code);
       } catch {
         if (cancelled) return;
-        // Room no longer active — treat as closed
         setConnectionStatus('disconnected');
         setPhase((prev) => (prev !== 'error' ? 'closed' : prev));
         if (intervalId) clearInterval(intervalId);
       }
     }
 
-    // Immediate first check, then every 10s
     checkRoom();
     intervalId = setInterval(checkRoom, 10000);
 
@@ -282,10 +326,9 @@ export default function BuzzerPage() {
 
   // ── BUZZ HANDLER ─────────────────────────────────────────────────────────────
   const handleBuzz = useCallback(() => {
-    // All guards use refs (not stale-closure state) for correctness
-    if (hasBuzzedRef.current) return;      // already buzzed this round
-    if (!isAllowedRef.current) return;     // not eligible this round
-    if (!channelRef.current) return;       // channel not ready
+    if (hasBuzzedRef.current) return;
+    if (!isAllowedRef.current) return;
+    if (!channelRef.current) return;
 
     hasBuzzedRef.current = true;
 
@@ -303,6 +346,31 @@ export default function BuzzerPage() {
 
     setPhase('buzzed');
   }, [user, displayName]);
+
+  // ── INPUT HANDLERS ───────────────────────────────────────────────────────────
+  const handleSubmitResponse = useCallback(() => {
+    const trimmed = inputText.trim();
+    if (!trimmed || !channelRef.current || !viewingQuestionId) return;
+
+    sendBuzzerEvent(channelRef.current, 'response', {
+      userId: user.id,
+      displayName,
+      text: trimmed,
+      questionId: viewingQuestionId,
+    });
+
+    myResponsesRef.current = { ...myResponsesRef.current, [viewingQuestionId]: trimmed };
+    setMyResponses(prev => ({ ...prev, [viewingQuestionId]: trimmed }));
+
+    // Show saved flash
+    setSavedFlash(true);
+    setTimeout(() => setSavedFlash(false), 1500);
+  }, [inputText, viewingQuestionId, user, displayName]);
+
+  const handleViewQuestion = useCallback((questionId) => {
+    setViewingQuestionId(questionId);
+    setInputText(myResponsesRef.current[questionId] || '');
+  }, []);
 
   // ── RENDER ───────────────────────────────────────────────────────────────────
 
@@ -373,6 +441,8 @@ export default function BuzzerPage() {
   }
 
   const isWinner = buzzResult?.winnerId === user?.id;
+  const hasExistingAnswer = viewingQuestionId && myResponses[viewingQuestionId];
+  const isViewingCurrent = viewingQuestionId === currentQuestionId;
 
   return (
     <div className="buzzer-page">
@@ -476,6 +546,73 @@ export default function BuzzerPage() {
                 ))}
               </div>
             )}
+          </div>
+        )}
+
+        {/* INPUT_READY — host opened input, type answer */}
+        {phase === 'input_ready' && (
+          <div className="buzzer-page__center">
+            {/* Question header */}
+            {currentQuestionText && isViewingCurrent && (
+              <div className="buzzer-page__question-header">
+                {currentQuestionText}
+              </div>
+            )}
+            {!isViewingCurrent && viewingQuestionId && (
+              <div className="buzzer-page__question-header buzzer-page__question-header--past">
+                {questionHistory.find(q => q.id === viewingQuestionId)?.text || 'Previous question'}
+              </div>
+            )}
+
+            {/* Question tabs */}
+            {questionHistory.length > 1 && (
+              <div className="buzzer-page__question-tabs">
+                {questionHistory.map((q, i) => (
+                  <button
+                    key={q.id}
+                    className={`buzzer-page__question-tab ${viewingQuestionId === q.id ? 'buzzer-page__question-tab--active' : ''} ${myResponses[q.id] ? 'buzzer-page__question-tab--answered' : ''}`}
+                    onClick={() => handleViewQuestion(q.id)}
+                  >
+                    Q{i + 1}
+                    {myResponses[q.id] && ' \u2713'}
+                  </button>
+                ))}
+              </div>
+            )}
+
+            {/* Textarea */}
+            <textarea
+              className="buzzer-page__input-field"
+              value={inputText}
+              onChange={(e) => setInputText(e.target.value)}
+              placeholder={inputLocked ? 'Answers locked' : 'Type your answer...'}
+              maxLength={500}
+              rows={4}
+              disabled={inputLocked}
+              autoFocus
+            />
+
+            {/* Character count */}
+            <div className="buzzer-page__input-meta">
+              <span>{inputText.length}/500</span>
+            </div>
+
+            {/* Submit / Update button */}
+            <button
+              className={`buzzer-page__btn ${hasExistingAnswer ? 'buzzer-btn--update' : 'buzzer-btn--submit'}`}
+              onClick={handleSubmitResponse}
+              disabled={inputLocked || !inputText.trim()}
+            >
+              {hasExistingAnswer ? 'UPDATE' : 'SUBMIT'}
+            </button>
+
+            {/* Status */}
+            <p className="buzzer-page__status-text">
+              {savedFlash && <span className="buzzer-page__saved-flash">Answer saved!</span>}
+              {!savedFlash && inputLocked && 'Answers locked — waiting for host...'}
+              {!savedFlash && !inputLocked && !hasExistingAnswer && 'Type your answer'}
+              {!savedFlash && !inputLocked && hasExistingAnswer && 'You can update your answer'}
+            </p>
           </div>
         )}
       </div>

@@ -403,6 +403,51 @@ function BuzzerTournamentVisual() {
   );
 }
 
+function InputModeToggleVisual() {
+  return (
+    <svg viewBox="0 0 200 120" aria-hidden="true" className="guide__svg">
+      <rect x="30" y="40" width="140" height="40" rx="8" fill="#1a1015" stroke="#2a1520" strokeWidth="1.5" />
+      <rect x="100" y="42" width="68" height="36" rx="6" fill="#3498db" />
+      <text x="65" y="65" textAnchor="middle" fill="#b0a0a5" fontSize="10" fontWeight="bold">Buzzer</text>
+      <text x="134" y="65" textAnchor="middle" fill="#fff" fontSize="10" fontWeight="bold">Input</text>
+    </svg>
+  );
+}
+
+function InputAnswerVisual() {
+  return (
+    <svg viewBox="0 0 200 120" aria-hidden="true" className="guide__svg">
+      <rect x="20" y="10" width="160" height="35" rx="6" fill="#1a1015" stroke="#2a1520" strokeWidth="1.5" />
+      <text x="100" y="32" textAnchor="middle" fill="#f0f0f0" fontSize="8">Type your answer...</text>
+      <rect x="20" y="55" width="70" height="26" rx="5" fill="#3498db" />
+      <text x="55" y="72" textAnchor="middle" fill="#fff" fontSize="9" fontWeight="bold">SUBMIT</text>
+      <rect x="100" y="55" width="80" height="26" rx="5" fill="rgba(255,255,255,0.06)" stroke="#2a1520" strokeWidth="1" />
+      <text x="112" y="72" fill="#2ecc71" fontSize="8">Q1 &#x2713;</text>
+      <text x="140" y="72" fill="#3498db" fontSize="8" fontWeight="bold">Q2</text>
+      <text x="165" y="72" fill="#b0a0a5" fontSize="8">Q3</text>
+      <text x="100" y="105" textAnchor="middle" fill="#b0a0a5" fontSize="7">Edit any previous answer</text>
+    </svg>
+  );
+}
+
+function InputRevealVisual() {
+  return (
+    <svg viewBox="0 0 200 120" aria-hidden="true" className="guide__svg">
+      {/* Hidden answers */}
+      <rect x="15" y="10" width="170" height="24" rx="4" fill="rgba(255,255,255,0.03)" />
+      <text x="30" y="26" fill="#b0a0a5" fontSize="7">Alice:</text>
+      <rect x="60" y="18" width="80" height="8" rx="2" fill="#2a1520" />
+      <rect x="15" y="38" width="170" height="24" rx="4" fill="rgba(255,255,255,0.03)" />
+      <text x="30" y="54" fill="#b0a0a5" fontSize="7">Lily:</text>
+      <rect x="60" y="46" width="65" height="8" rx="2" fill="#2a1520" />
+      {/* Reveal button */}
+      <rect x="60" y="72" width="80" height="26" rx="5" fill="#9b59b6" />
+      <text x="100" y="89" textAnchor="middle" fill="#fff" fontSize="9" fontWeight="bold">Reveal All</text>
+      <text x="100" y="112" textAnchor="middle" fill="#b0a0a5" fontSize="7">Answers hidden until reveal</text>
+    </svg>
+  );
+}
+
 function FormatSelectVisual() {
   return (
     <svg viewBox="0 0 200 120" aria-hidden="true" className="guide__svg">
@@ -506,13 +551,13 @@ export default function Guide() {
         <GuideStep
           number={2}
           title="Players Join"
-          description="Share the room code or join link with participants. Players must be logged in — go to /buzz/ROOMCODE to join. Names are pulled from your account automatically."
+          description="Share the room code or join link with participants. Players must be logged in — go to /buzz/ROOMCODE to join. A green dot next to the room code confirms the connection is live."
           visual={<ParticipantsVisual />}
         />
         <GuideStep
           number={3}
           title="Host Opens the Buzzer"
-          description="For each question, the host clicks 'Open Buzzer'. Players see a green BUZZ button appear on their device. The host can lock the buzzer at any time."
+          description="For each question, click 'Open Buzzer'. Players see a green BUZZ button on their device. After awarding a point, click 'Next Round' to reset and open the buzzer in one step — no separate reset needed."
           visual={<BuzzerHostFlowVisual />}
         />
         <GuideStep
@@ -523,8 +568,8 @@ export default function Guide() {
         />
         <GuideStep
           number={5}
-          title="Ranked Results"
-          description="The host sees all buzzes ranked by speed. If two players buzz within 50ms of each other, it's flagged as a tie and the host decides the winner."
+          title="Ranked Results & Award"
+          description="The host sees all buzzes ranked by speed. If two players buzz within 50ms of each other, it's flagged as a tie and the host decides. Click 'Award' to give the point, then 'Next Round' to continue."
           visual={<BuzzerRankVisual />}
         />
         <GuideStep
@@ -535,6 +580,43 @@ export default function Guide() {
         />
         <GuideTip>
           The buzzer uses real-time broadcasting for near-instant response. Each player's buzz time is measured from when they received the question — no unfair advantage from network speed!
+        </GuideTip>
+        <GuideTip>
+          Host flow per round: Open Buzzer &rarr; Lock &rarr; Award &rarr; Next Round. That's it — no manual reset needed between rounds!
+        </GuideTip>
+        <GuideTip>
+          Players see a connection dot in the header: green = connected, amber = connecting, red = disconnected. If the room is closed, participants are notified automatically.
+        </GuideTip>
+
+        <div className="guide__subsection-divider" />
+        <h3 className="guide__subsection-title">Input Mode</h3>
+        <p className="guide__subsection-desc">
+          Instead of buzzing in, participants can type and submit text answers. Great for open-ended questions!
+        </p>
+
+        <GuideStep
+          number={1}
+          title="Toggle to Input Mode"
+          description="In the buzzer overlay, use the Buzzer / Input toggle to switch modes. You can switch between modes per question."
+          visual={<InputModeToggleVisual />}
+        />
+        <GuideStep
+          number={2}
+          title="Participants Type Answers"
+          description="When you open input, participants see a text field and submit their answers. They can go back and edit any previous answer until you lock."
+          visual={<InputAnswerVisual />}
+        />
+        <GuideStep
+          number={3}
+          title="Reveal Answers"
+          description="Answers are hidden by default. Click 'Reveal All' to see everyone's responses at once — game-show style!"
+          visual={<InputRevealVisual />}
+        />
+        <GuideTip>
+          Participants can browse and edit answers to any previous question using the Q1, Q2, Q3 tabs. Editing is disabled only when you lock or end the quiz.
+        </GuideTip>
+        <GuideTip>
+          Use &ldquo;Reset All&rdquo; to clear all accumulated responses and start fresh. This works across all questions.
         </GuideTip>
       </GuideSection>
 
