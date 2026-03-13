@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState } from 'react';
 import '../../styles/BuzzerOverlay.css';
 
 /**
@@ -36,19 +36,19 @@ export default function BuzzerOverlay({
   const [expanded, setExpanded] = useState(false);
   const [awarded, setAwarded] = useState(false);
 
-  const handleOpenBuzzer = useCallback(() => {
+  const handleOpenBuzzer = () => {
     setAwarded(false);
     onOpenBuzzer(allowedUserIds || null);
-  }, [onOpenBuzzer, allowedUserIds]);
+  };
 
-  const handleSelectWinner = useCallback((buzz) => {
+  const handleSelectWinner = (buzz) => {
     setAwarded(true);
     onAnnounceBuzzResult(buzz.userId, buzz.displayName);
-  }, [onAnnounceBuzzResult]);
+  };
 
-  const handleOpenInput = useCallback(() => {
+  const handleOpenInput = () => {
     if (onOpenInput) onOpenInput(allowedUserIds || null);
-  }, [onOpenInput, allowedUserIds]);
+  };
 
   if (isCreating || !roomCode) return null;
 
