@@ -37,6 +37,8 @@ export default function useBuzzerHost({ hostUserId, sessionType, sessionRef, ena
   const [allResponses, setAllResponses] = useState({}); // {questionId: [{userId, displayName, text, receivedAt}]}
   const [currentInputQuestionId, setCurrentInputQuestionId] = useState(null);
   const [inputRevealed, setInputRevealed] = useState({}); // {questionId: boolean}
+  const [questionLabels, setQuestionLabels] = useState({}); // {questionId: text}
+  const [inputQuestionOrder, setInputQuestionOrder] = useState([]); // [questionId, ...]
   const allowedUserIdsRef = useRef(null);
   const allResponsesRef = useRef({});
 
@@ -276,6 +278,12 @@ export default function useBuzzerHost({ hostUserId, sessionType, sessionRef, ena
     setCurrentInputQuestionId(questionId);
     setIsOpen(true);
 
+    // Track question label and order for host browsing/export
+    setQuestionLabels(prev => ({ ...prev, [questionId]: questionText || '' }));
+    setInputQuestionOrder(prev =>
+      prev.includes(questionId) ? prev : [...prev, questionId]
+    );
+
     sendBuzzerEvent(channelRef.current, 'input_open', {
       questionId,
       questionText,
@@ -311,6 +319,8 @@ export default function useBuzzerHost({ hostUserId, sessionType, sessionRef, ena
     allResponsesRef.current = {};
     setAllResponses({});
     setInputRevealed({});
+    setQuestionLabels({});
+    setInputQuestionOrder([]);
     setCurrentInputQuestionId(null);
     setInteractionMode('buzzer');
     setIsOpen(false);
@@ -336,6 +346,8 @@ export default function useBuzzerHost({ hostUserId, sessionType, sessionRef, ena
     allResponsesRef.current = {};
     setAllResponses({});
     setInputRevealed({});
+    setQuestionLabels({});
+    setInputQuestionOrder([]);
     setCurrentInputQuestionId(null);
     setInteractionMode('buzzer');
   }, [roomId]);
@@ -353,6 +365,8 @@ export default function useBuzzerHost({ hostUserId, sessionType, sessionRef, ena
     allResponses,
     currentInputQuestionId,
     inputRevealed,
+    questionLabels,
+    inputQuestionOrder,
     openBuzzer,
     lockBuzzer,
     announceBuzzResult,

@@ -415,6 +415,82 @@
   opacity: 0.9;
 }
 
+/* Question tabs (host browsing) */
+.buzzer-fab__question-tabs {
+  display: flex;
+  gap: 0.25rem;
+  overflow-x: auto;
+  padding-bottom: 0.15rem;
+}
+
+.buzzer-fab__question-tab {
+  display: flex;
+  align-items: center;
+  gap: 0.2rem;
+  padding: 0.2rem 0.5rem;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--border-color, #2a1520);
+  border-radius: 12px;
+  color: var(--text-secondary, #b0a0a5);
+  font-size: 0.7rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: all 0.15s ease;
+}
+
+.buzzer-fab__question-tab--active {
+  background: rgba(52, 152, 219, 0.2);
+  border-color: #3498db;
+  color: #3498db;
+}
+
+.buzzer-fab__question-tab-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 14px;
+  height: 14px;
+  padding: 0 3px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 7px;
+  font-size: 0.6rem;
+  line-height: 1;
+}
+
+.buzzer-fab__question-tab--active .buzzer-fab__question-tab-count {
+  background: rgba(52, 152, 219, 0.3);
+}
+
+/* Actions row (export + reset) */
+.buzzer-fab__actions-row {
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+/* Export button */
+.buzzer-fab__export-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.35rem 0.6rem;
+  background: rgba(46, 204, 113, 0.12);
+  color: #2ecc71;
+  border: 1px solid rgba(46, 204, 113, 0.3);
+  border-radius: var(--radius-sm, 8px);
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.buzzer-fab__export-btn:hover {
+  background: rgba(46, 204, 113, 0.22);
+}
+
 /* ---- Responsive ---- */
 @media (max-width: 480px) {
   .buzzer-fab-container {

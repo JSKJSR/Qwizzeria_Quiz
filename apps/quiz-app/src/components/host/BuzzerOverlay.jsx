@@ -2,13 +2,50 @@ import { useState } from 'react';
 import '../../styles/BuzzerOverlay.css';
 
 /**
+ * Generate a CSV string from all responses and trigger a browser download.
+ */
+function exportResponsesCSV(allResponses, questionLabels, inputQuestionOrder) {
+  const escapeCSV = (val) => {
+    const str = String(val ?? '');
+    if (str.includes(',') || str.includes('"') || str.includes('\n')) {
+      return `"${str.replace(/"/g, '""')}"`;
+    }
+    return str;
+  };
+
+  const rows = [['Question #', 'Question', 'Participant', 'Answer'].map(escapeCSV).join(',')];
+
+  inputQuestionOrder.forEach((qId, idx) => {
+    const label = questionLabels[qId] || '';
+    const responses = allResponses[qId] || [];
+    responses.forEach((r) => {
+      rows.push([
+        idx + 1,
+        escapeCSV(label),
+        escapeCSV(r.displayName),
+        escapeCSV(r.text),
+      ].join(','));
+    });
+  });
+
+  const blob = new Blob([rows.join('\n')], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `responses_${new Date().toISOString().slice(0, 16).replace(':', '-')}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+/**
  * BuzzerOverlay — floating buzzer/input controls (bottom-right).
  *
  * Shows a compact FAB that expands to reveal:
  * - Mode toggle (Buzzer / Input)
  * - Open/Lock buzzer or input button
  * - Ranked buzz results (buzzer mode)
- * - Response list with reveal (input mode)
+ * - Response list with reveal + question tabs (input mode)
+ * - CSV export for all responses
  * - Connected participants list
  */
 export default function BuzzerOverlay({
@@ -28,6 +65,8 @@ export default function BuzzerOverlay({
   allResponses = {},
   currentInputQuestionId,
   inputRevealed = {},
+  questionLabels = {},
+  inputQuestionOrder = [],
   onOpenInput,
   onLockInput,
   onRevealResponses,
@@ -35,6 +74,17 @@ export default function BuzzerOverlay({
 }) {
   const [expanded, setExpanded] = useState(false);
   const [awarded, setAwarded] = useState(false);
+  const [manualQId, setManualQId] = useState(null);
+  const [prevQuestionId, setPrevQuestionId] = useState(currentInputQuestionId);
+
+  // Auto-follow: reset manual override when host opens a new question
+  if (prevQuestionId !== currentInputQuestionId) {
+    setPrevQuestionId(currentInputQuestionId);
+    if (manualQId !== null) setManualQId(null);
+  }
+
+  // Manual pick takes precedence; otherwise follow current
+  const viewingQId = manualQId || currentInputQuestionId;
 
   const handleOpenBuzzer = () => {
     setAwarded(false);
@@ -50,13 +100,19 @@ export default function BuzzerOverlay({
     if (onOpenInput) onOpenInput(allowedUserIds || null);
   };
 
+  const handleExportCSV = () => {
+    exportResponsesCSV(allResponses, questionLabels, inputQuestionOrder);
+  };
+
   if (isCreating || !roomCode) return null;
 
   const isInputMode = interactionMode === 'input';
   const hasBuzzes = buzzes.length > 0;
-  const currentResponses = currentInputQuestionId ? (allResponses[currentInputQuestionId] || []) : [];
+  const effectiveQId = viewingQId || currentInputQuestionId;
+  const viewedResponses = effectiveQId ? (allResponses[effectiveQId] || []) : [];
   const totalResponseCount = Object.values(allResponses).reduce((sum, arr) => sum + arr.length, 0);
-  const isCurrentRevealed = currentInputQuestionId ? inputRevealed[currentInputQuestionId] : false;
+  const isViewedRevealed = effectiveQId ? inputRevealed[effectiveQId] : false;
+  const hasMultipleQuestions = inputQuestionOrder.length > 1;
 
   // FAB label
   let statusLabel;
@@ -201,7 +257,7 @@ export default function BuzzerOverlay({
                   <div className="buzzer-fab__live-row">
                     <span className="buzzer-fab__input-badge">INPUT OPEN</span>
                     <span className="buzzer-fab__live-count">
-                      {currentResponses.length} of {participants.length} responded
+                      {viewedResponses.length} of {participants.length} responded
                     </span>
                     <button className="buzzer-fab__lock-btn" onClick={onLockInput}>
                       Lock
@@ -216,27 +272,49 @@ export default function BuzzerOverlay({
                 )}
               </div>
 
-              {/* Response list for current question */}
-              {currentResponses.length > 0 && (
+              {/* Question tabs for browsing across questions */}
+              {hasMultipleQuestions && (
+                <div className="buzzer-fab__section">
+                  <div className="buzzer-fab__question-tabs">
+                    {inputQuestionOrder.map((qId, i) => {
+                      const count = (allResponses[qId] || []).length;
+                      return (
+                        <button
+                          key={qId}
+                          className={`buzzer-fab__question-tab ${effectiveQId === qId ? 'buzzer-fab__question-tab--active' : ''}`}
+                          onClick={() => setManualQId(qId)}
+                          title={questionLabels[qId] || `Question ${i + 1}`}
+                        >
+                          Q{i + 1}
+                          {count > 0 && <span className="buzzer-fab__question-tab-count">{count}</span>}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
+              {/* Response list for viewed question */}
+              {viewedResponses.length > 0 && (
                 <div className="buzzer-fab__section">
                   <div className="buzzer-fab__section-label">
-                    Responses ({currentResponses.length})
+                    Responses — Q{inputQuestionOrder.indexOf(effectiveQId) + 1} ({viewedResponses.length})
                   </div>
 
-                  {!isCurrentRevealed && (
+                  {!isViewedRevealed && (
                     <button
                       className="buzzer-fab__reveal-btn"
-                      onClick={() => onRevealResponses(currentInputQuestionId)}
+                      onClick={() => onRevealResponses(effectiveQId)}
                     >
                       Reveal All
                     </button>
                   )}
 
                   <div className="buzzer-fab__response-list">
-                    {currentResponses.map((r) => (
+                    {viewedResponses.map((r) => (
                       <div key={r.userId} className="buzzer-fab__response-card">
                         <span className="buzzer-fab__response-name">{r.displayName}</span>
-                        {isCurrentRevealed ? (
+                        {isViewedRevealed ? (
                           <span className="buzzer-fab__response-text">{r.text}</span>
                         ) : (
                           <span className="buzzer-fab__response-hidden">Answer hidden</span>
@@ -247,11 +325,19 @@ export default function BuzzerOverlay({
                 </div>
               )}
 
-              {/* Reset All */}
+              {/* Export + Reset */}
               {totalResponseCount > 0 && (
-                <button className="buzzer-fab__reset-btn" onClick={onResetInput}>
-                  Reset All
-                </button>
+                <div className="buzzer-fab__section buzzer-fab__actions-row">
+                  <button className="buzzer-fab__export-btn" onClick={handleExportCSV} title="Download all responses as CSV">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
+                    </svg>
+                    Export CSV
+                  </button>
+                  <button className="buzzer-fab__reset-btn" onClick={onResetInput}>
+                    Reset All
+                  </button>
+                </div>
               )}
             </>
           )}

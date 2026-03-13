@@ -1111,6 +1111,8 @@ export default function HostQuiz() {
             allResponses={buzzer.allResponses}
             currentInputQuestionId={buzzer.currentInputQuestionId}
             inputRevealed={buzzer.inputRevealed}
+            questionLabels={buzzer.questionLabels}
+            inputQuestionOrder={buzzer.inputQuestionOrder}
             onOpenInput={(allowedUserIds) => {
               if (!state.selectedQuestion) return;
               buzzer.openInput(
@@ -1194,6 +1196,8 @@ export default function HostQuiz() {
           allResponses={buzzer.allResponses}
           currentInputQuestionId={buzzer.currentInputQuestionId}
           inputRevealed={buzzer.inputRevealed}
+          questionLabels={buzzer.questionLabels}
+          inputQuestionOrder={buzzer.inputQuestionOrder}
           onOpenInput={(allowedUserIds) => {
             if (!state.selectedQuestion) return;
             buzzer.openInput(
