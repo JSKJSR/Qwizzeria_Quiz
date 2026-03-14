@@ -610,6 +610,8 @@ export default function HostQuiz() {
     const saved = loadBuzzerState();
     return !!(saved?.buzzerEnabled && saved.roomCode && saved.roomId);
   });
+  const timerRef = useRef(null);
+  const [autoShowResponses, setAutoShowResponses] = useState(false);
   const [buzzerCopied, setBuzzerCopied] = useState(false);
   const [buzzerRestore] = useState(() => {
     const saved = loadBuzzerState();
@@ -637,6 +639,14 @@ export default function HostQuiz() {
       setTimeout(() => setBuzzerCopied(false), 2000);
     }).catch(() => {});
   }, [buzzer.roomCode]);
+
+  // Auto-lock input + show responses when timer expires
+  const handleTimerExpire = useCallback(() => {
+    if (buzzer.interactionMode === 'input' && buzzer.isOpen) {
+      buzzer.lockInput();
+      setAutoShowResponses(true);
+    }
+  }, [buzzer]);
 
   // Attempt session restore on mount
   useEffect(() => {
@@ -1093,6 +1103,8 @@ export default function HostQuiz() {
           buzzerPlayerCount={buzzer.participants.length}
           onCopyBuzzerLink={buzzerEnabled ? handleCopyBuzzerLink : null}
           buzzerCopied={buzzerCopied}
+          timerRef={timerRef}
+          onTimerExpire={handleTimerExpire}
         />
 
         {buzzerEnabled && buzzer.roomCode && (
@@ -1121,10 +1133,15 @@ export default function HostQuiz() {
                 state.selectedQuestion.question || state.selectedQuestion.question_text,
                 allowedUserIds
               );
+              timerRef.current?.reset();
+              timerRef.current?.start();
             }}
             onLockInput={buzzer.lockInput}
             onRevealResponses={buzzer.revealResponses}
             onResetInput={buzzer.resetInput}
+            autoShowResponses={autoShowResponses}
+            onAutoShowResponsesHandled={() => setAutoShowResponses(false)}
+            onGoToGrid={handleMatchBackToGrid}
           />
         )}
 
@@ -1179,6 +1196,8 @@ export default function HostQuiz() {
         buzzerPlayerCount={buzzer.participants.length}
         onCopyBuzzerLink={buzzerEnabled ? handleCopyBuzzerLink : null}
         buzzerCopied={buzzerCopied}
+        timerRef={timerRef}
+        onTimerExpire={handleTimerExpire}
       />
 
       {buzzerEnabled && buzzer.roomCode && (
@@ -1207,10 +1226,15 @@ export default function HostQuiz() {
               state.selectedQuestion.question || state.selectedQuestion.question_text,
               allowedUserIds
             );
+            timerRef.current?.reset();
+            timerRef.current?.start();
           }}
           onLockInput={buzzer.lockInput}
           onRevealResponses={buzzer.revealResponses}
           onResetInput={buzzer.resetInput}
+          autoShowResponses={autoShowResponses}
+          onAutoShowResponsesHandled={() => setAutoShowResponses(false)}
+          onGoToGrid={handleBackToGrid}
         />
       )}
 

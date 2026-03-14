@@ -129,6 +129,16 @@
   color: var(--text-primary, #f0f0f0);
 }
 
+.buzzer-fab__participant-chip--submitted {
+  background: rgba(46, 204, 113, 0.15);
+  color: #2ecc71;
+  border: 1px solid rgba(46, 204, 113, 0.3);
+}
+
+.buzzer-fab__participant-chip--pending {
+  opacity: 0.5;
+}
+
 .buzzer-fab__empty {
   font-size: 0.75rem;
   color: var(--text-secondary, #b0a0a5);
@@ -311,51 +321,25 @@
   flex: 1;
 }
 
-/* Lock & View button */
-.buzzer-fab__lock-view-btn {
-  padding: 0.25rem 0.5rem;
-  background: rgba(52, 152, 219, 0.15);
-  color: #3498db;
-  border: 1px solid #3498db;
-  border-radius: var(--radius-sm, 8px);
-  font-size: 0.7rem;
-  font-weight: 600;
-  cursor: pointer;
-}
-
-.buzzer-fab__lock-view-btn:hover {
-  background: rgba(52, 152, 219, 0.25);
-}
-
-/* Response actions row */
-.buzzer-fab__response-actions {
-  display: flex;
-  gap: 0.4rem;
-}
-
-.buzzer-fab__response-actions .buzzer-fab__view-responses-btn {
-  flex: 1;
-}
-
-/* Clear All button */
-.buzzer-fab__clear-all-btn {
-  padding: 0.45rem 0.6rem;
-  background: transparent;
-  color: var(--text-secondary, #b0a0a5);
-  border: 1px solid var(--border-color, #2a1520);
+/* Stop Collection button */
+.buzzer-fab__stop-collection-btn {
+  width: 100%;
+  padding: 0.35rem 0.5rem;
+  background: rgba(231, 76, 60, 0.15);
+  color: #e74c3c;
+  border: 1px solid rgba(231, 76, 60, 0.4);
   border-radius: var(--radius-sm, 8px);
   font-size: 0.75rem;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.15s ease;
-  white-space: nowrap;
+  transition: background 0.15s ease;
 }
 
-.buzzer-fab__clear-all-btn:hover {
-  background: rgba(231, 76, 60, 0.1);
-  color: #e74c3c;
-  border-color: #e74c3c;
+.buzzer-fab__stop-collection-btn:hover {
+  background: rgba(231, 76, 60, 0.25);
 }
+
+/* (Clear All moved to ResponsesModal) */
 
 /* Open input button */
 .buzzer-fab__open-input-btn {

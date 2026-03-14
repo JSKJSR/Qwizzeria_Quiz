@@ -33,6 +33,8 @@ export default function HostScoreboard({
   buzzerPlayerCount,
   onCopyBuzzerLink,
   buzzerCopied,
+  timerRef,
+  onTimerExpire,
 }) {
   const maxScore = Math.max(...participants.map(p => p.score), 0);
   const hasScores = maxScore > 0;
@@ -135,7 +137,7 @@ export default function HostScoreboard({
 
         {/* Center zone: Timer */}
         <div className="scoreboard__center">
-          <TimerControl />
+          <TimerControl ref={timerRef} onExpire={onTimerExpire} />
         </div>
 
         {/* Right zone: Scores + End button */}

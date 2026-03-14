@@ -1,13 +1,17 @@
-import { useState, useRef, useCallback } from 'react';
+import { useState, useRef, useCallback, useEffect, useImperativeHandle, forwardRef } from 'react';
 import '../../styles/TimerControl.css';
 
-export default function TimerControl() {
+const TimerControl = forwardRef(function TimerControl({ onExpire }, ref) {
   const [minutes, setMinutes] = useState(0);
   const [seconds, setSeconds] = useState(30);
   const [timeLeft, setTimeLeft] = useState(null); // null = use input values; number = countdown active/done
   const [isRunning, setIsRunning] = useState(false);
   const intervalRef = useRef(null);
   const audioContextRef = useRef(null);
+  const onExpireRef = useRef(onExpire);
+  useEffect(() => {
+    onExpireRef.current = onExpire;
+  }, [onExpire]);
 
   // Effective display time: countdown value if started, otherwise derived from inputs
   const displayTime = timeLeft !== null ? timeLeft : minutes * 60 + seconds;
@@ -45,6 +49,37 @@ export default function TimerControl() {
     }
   }, []);
 
+  // Expose start/reset to parent via ref
+  useImperativeHandle(ref, () => ({
+    start() {
+      if (isRunning) return; // already running
+      const startTime = timeLeft !== null ? timeLeft : minutes * 60 + seconds;
+      if (startTime <= 0) return;
+      setTimeLeft(startTime);
+      setIsRunning(true);
+      const startedAt = Date.now();
+      const startValue = startTime;
+      stopInterval();
+      intervalRef.current = setInterval(() => {
+        const elapsed = Math.floor((Date.now() - startedAt) / 1000);
+        const remaining = Math.max(0, startValue - elapsed);
+        setTimeLeft(remaining);
+        if (remaining <= 0) {
+          clearInterval(intervalRef.current);
+          intervalRef.current = null;
+          setIsRunning(false);
+          playAlarmSound();
+          onExpireRef.current?.();
+        }
+      }, 200);
+    },
+    reset() {
+      stopInterval();
+      setIsRunning(false);
+      setTimeLeft(null);
+    },
+  }), [isRunning, timeLeft, minutes, seconds, stopInterval, playAlarmSound]);
+
   function handleStartPause() {
     if (isRunning) {
       // Pause
@@ -72,6 +107,7 @@ export default function TimerControl() {
           intervalRef.current = null;
           setIsRunning(false);
           playAlarmSound();
+          onExpireRef.current?.();
         }
       }, 200);
     }
@@ -171,4 +207,6 @@ export default function TimerControl() {
       </div>
     </div>
   );
-}
+});
+
+export default TimerControl;

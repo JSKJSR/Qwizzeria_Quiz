@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import ResponsesModal from './ResponsesModal';
 import { getHostHint } from '../../utils/hostHintText';
 import '../../styles/BuzzerOverlay.css';
@@ -36,16 +36,28 @@ export default function BuzzerOverlay({
   onLockInput,
   onRevealResponses,
   onResetInput,
+  // Auto-timer flow props
+  autoShowResponses = false,
+  onAutoShowResponsesHandled,
+  // Navigation
+  onGoToGrid,
 }) {
   const [expanded, setExpanded] = useState(false);
   const [awarded, setAwarded] = useState(false);
   const [showResponsesModal, setShowResponsesModal] = useState(false);
-  const [confirmClear, setConfirmClear] = useState(false);
   const [showHints, setShowHints] = useState(() => {
     try { return localStorage.getItem('qwizzeria_host_hints') !== 'false'; }
     catch { /* ignore */ return true; }
   });
   const [guideOpen, setGuideOpen] = useState(false);
+
+  // Auto-expand panel when timer expires and collection is locked (show names inline)
+  useEffect(() => {
+    if (autoShowResponses) {
+      setExpanded(true);
+      onAutoShowResponsesHandled?.();
+    }
+  }, [autoShowResponses, onAutoShowResponsesHandled]);
 
   if (isCreating || !roomCode) return null;
 
@@ -80,12 +92,14 @@ export default function BuzzerOverlay({
       {showResponsesModal && (
         <ResponsesModal
           allResponses={allResponses}
+          participants={participants}
           questionLabels={questionLabels}
           inputQuestionOrder={inputQuestionOrder}
           inputRevealed={inputRevealed}
           onRevealResponses={onRevealResponses}
           onResetInput={() => { onResetInput(); setShowResponsesModal(false); }}
           onClose={() => setShowResponsesModal(false)}
+          onGoToGrid={() => { setShowResponsesModal(false); onGoToGrid?.(); }}
         />
       )}
 
@@ -130,7 +144,7 @@ export default function BuzzerOverlay({
             )}
           </div>
 
-          {/* ─── Input Active: Lock + Lock & View ─── */}
+          {/* ─── Input Active: Stop Collection ─── */}
           {isOpen && isInputMode && (
             <div className="buzzer-fab__section">
               <div className="buzzer-fab__live-row">
@@ -139,17 +153,12 @@ export default function BuzzerOverlay({
                   {currentResponses.length} of {participants.length} responded
                 </span>
               </div>
-              <div className="buzzer-fab__dual-actions">
-                <button className="buzzer-fab__lock-btn" onClick={onLockInput}>
-                  Lock
-                </button>
-                <button
-                  className="buzzer-fab__lock-view-btn"
-                  onClick={() => { onLockInput(); setShowResponsesModal(true); }}
-                >
-                  Lock &amp; View
-                </button>
-              </div>
+              <button
+                className="buzzer-fab__stop-collection-btn"
+                onClick={() => { onLockInput(); }}
+              >
+                Stop Collection
+              </button>
             </div>
           )}
 
@@ -243,28 +252,35 @@ export default function BuzzerOverlay({
             </div>
           )}
 
-          {/* ─── Response Actions (when responses exist and not actively collecting) ─── */}
+          {/* ─── Submitted Names + Response Actions (when responses exist and not actively collecting) ─── */}
           {!isOpen && totalResponseCount > 0 && (
-            <div className="buzzer-fab__section buzzer-fab__response-actions">
+            <div className="buzzer-fab__section">
+              {/* Names-only submitted list */}
+              {currentResponses.length > 0 && (
+                <>
+                  <div className="buzzer-fab__section-label">
+                    Submitted ({currentResponses.length} of {participants.length})
+                  </div>
+                  <div className="buzzer-fab__participant-list">
+                    {participants.map(p => {
+                      const hasResponded = currentResponses.some(r => r.userId === p.userId);
+                      return (
+                        <span
+                          key={p.userId}
+                          className={`buzzer-fab__participant-chip ${hasResponded ? 'buzzer-fab__participant-chip--submitted' : 'buzzer-fab__participant-chip--pending'}`}
+                        >
+                          {p.displayName}
+                        </span>
+                      );
+                    })}
+                  </div>
+                </>
+              )}
               <button
                 className="buzzer-fab__view-responses-btn"
                 onClick={() => setShowResponsesModal(true)}
               >
                 View Responses ({totalResponseCount})
-              </button>
-              <button
-                className="buzzer-fab__clear-all-btn"
-                onClick={() => {
-                  if (confirmClear) {
-                    onResetInput();
-                    setConfirmClear(false);
-                  } else {
-                    setConfirmClear(true);
-                    setTimeout(() => setConfirmClear(false), 3000);
-                  }
-                }}
-              >
-                {confirmClear ? 'Confirm Clear?' : 'Clear All'}
               </button>
             </div>
           )}
@@ -299,11 +315,10 @@ export default function BuzzerOverlay({
               <div className="buzzer-fab__guide-flow">Collect Answers Flow</div>
               {[
                 'Select question from grid',
-                'Click "Collect Answers"',
-                'Wait for responses',
-                'Click "Lock & View"',
-                'Click "Reveal All" in modal',
-                'Close modal → next question',
+                'Click "Collect Answers" (timer auto-starts)',
+                'Timer expires → auto-locks & shows who submitted',
+                'Click "View Responses" → reveal answers',
+                '"Go to Grid" or "Back to Question" to continue',
               ].map((step, i) => (
                 <div key={i} className="buzzer-fab__guide-step">
                   <span className="buzzer-fab__guide-step-num">{i + 1}</span>
