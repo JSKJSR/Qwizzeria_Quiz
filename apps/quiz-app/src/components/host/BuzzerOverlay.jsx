@@ -139,17 +139,12 @@ export default function BuzzerOverlay({
                   {currentResponses.length} of {participants.length} responded
                 </span>
               </div>
-              <div className="buzzer-fab__dual-actions">
-                <button className="buzzer-fab__lock-btn" onClick={onLockInput}>
-                  Lock
-                </button>
-                <button
-                  className="buzzer-fab__lock-view-btn"
-                  onClick={() => { onLockInput(); setShowResponsesModal(true); }}
-                >
-                  Lock &amp; View
-                </button>
-              </div>
+              <button
+                className="buzzer-fab__lock-view-btn"
+                onClick={() => { onLockInput(); setShowResponsesModal(true); }}
+              >
+                Lock &amp; View
+              </button>
             </div>
           )}
 
@@ -302,8 +297,7 @@ export default function BuzzerOverlay({
                 'Click "Collect Answers"',
                 'Wait for responses',
                 'Click "Lock & View"',
-                'Click "Reveal All" in modal',
-                'Close modal → next question',
+                'Click "Reveal All" → close modal',
               ].map((step, i) => (
                 <div key={i} className="buzzer-fab__guide-step">
                   <span className="buzzer-fab__guide-step-num">{i + 1}</span>

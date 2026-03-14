@@ -313,6 +313,7 @@
 
 /* Lock & View button */
 .buzzer-fab__lock-view-btn {
+  width: 100%;
   padding: 0.25rem 0.5rem;
   background: rgba(52, 152, 219, 0.15);
   color: #3498db;
