@@ -20,7 +20,7 @@ This document covers data storage, access control, and the shared backend utilit
 - **`host_tournament_matches`**: Isolated individual match states. Uses `claimed_by` for optimistic locking in multi-tab play.
 
 ### Billing
-- **`subscriptions`**: Stripe subscription states mapped to user UUIDs. Supports `player`, `host`, and `pass` tier structures.
+- **`subscriptions`**: Stripe subscription states mapped to user UUIDs. Supports **Basic** and **Pro** tier structures.
 
 ---
 
@@ -38,7 +38,7 @@ Controls granular access. Examples: `read`, `write`, `manage` specific categorie
 1. **`superadmin`**: Full system control. Manages roles via the UI.
 2. **`admin`**: Bypasses Gate 1, platform-wide management.
 3. **`editor`**: Gate 1 access. Gate 2 specifies their content.
-4. **`player` / `host`**: Gate 1 access to premium features depending on subscription plan or purchased passes.
+4. **`premium`**: Database-level role granted via subscription or manual assignment.
 5. **`user`**: Base role.
 
 ### Row-Level Security (RLS)
@@ -47,18 +47,17 @@ Controls granular access. Examples: `read`, `write`, `manage` specific categorie
 
 #### Buzzer RLS Policies (`buzzer_participants`)
 
-Migration `021_buzzer_rls_fix.sql` corrected a missing `UPDATE` policy that caused the error:
-> *"new row violates row-level security policy (USING expression) for table buzzer_participants"*
+Migration `021_buzzer_rls_fix.sql` corrected a missing `UPDATE` policy that caused potential access issues.
 
 | Operation | Policy | Rule |
 |---|---|---|
 | `SELECT` | `buzzer_participants_select` | User is authenticated AND room is `waiting`/`active` or owned by user |
 | `INSERT` | `buzzer_participants_insert` | `user_id = auth.uid()` AND room is `waiting`/`active` |
-| `UPDATE` | `buzzer_participants_update_own` *(added 021)* | `user_id = auth.uid()` AND room is `waiting`/`active` |
+| `UPDATE` | `buzzer_participants_update_own` | `user_id = auth.uid()` AND room is `waiting`/`active` |
 | `DELETE` | `buzzer_participants_delete` | Own row OR host of the room |
 | `ALL` | `buzzer_participants_admin` | `is_admin()` |
 
-> **Note:** `joinBuzzerRoom()` in `buzzer.js` uses INSERT-or-fetch (not upsert) to avoid triggering the UPDATE path unnecessarily. See [`docs/buzzer-bugfixes.md`](./buzzer-bugfixes.md) for the full fix history.
+> **Note:** `joinBuzzerRoom()` in `buzzer.js` uses INSERT-or-fetch (not upsert) to avoid triggering the UPDATE path unnecessarily. See [`docs/reference/buzzer-bugfixes.md`](./reference/buzzer-bugfixes.md) for the full fix history.
 
 ---
 
