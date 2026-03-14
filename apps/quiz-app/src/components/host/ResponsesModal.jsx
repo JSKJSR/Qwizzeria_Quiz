@@ -58,17 +58,38 @@ export default function ResponsesModal({
         <div className="responses-modal__header">
           <h2 className="responses-modal__title">Responses</h2>
           <div className="responses-modal__header-actions">
-            {totalResponseCount > 0 && (
-              <button
-                className="responses-modal__export-btn"
-                onClick={() => exportResponsesCSV(allResponses, questionLabels, inputQuestionOrder)}
-              >
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
-                </svg>
-                Export CSV
-              </button>
-            )}
+            {totalResponseCount > 0 && (() => {
+              const hasUnrevealed = inputQuestionOrder.some(
+                qId => (allResponses[qId] || []).length > 0 && !inputRevealed[qId]
+              );
+              return (
+                <>
+                  {hasUnrevealed && (
+                    <button
+                      className="responses-modal__reveal-all-btn"
+                      onClick={() => {
+                        inputQuestionOrder.forEach(qId => {
+                          if ((allResponses[qId]?.length > 0) && !inputRevealed[qId]) {
+                            onRevealResponses(qId);
+                          }
+                        });
+                      }}
+                    >
+                      Reveal All
+                    </button>
+                  )}
+                  <button
+                    className="responses-modal__export-btn"
+                    onClick={() => exportResponsesCSV(allResponses, questionLabels, inputQuestionOrder)}
+                  >
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
+                    </svg>
+                    Export CSV
+                  </button>
+                </>
+              );
+            })()}
             <button className="responses-modal__close-btn" onClick={onClose} aria-label="Close">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <line x1="18" y1="6" x2="6" y2="18" />

@@ -240,6 +240,14 @@ export default function useBuzzerHost({ hostUserId, sessionType, sessionRef, ena
   }, []);
 
   /**
+   * Switch interaction mode without opening input for a question.
+   * @param {'buzzer'|'input'} mode
+   */
+  const setMode = useCallback((mode) => {
+    setInteractionMode(mode);
+  }, []);
+
+  /**
    * Reset buzzer for next question.
    */
   const resetBuzzer = useCallback(() => {
@@ -322,7 +330,6 @@ export default function useBuzzerHost({ hostUserId, sessionType, sessionRef, ena
     setQuestionLabels({});
     setInputQuestionOrder([]);
     setCurrentInputQuestionId(null);
-    setInteractionMode('buzzer');
     setIsOpen(false);
 
     sendBuzzerEvent(channelRef.current, 'input_reset', {});
@@ -372,6 +379,7 @@ export default function useBuzzerHost({ hostUserId, sessionType, sessionRef, ena
     announceBuzzResult,
     resetBuzzer,
     closeRoom,
+    setMode,
     openInput,
     lockInput,
     revealResponses,

@@ -61,6 +61,26 @@
   gap: 0.5rem;
 }
 
+/* Reveal All button */
+.responses-modal__reveal-all-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.4rem 0.75rem;
+  background: linear-gradient(145deg, #9b59b6, #8e44ad);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-sm, 8px);
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.15s ease;
+}
+
+.responses-modal__reveal-all-btn:hover {
+  opacity: 0.9;
+}
+
 .responses-modal__export-btn {
   display: inline-flex;
   align-items: center;
