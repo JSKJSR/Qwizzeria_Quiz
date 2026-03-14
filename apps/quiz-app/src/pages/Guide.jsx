@@ -596,27 +596,24 @@ export default function Guide() {
 
         <GuideStep
           number={1}
-          title="Toggle to Input Mode"
-          description="In the buzzer overlay, use the Buzzer / Input toggle to switch modes. You can switch between modes per question."
-          visual={<InputModeToggleVisual />}
-        />
-        <GuideStep
-          number={2}
-          title="Participants Type Answers"
-          description="When you open input, participants see a text field and submit their answers. They can go back and edit any previous answer until you lock."
+          title="Collect Answers"
+          description="Click 'Collect Answers' in the buzzer overlay — right next to 'Open Buzzer'. No mode switching needed. Participants see a text field and submit their answers."
           visual={<InputAnswerVisual />}
         />
         <GuideStep
-          number={3}
-          title="Reveal Answers"
-          description="Answers are hidden by default. Click 'Reveal All' to see everyone's responses at once — game-show style!"
+          number={2}
+          title="Lock & View"
+          description="Click 'Lock & View' to stop accepting answers and immediately see all responses. Answers are hidden by default — click 'Reveal All' to show them all at once, game-show style!"
           visual={<InputRevealVisual />}
         />
+        <GuideTip>
+          You can use buzzer and input on the same question — award a buzzer point, then click &ldquo;Collect Answers&rdquo; to gather written responses too.
+        </GuideTip>
         <GuideTip>
           Participants can browse and edit answers to any previous question using the Q1, Q2, Q3 tabs. Editing is disabled only when you lock or end the quiz.
         </GuideTip>
         <GuideTip>
-          Use &ldquo;Reset All&rdquo; to clear all accumulated responses and start fresh. This works across all questions.
+          Use &ldquo;Clear All&rdquo; in the buzzer overlay to reset all accumulated responses and start fresh.
         </GuideTip>
       </GuideSection>
 

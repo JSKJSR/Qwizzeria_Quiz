@@ -6,10 +6,9 @@ import '../../styles/BuzzerOverlay.css';
  * BuzzerOverlay — floating buzzer/input controls (bottom-right).
  *
  * Compact FAB that expands to reveal:
- * - Mode toggle (Buzzer / Input)
- * - Open/Lock controls
- * - Buzz results + award (buzzer mode)
- * - Response count + "View Responses" (input mode — opens modal)
+ * - Dual action buttons: Open Buzzer / Collect Answers (no mode toggle)
+ * - Buzz results + award
+ * - Response count + "View Responses" (opens modal)
  * - Connected participants
  */
 export default function BuzzerOverlay({
@@ -31,6 +30,7 @@ export default function BuzzerOverlay({
   inputRevealed = {},
   questionLabels = {},
   inputQuestionOrder = [],
+  hasSelectedQuestion = false,
   onOpenInput,
   onLockInput,
   onRevealResponses,
@@ -39,20 +39,7 @@ export default function BuzzerOverlay({
   const [expanded, setExpanded] = useState(false);
   const [awarded, setAwarded] = useState(false);
   const [showResponsesModal, setShowResponsesModal] = useState(false);
-
-  const handleOpenBuzzer = () => {
-    setAwarded(false);
-    onOpenBuzzer(allowedUserIds || null);
-  };
-
-  const handleSelectWinner = (buzz) => {
-    setAwarded(true);
-    onAnnounceBuzzResult(buzz.userId, buzz.displayName);
-  };
-
-  const handleOpenInput = () => {
-    if (onOpenInput) onOpenInput(allowedUserIds || null);
-  };
+  const [confirmClear, setConfirmClear] = useState(false);
 
   if (isCreating || !roomCode) return null;
 
@@ -61,25 +48,25 @@ export default function BuzzerOverlay({
   const currentResponses = currentInputQuestionId ? (allResponses[currentInputQuestionId] || []) : [];
   const totalResponseCount = Object.values(allResponses).reduce((sum, arr) => sum + arr.length, 0);
 
-  // FAB label
+  // FAB label — action-oriented
   let statusLabel;
   let statusClass = '';
-  if (isInputMode) {
-    if (isOpen) {
-      statusLabel = 'INPUT (ACTIVE)';
-      statusClass = 'buzzer-fab--input-active';
-    } else if (totalResponseCount > 0) {
-      statusLabel = `INPUT (${totalResponseCount})`;
-      statusClass = 'buzzer-fab--input-active';
-    } else {
-      statusLabel = 'INPUT';
-    }
+  if (isOpen && isInputMode) {
+    statusLabel = 'COLLECTING...';
+    statusClass = 'buzzer-fab--input-active';
+  } else if (isOpen && !isInputMode) {
+    statusLabel = 'BUZZER OPEN';
+    statusClass = 'buzzer-fab--active';
+  } else if (totalResponseCount > 0) {
+    statusLabel = `RESPONSES (${totalResponseCount})`;
+    statusClass = 'buzzer-fab--input-active';
+  } else if (hasBuzzes) {
+    statusLabel = 'RESULTS';
+    statusClass = 'buzzer-fab--results';
   } else {
-    statusLabel = isOpen ? 'ACTIVE' : hasBuzzes ? 'RESULTS' : 'READY';
-    statusClass = isOpen ? 'buzzer-fab--active' : hasBuzzes ? 'buzzer-fab--results' : '';
+    statusLabel = 'READY';
+    statusClass = '';
   }
-
-  const canToggleMode = !isOpen && !hasBuzzes;
 
   return (
     <div className="buzzer-fab-container">
@@ -117,128 +104,143 @@ export default function BuzzerOverlay({
             )}
           </div>
 
-          {/* Mode toggle */}
-          {canToggleMode && (
+          {/* ─── Input Active: Lock + Lock & View ─── */}
+          {isOpen && isInputMode && (
             <div className="buzzer-fab__section">
-              <div className="buzzer-fab__mode-toggle">
-                <button
-                  className={`buzzer-fab__mode-btn ${!isInputMode ? 'buzzer-fab__mode-btn--active' : ''}`}
-                  onClick={() => onResetInput && onResetInput()}
-                  disabled={!isInputMode}
-                >
-                  Buzzer
+              <div className="buzzer-fab__live-row">
+                <span className="buzzer-fab__input-badge">COLLECTING</span>
+                <span className="buzzer-fab__live-count">
+                  {currentResponses.length} of {participants.length} responded
+                </span>
+              </div>
+              <div className="buzzer-fab__dual-actions">
+                <button className="buzzer-fab__lock-btn" onClick={onLockInput}>
+                  Lock
                 </button>
                 <button
-                  className={`buzzer-fab__mode-btn ${isInputMode ? 'buzzer-fab__mode-btn--active' : ''}`}
-                  onClick={() => onOpenInput && onOpenInput(allowedUserIds || null)}
-                  disabled={isInputMode || !onOpenInput}
+                  className="buzzer-fab__lock-view-btn"
+                  onClick={() => { onLockInput(); setShowResponsesModal(true); }}
                 >
-                  Input
+                  Lock &amp; View
                 </button>
               </div>
             </div>
           )}
 
-          {/* ─── Buzzer Mode ─── */}
-          {!isInputMode && (
-            <>
-              <div className="buzzer-fab__section">
-                {!isOpen && buzzes.length === 0 && (
-                  <button className="buzzer-fab__open-btn" onClick={handleOpenBuzzer}>
-                    Open Buzzer
-                  </button>
-                )}
-
-                {!isOpen && awarded && buzzes.length > 0 && (
-                  <button className="buzzer-fab__open-btn" onClick={handleOpenBuzzer}>
-                    Re Open
-                  </button>
-                )}
-
-                {isOpen && (
-                  <div className="buzzer-fab__live-row">
-                    <span className="buzzer-fab__live-badge">BUZZER OPEN</span>
-                    <span className="buzzer-fab__live-count">
-                      {buzzes.length} buzz{buzzes.length !== 1 ? 'es' : ''}
-                    </span>
-                    <button className="buzzer-fab__lock-btn" onClick={onLockBuzzer}>
-                      Lock
-                    </button>
-                  </div>
-                )}
+          {/* ─── Buzzer Active: Live row ─── */}
+          {isOpen && !isInputMode && (
+            <div className="buzzer-fab__section">
+              <div className="buzzer-fab__live-row">
+                <span className="buzzer-fab__live-badge">BUZZER OPEN</span>
+                <span className="buzzer-fab__live-count">
+                  {buzzes.length} buzz{buzzes.length !== 1 ? 'es' : ''}
+                </span>
+                <button className="buzzer-fab__lock-btn" onClick={onLockBuzzer}>
+                  Lock
+                </button>
               </div>
-
-              {buzzResult?.isTied && !isOpen && (
-                <div className="buzzer-fab__tie-notice">
-                  TIE — Host decides who gets the point
-                </div>
-              )}
-
-              {hasBuzzes && (
-                <div className="buzzer-fab__section">
-                  <div className="buzzer-fab__buzz-list">
-                    {buzzes.map((b) => (
-                      <div key={b.userId} className={`buzzer-fab__buzz-row ${b.isTied ? 'buzzer-fab__buzz-row--tied' : ''}`}>
-                        <span className="buzzer-fab__buzz-rank">
-                          #{b.rank || 1}{b.isTied ? ' \u2248' : ''}
-                        </span>
-                        <span className="buzzer-fab__buzz-name">{b.displayName}</span>
-                        <span className="buzzer-fab__buzz-time">{b.buzzOffset}ms</span>
-                        {!isOpen && (
-                          <button
-                            className="buzzer-fab__award-btn"
-                            onClick={() => handleSelectWinner(b)}
-                            title={`Award to ${b.displayName}`}
-                          >
-                            Award
-                          </button>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                  {!isOpen && !awarded && (
-                    <button className="buzzer-fab__reset-btn" onClick={() => { setAwarded(false); onResetBuzzer(); }}>
-                      Reset Buzzer
-                    </button>
-                  )}
-                </div>
-              )}
-            </>
+            </div>
           )}
 
-          {/* ─── Input Mode ─── */}
-          {isInputMode && (
-            <>
-              <div className="buzzer-fab__section">
-                {isOpen && (
-                  <div className="buzzer-fab__live-row">
-                    <span className="buzzer-fab__input-badge">INPUT OPEN</span>
-                    <span className="buzzer-fab__live-count">
-                      {currentResponses.length} of {participants.length} responded
+          {/* ─── Buzzer Results (not open) ─── */}
+          {!isOpen && buzzResult?.isTied && (
+            <div className="buzzer-fab__tie-notice">
+              TIE — Host decides who gets the point
+            </div>
+          )}
+
+          {!isOpen && hasBuzzes && (
+            <div className="buzzer-fab__section">
+              <div className="buzzer-fab__buzz-list">
+                {buzzes.map((b) => (
+                  <div key={b.userId} className={`buzzer-fab__buzz-row ${b.isTied ? 'buzzer-fab__buzz-row--tied' : ''}`}>
+                    <span className="buzzer-fab__buzz-rank">
+                      #{b.rank || 1}{b.isTied ? ' \u2248' : ''}
                     </span>
-                    <button className="buzzer-fab__lock-btn" onClick={onLockInput}>
-                      Lock
+                    <span className="buzzer-fab__buzz-name">{b.displayName}</span>
+                    <span className="buzzer-fab__buzz-time">{b.buzzOffset}ms</span>
+                    <button
+                      className="buzzer-fab__award-btn"
+                      onClick={() => { setAwarded(true); onAnnounceBuzzResult(b.userId, b.displayName); }}
+                      title={`Award to ${b.displayName}`}
+                    >
+                      Award
                     </button>
                   </div>
-                )}
-
-                {!isOpen && currentInputQuestionId && (
-                  <button className="buzzer-fab__open-input-btn" onClick={handleOpenInput}>
-                    Open Input
-                  </button>
-                )}
+                ))}
               </div>
-
-              {/* View Responses button */}
-              {totalResponseCount > 0 && (
-                <button
-                  className="buzzer-fab__view-responses-btn"
-                  onClick={() => setShowResponsesModal(true)}
-                >
-                  View Responses ({totalResponseCount})
+              {!awarded && (
+                <button className="buzzer-fab__reset-btn" onClick={() => { setAwarded(false); onResetBuzzer(); }}>
+                  Reset Buzzer
                 </button>
               )}
-            </>
+              {/* Collect Answers available even after buzz results */}
+              <button
+                className="buzzer-fab__open-input-btn"
+                onClick={() => onOpenInput(allowedUserIds || null)}
+                disabled={!hasSelectedQuestion}
+                title={hasSelectedQuestion ? 'Collect text answers for this question' : 'Select a question from the grid first'}
+              >
+                {hasSelectedQuestion ? 'Collect Answers' : 'Select a question first'}
+              </button>
+            </div>
+          )}
+
+          {/* ─── Idle State: Dual Action Buttons ─── */}
+          {!isOpen && !hasBuzzes && (
+            <div className="buzzer-fab__section">
+              <div className="buzzer-fab__dual-actions">
+                <button
+                  className="buzzer-fab__open-btn"
+                  onClick={() => { setAwarded(false); onOpenBuzzer(allowedUserIds || null); }}
+                >
+                  Open Buzzer
+                </button>
+                <button
+                  className="buzzer-fab__open-input-btn"
+                  onClick={() => onOpenInput(allowedUserIds || null)}
+                  disabled={!hasSelectedQuestion}
+                  title={hasSelectedQuestion ? 'Collect text answers for this question' : 'Select a question from the grid first'}
+                >
+                  {hasSelectedQuestion ? 'Collect Answers' : 'Select question first'}
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* ─── Re-open buzzer after award ─── */}
+          {!isOpen && awarded && hasBuzzes && (
+            <div className="buzzer-fab__section">
+              <button className="buzzer-fab__open-btn" onClick={() => { setAwarded(false); onOpenBuzzer(allowedUserIds || null); }}>
+                Re Open
+              </button>
+            </div>
+          )}
+
+          {/* ─── Response Actions (when responses exist and not actively collecting) ─── */}
+          {!isOpen && totalResponseCount > 0 && (
+            <div className="buzzer-fab__section buzzer-fab__response-actions">
+              <button
+                className="buzzer-fab__view-responses-btn"
+                onClick={() => setShowResponsesModal(true)}
+              >
+                View Responses ({totalResponseCount})
+              </button>
+              <button
+                className="buzzer-fab__clear-all-btn"
+                onClick={() => {
+                  if (confirmClear) {
+                    onResetInput();
+                    setConfirmClear(false);
+                  } else {
+                    setConfirmClear(true);
+                    setTimeout(() => setConfirmClear(false), 3000);
+                  }
+                }}
+              >
+                {confirmClear ? 'Confirm Clear?' : 'Clear All'}
+              </button>
+            </div>
           )}
         </div>
       )}
@@ -250,7 +252,7 @@ export default function BuzzerOverlay({
         title="Buzzer controls"
       >
         <span className="buzzer-fab__icon">
-          {isInputMode ? (
+          {isInputMode && isOpen ? (
             <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
               <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
             </svg>
@@ -264,9 +266,7 @@ export default function BuzzerOverlay({
             </svg>
           )}
         </span>
-        <span className="buzzer-fab__text">
-          {isInputMode ? statusLabel : `BUZZER (${statusLabel})`}
-        </span>
+        <span className="buzzer-fab__text">{statusLabel}</span>
         {(isOpen && !isInputMode) && <span className="buzzer-fab__pulse" />}
         {(isOpen && isInputMode) && <span className="buzzer-fab__pulse buzzer-fab__pulse--input" />}
       </button>

@@ -1103,6 +1103,7 @@ export default function HostQuiz() {
             buzzResult={buzzer.buzzResult}
             isOpen={buzzer.isOpen}
             isCreating={buzzer.isCreating}
+            hasSelectedQuestion={!!state.selectedQuestion}
             onOpenBuzzer={buzzer.openBuzzer}
             onLockBuzzer={buzzer.lockBuzzer}
             onAnnounceBuzzResult={buzzer.announceBuzzResult}
@@ -1188,6 +1189,7 @@ export default function HostQuiz() {
           buzzResult={buzzer.buzzResult}
           isOpen={buzzer.isOpen}
           isCreating={buzzer.isCreating}
+          hasSelectedQuestion={!!state.selectedQuestion}
           onOpenBuzzer={buzzer.openBuzzer}
           onLockBuzzer={buzzer.lockBuzzer}
           onAnnounceBuzzResult={buzzer.announceBuzzResult}
