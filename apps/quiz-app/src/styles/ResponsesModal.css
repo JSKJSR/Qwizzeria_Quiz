@@ -136,6 +136,61 @@
   font-size: 0.9rem;
 }
 
+/* ---- Summary bar ---- */
+.responses-modal__summary-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem 0.75rem;
+  background: rgba(52, 152, 219, 0.08);
+  border: 1px solid rgba(52, 152, 219, 0.2);
+  border-radius: var(--radius-sm, 8px);
+  font-size: 0.8rem;
+  color: var(--text-secondary, #b0a0a5);
+}
+
+.responses-modal__summary-revealed {
+  font-size: 0.75rem;
+  color: #3498db;
+  font-weight: 600;
+}
+
+/* ---- Participant tracker ---- */
+.responses-modal__participant-tracker {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.responses-modal__tracker-label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-secondary, #b0a0a5);
+}
+
+.responses-modal__tracker-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+}
+
+.responses-modal__tracker-chip {
+  padding: 0.2rem 0.5rem;
+  border-radius: 12px;
+  font-size: 0.7rem;
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--text-secondary, #b0a0a5);
+  border: 1px solid transparent;
+}
+
+.responses-modal__tracker-chip--responded {
+  background: rgba(46, 204, 113, 0.15);
+  color: #2ecc71;
+  border-color: rgba(46, 204, 113, 0.3);
+}
+
 /* ---- Question block ---- */
 .responses-modal__question {
   display: flex;
@@ -260,9 +315,15 @@
   flex-shrink: 0;
 }
 
-/* Select Next Question — prominent action */
-.responses-modal__next-question-btn {
+/* Navigation buttons row */
+.responses-modal__nav-buttons {
+  display: flex;
+  gap: 0.5rem;
   width: 100%;
+}
+
+.responses-modal__go-to-grid-btn {
+  flex: 1;
   padding: 0.6rem 1rem;
   background: linear-gradient(145deg, #2ecc71, #27ae60);
   color: #fff;
@@ -274,8 +335,26 @@
   transition: opacity 0.15s ease;
 }
 
-.responses-modal__next-question-btn:hover {
+.responses-modal__go-to-grid-btn:hover {
   opacity: 0.9;
+}
+
+.responses-modal__back-to-question-btn {
+  flex: 1;
+  padding: 0.6rem 1rem;
+  background: transparent;
+  color: var(--text-primary, #f0f0f0);
+  border: 1px solid var(--border-color, #2a1520);
+  border-radius: var(--radius-sm, 8px);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.responses-modal__back-to-question-btn:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: var(--text-secondary, #b0a0a5);
 }
 
 /* Divider between next-question and clear */

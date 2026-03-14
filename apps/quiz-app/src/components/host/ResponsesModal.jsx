@@ -43,15 +43,19 @@ function exportResponsesCSV(allResponses, questionLabels, inputQuestionOrder) {
  */
 export default function ResponsesModal({
   allResponses,
+  participants = [],
   questionLabels,
   inputQuestionOrder,
   inputRevealed,
   onRevealResponses,
   onResetInput,
   onClose,
+  onGoToGrid,
 }) {
   const [confirmClear, setConfirmClear] = useState(false);
   const totalResponseCount = Object.values(allResponses).reduce((sum, arr) => sum + arr.length, 0);
+  const questionsWithResponses = inputQuestionOrder.filter(qId => (allResponses[qId] || []).length > 0).length;
+  const revealedCount = inputQuestionOrder.filter(qId => inputRevealed[qId] && (allResponses[qId] || []).length > 0).length;
 
   return (
     <div className="responses-modal" onClick={onClose}>
@@ -103,6 +107,38 @@ export default function ResponsesModal({
 
         {/* Question list */}
         <div className="responses-modal__body">
+          {/* Summary bar */}
+          {totalResponseCount > 0 && (
+            <div className="responses-modal__summary-bar">
+              <span>{totalResponseCount} response{totalResponseCount !== 1 ? 's' : ''} across {questionsWithResponses} question{questionsWithResponses !== 1 ? 's' : ''}</span>
+              <span className="responses-modal__summary-revealed">{revealedCount} of {questionsWithResponses} revealed</span>
+            </div>
+          )}
+
+          {/* Participant tracker for latest question */}
+          {inputQuestionOrder.length > 0 && participants.length > 0 && (() => {
+            const latestQId = inputQuestionOrder[inputQuestionOrder.length - 1];
+            const latestResponses = allResponses[latestQId] || [];
+            const respondedUserIds = new Set(latestResponses.map(r => r.userId));
+            return (
+              <div className="responses-modal__participant-tracker">
+                <div className="responses-modal__tracker-label">
+                  Latest question — {latestResponses.length} of {participants.length} responded
+                </div>
+                <div className="responses-modal__tracker-chips">
+                  {participants.map(p => (
+                    <span
+                      key={p.userId}
+                      className={`responses-modal__tracker-chip ${respondedUserIds.has(p.userId) ? 'responses-modal__tracker-chip--responded' : ''}`}
+                    >
+                      {p.displayName}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            );
+          })()}
+
           {inputQuestionOrder.length === 0 && (
             <p className="responses-modal__empty">No questions opened yet.</p>
           )}
@@ -164,9 +200,14 @@ export default function ResponsesModal({
 
         {/* Footer */}
         <div className="responses-modal__footer">
-          <button className="responses-modal__next-question-btn" onClick={onClose}>
-            Select Next Question
-          </button>
+          <div className="responses-modal__nav-buttons">
+            <button className="responses-modal__go-to-grid-btn" onClick={onGoToGrid}>
+              Go to Grid
+            </button>
+            <button className="responses-modal__back-to-question-btn" onClick={onClose}>
+              Back to Question
+            </button>
+          </div>
 
           {totalResponseCount > 0 && (
             <>

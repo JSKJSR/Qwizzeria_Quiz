@@ -1140,6 +1140,7 @@ export default function HostQuiz() {
             onResetInput={buzzer.resetInput}
             autoShowResponses={autoShowResponses}
             onAutoShowResponsesHandled={() => setAutoShowResponses(false)}
+            onGoToGrid={handleMatchBackToGrid}
           />
         )}
 
@@ -1231,6 +1232,7 @@ export default function HostQuiz() {
           onResetInput={buzzer.resetInput}
           autoShowResponses={autoShowResponses}
           onAutoShowResponsesHandled={() => setAutoShowResponses(false)}
+          onGoToGrid={handleBackToGrid}
         />
       )}
 

@@ -129,6 +129,16 @@
   color: var(--text-primary, #f0f0f0);
 }
 
+.buzzer-fab__participant-chip--submitted {
+  background: rgba(46, 204, 113, 0.15);
+  color: #2ecc71;
+  border: 1px solid rgba(46, 204, 113, 0.3);
+}
+
+.buzzer-fab__participant-chip--pending {
+  opacity: 0.5;
+}
+
 .buzzer-fab__empty {
   font-size: 0.75rem;
   color: var(--text-secondary, #b0a0a5);

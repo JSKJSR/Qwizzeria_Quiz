@@ -39,6 +39,8 @@ export default function BuzzerOverlay({
   // Auto-timer flow props
   autoShowResponses = false,
   onAutoShowResponsesHandled,
+  // Navigation
+  onGoToGrid,
 }) {
   const [expanded, setExpanded] = useState(false);
   const [awarded, setAwarded] = useState(false);
@@ -49,10 +51,9 @@ export default function BuzzerOverlay({
   });
   const [guideOpen, setGuideOpen] = useState(false);
 
-  // Auto-show responses modal when timer expires and collection is locked
+  // Auto-expand panel when timer expires and collection is locked (show names inline)
   useEffect(() => {
     if (autoShowResponses) {
-      setShowResponsesModal(true);
       setExpanded(true);
       onAutoShowResponsesHandled?.();
     }
@@ -91,12 +92,14 @@ export default function BuzzerOverlay({
       {showResponsesModal && (
         <ResponsesModal
           allResponses={allResponses}
+          participants={participants}
           questionLabels={questionLabels}
           inputQuestionOrder={inputQuestionOrder}
           inputRevealed={inputRevealed}
           onRevealResponses={onRevealResponses}
           onResetInput={() => { onResetInput(); setShowResponsesModal(false); }}
           onClose={() => setShowResponsesModal(false)}
+          onGoToGrid={() => { setShowResponsesModal(false); onGoToGrid?.(); }}
         />
       )}
 
@@ -152,7 +155,7 @@ export default function BuzzerOverlay({
               </div>
               <button
                 className="buzzer-fab__stop-collection-btn"
-                onClick={() => { onLockInput(); setShowResponsesModal(true); }}
+                onClick={() => { onLockInput(); }}
               >
                 Stop Collection
               </button>
@@ -249,9 +252,30 @@ export default function BuzzerOverlay({
             </div>
           )}
 
-          {/* ─── Response Actions (when responses exist and not actively collecting) ─── */}
+          {/* ─── Submitted Names + Response Actions (when responses exist and not actively collecting) ─── */}
           {!isOpen && totalResponseCount > 0 && (
             <div className="buzzer-fab__section">
+              {/* Names-only submitted list */}
+              {currentResponses.length > 0 && (
+                <>
+                  <div className="buzzer-fab__section-label">
+                    Submitted ({currentResponses.length} of {participants.length})
+                  </div>
+                  <div className="buzzer-fab__participant-list">
+                    {participants.map(p => {
+                      const hasResponded = currentResponses.some(r => r.userId === p.userId);
+                      return (
+                        <span
+                          key={p.userId}
+                          className={`buzzer-fab__participant-chip ${hasResponded ? 'buzzer-fab__participant-chip--submitted' : 'buzzer-fab__participant-chip--pending'}`}
+                        >
+                          {p.displayName}
+                        </span>
+                      );
+                    })}
+                  </div>
+                </>
+              )}
               <button
                 className="buzzer-fab__view-responses-btn"
                 onClick={() => setShowResponsesModal(true)}
@@ -292,9 +316,9 @@ export default function BuzzerOverlay({
               {[
                 'Select question from grid',
                 'Click "Collect Answers" (timer auto-starts)',
-                'Timer expires → auto-locks & shows responses',
-                'Click "Reveal All" to show answers',
-                'Click "Next Question" → return to grid',
+                'Timer expires → auto-locks & shows who submitted',
+                'Click "View Responses" → reveal answers',
+                '"Go to Grid" or "Back to Question" to continue',
               ].map((step, i) => (
                 <div key={i} className="buzzer-fab__guide-step">
                   <span className="buzzer-fab__guide-step-num">{i + 1}</span>
