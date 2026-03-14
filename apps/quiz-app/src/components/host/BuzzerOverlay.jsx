@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import ResponsesModal from './ResponsesModal';
+import { getHostHint } from '../../utils/hostHintText';
 import '../../styles/BuzzerOverlay.css';
 
 /**
@@ -40,6 +41,11 @@ export default function BuzzerOverlay({
   const [awarded, setAwarded] = useState(false);
   const [showResponsesModal, setShowResponsesModal] = useState(false);
   const [confirmClear, setConfirmClear] = useState(false);
+  const [showHints, setShowHints] = useState(() => {
+    try { return localStorage.getItem('qwizzeria_host_hints') !== 'false'; }
+    catch { return true; }
+  });
+  const [guideOpen, setGuideOpen] = useState(false);
 
   if (isCreating || !roomCode) return null;
 
@@ -86,6 +92,26 @@ export default function BuzzerOverlay({
       {/* Expanded panel */}
       {expanded && (
         <div className="buzzer-fab__panel">
+          {/* Contextual hint line */}
+          {showHints && (
+            <div className="buzzer-fab__hint">
+              <span className="buzzer-fab__hint-text">
+                {getHostHint({ isOpen, isInputMode, hasBuzzes, totalResponseCount, hasSelectedQuestion, awarded })}
+              </span>
+              <button
+                className="buzzer-fab__hint-dismiss"
+                onClick={() => {
+                  setShowHints(false);
+                  try { localStorage.setItem('qwizzeria_host_hints', 'false'); } catch {}
+                }}
+                title="Dismiss hints"
+                aria-label="Dismiss hints"
+              >
+                ×
+              </button>
+            </div>
+          )}
+
           {/* Connected participants */}
           <div className="buzzer-fab__section">
             <div className="buzzer-fab__section-label">
@@ -240,6 +266,62 @@ export default function BuzzerOverlay({
               >
                 {confirmClear ? 'Confirm Clear?' : 'Clear All'}
               </button>
+            </div>
+          )}
+
+          {/* ─── Quick Guide (collapsible) ─── */}
+          <div
+            className="buzzer-fab__guide-toggle"
+            onClick={() => setGuideOpen(g => !g)}
+            role="button"
+            tabIndex={0}
+            onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setGuideOpen(g => !g); } }}
+          >
+            <span className="buzzer-fab__guide-chevron">{guideOpen ? '▾' : '▸'}</span>
+            Quick Guide
+          </div>
+          {guideOpen && (
+            <div className="buzzer-fab__guide-content">
+              <div className="buzzer-fab__guide-flow">Buzzer Flow</div>
+              {[
+                'Select question from grid',
+                'Click "Open Buzzer"',
+                'Players buzz → results ranked',
+                'Click "Award" next to winner',
+                'Select next question (auto-resets)',
+              ].map((step, i) => (
+                <div key={i} className="buzzer-fab__guide-step">
+                  <span className="buzzer-fab__guide-step-num">{i + 1}</span>
+                  <span>{step}</span>
+                </div>
+              ))}
+
+              <div className="buzzer-fab__guide-flow">Collect Answers Flow</div>
+              {[
+                'Select question from grid',
+                'Click "Collect Answers"',
+                'Wait for responses',
+                'Click "Lock & View"',
+                'Click "Reveal All" in modal',
+                'Close modal → next question',
+              ].map((step, i) => (
+                <div key={i} className="buzzer-fab__guide-step">
+                  <span className="buzzer-fab__guide-step-num">{i + 1}</span>
+                  <span>{step}</span>
+                </div>
+              ))}
+
+              <label className="buzzer-fab__guide-hint-toggle">
+                <input
+                  type="checkbox"
+                  checked={showHints}
+                  onChange={e => {
+                    setShowHints(e.target.checked);
+                    try { localStorage.setItem('qwizzeria_host_hints', e.target.checked ? 'true' : 'false'); } catch {}
+                  }}
+                />
+                Show step hints
+              </label>
             </div>
           )}
         </div>

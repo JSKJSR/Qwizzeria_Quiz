@@ -411,6 +411,114 @@
   background: rgba(52, 152, 219, 0.2);
 }
 
+/* ---- Contextual hint line ---- */
+.buzzer-fab__hint {
+  border-left: 3px solid var(--accent-primary, #e85c1a);
+  background: rgba(232, 92, 26, 0.06);
+  padding: 0.3rem 0.5rem;
+  font-size: 0.72rem;
+  color: var(--text-secondary, #b0a0a5);
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  border-radius: 0 6px 6px 0;
+}
+
+.buzzer-fab__hint-text {
+  flex: 1;
+}
+
+.buzzer-fab__hint-dismiss {
+  width: 16px;
+  height: 16px;
+  padding: 0;
+  background: transparent;
+  border: none;
+  color: var(--text-secondary, #b0a0a5);
+  cursor: pointer;
+  font-size: 0.85rem;
+  line-height: 1;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.buzzer-fab__hint-dismiss:hover {
+  color: var(--text-primary, #f0f0f0);
+}
+
+/* ---- Quick Guide section ---- */
+.buzzer-fab__guide-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  cursor: pointer;
+  padding: 0.3rem 0;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--text-secondary, #b0a0a5);
+  border-top: 1px solid var(--border-color, #2a1520);
+  user-select: none;
+}
+
+.buzzer-fab__guide-toggle:hover {
+  color: var(--text-primary, #f0f0f0);
+}
+
+.buzzer-fab__guide-chevron {
+  font-size: 0.6rem;
+  width: 1rem;
+  text-align: center;
+}
+
+.buzzer-fab__guide-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  padding-top: 0.2rem;
+}
+
+.buzzer-fab__guide-flow {
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--accent-primary, #e85c1a);
+  font-weight: 700;
+  margin-top: 0.25rem;
+}
+
+.buzzer-fab__guide-step {
+  display: flex;
+  gap: 0.3rem;
+  font-size: 0.7rem;
+  color: var(--text-secondary, #b0a0a5);
+  line-height: 1.3;
+}
+
+.buzzer-fab__guide-step-num {
+  color: var(--accent-primary, #e85c1a);
+  font-weight: 700;
+  min-width: 1rem;
+  flex-shrink: 0;
+}
+
+.buzzer-fab__guide-hint-toggle {
+  font-size: 0.7rem;
+  color: var(--text-secondary, #b0a0a5);
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  cursor: pointer;
+  margin-top: 0.3rem;
+  border-top: 1px solid var(--border-color, #2a1520);
+  padding-top: 0.4rem;
+}
+
+.buzzer-fab__guide-hint-toggle input[type="checkbox"] {
+  accent-color: var(--accent-primary, #e85c1a);
+}
+
 /* ---- Responsive ---- */
 @media (max-width: 480px) {
   .buzzer-fab-container {
