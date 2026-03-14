@@ -43,7 +43,7 @@ export default function BuzzerOverlay({
   const [confirmClear, setConfirmClear] = useState(false);
   const [showHints, setShowHints] = useState(() => {
     try { return localStorage.getItem('qwizzeria_host_hints') !== 'false'; }
-    catch { return true; }
+    catch { /* ignore */ return true; }
   });
   const [guideOpen, setGuideOpen] = useState(false);
 
@@ -102,7 +102,7 @@ export default function BuzzerOverlay({
                 className="buzzer-fab__hint-dismiss"
                 onClick={() => {
                   setShowHints(false);
-                  try { localStorage.setItem('qwizzeria_host_hints', 'false'); } catch {}
+                  try { localStorage.setItem('qwizzeria_host_hints', 'false'); } catch { /* ignore */ }
                 }}
                 title="Dismiss hints"
                 aria-label="Dismiss hints"
@@ -317,7 +317,7 @@ export default function BuzzerOverlay({
                   checked={showHints}
                   onChange={e => {
                     setShowHints(e.target.checked);
-                    try { localStorage.setItem('qwizzeria_host_hints', e.target.checked ? 'true' : 'false'); } catch {}
+                    try { localStorage.setItem('qwizzeria_host_hints', e.target.checked ? 'true' : 'false'); } catch { /* ignore */ }
                   }}
                 />
                 Show step hints
