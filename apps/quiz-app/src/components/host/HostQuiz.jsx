@@ -1133,6 +1133,7 @@ export default function HostQuiz() {
                 state.selectedQuestion.question || state.selectedQuestion.question_text,
                 allowedUserIds
               );
+              timerRef.current?.reset();
               timerRef.current?.start();
             }}
             onLockInput={buzzer.lockInput}
@@ -1225,6 +1226,7 @@ export default function HostQuiz() {
               state.selectedQuestion.question || state.selectedQuestion.question_text,
               allowedUserIds
             );
+            timerRef.current?.reset();
             timerRef.current?.start();
           }}
           onLockInput={buzzer.lockInput}
