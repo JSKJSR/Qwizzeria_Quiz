@@ -1,7 +1,6 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
-import { bulkCreateQuestions } from '@qwizzeria/supabase-client/src/questions.js';
-import { parseExcelFile, generateTemplate } from '../../utils/adminExcelParser';
-import { fetchAllPacks, createPack, bulkAddQuestionsToPack } from '@qwizzeria/supabase-client/src/packs.js';
+import { bulkCreateQuestions, fetchAllPacks, createPack, bulkAddQuestionsToPack } from '@qwizzeria/supabase-client';
+import { parseExcelFile, generateTemplate } from '@/utils/adminExcelParser';
 
 export default function BulkImport() {
   const [parsed, setParsed] = useState(null);

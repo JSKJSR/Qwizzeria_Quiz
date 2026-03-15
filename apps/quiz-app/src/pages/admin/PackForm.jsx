@@ -5,7 +5,7 @@ import {
   createPack,
   updatePack,
   fetchPackCategories,
-} from '@qwizzeria/supabase-client/src/packs.js';
+} from '@qwizzeria/supabase-client';
 
 export default function PackForm() {
   const navigate = useNavigate();

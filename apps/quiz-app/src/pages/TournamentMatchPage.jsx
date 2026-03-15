@@ -8,8 +8,8 @@ import {
   claimTournamentMatch,
   advanceMatchWinner as dbAdvanceMatchWinner,
   completeTournament as dbCompleteTournament,
-} from '@qwizzeria/supabase-client/src/tournaments.js';
-import { fetchPackPlayQuestions } from '@qwizzeria/supabase-client/src/packs.js';
+  fetchPackPlayQuestions,
+} from '@qwizzeria/supabase-client';
 import HostScoreboard from '../components/host/HostScoreboard';
 import HostTopicGrid from '../components/host/HostTopicGrid';
 import HostAnswerView from '../components/host/HostAnswerView';

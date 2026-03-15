@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
-import '../../styles/HostScoreboard.css';
+import '@/styles/HostScoreboard.css';
 import TimerControl from './TimerControl';
 import BuzzerQRCode from './BuzzerQRCode';
 
@@ -177,7 +177,7 @@ export default function HostScoreboard({
                 setTimeout(() => setPublished(false), 2000);
               }}
             >
-              {published ? 'Published!' : 'Publish'}
+              {published ? 'Published!' : 'Publish Scores'}
             </button>
           )}
           <label className="scoreboard__theme-toggle">

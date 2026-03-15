@@ -79,22 +79,25 @@ npm run test
 cd apps/quiz-app && npx vitest run
 ```
 
-### Current Coverage (96 tests, 10 files)
-- `mediaDetector.test.js` — Media URL detection (7 tests)
+### Current Coverage (149 tests, 14 files)
+- `hostQuizReducer.test.js` — Core host state machine (39 tests)
 - `tournamentBracket.test.js` — Bracket generation, seeding, advancement (36 tests)
-- `hostSessionPersistence.test.js` — localStorage save/load/clear (12 tests)
-- `AuthContext.test.js` — Auth provider initialization (1 test)
-- `supabaseClient.test.js` — Supabase client configuration (2 tests)
 - `buzzerTimestamp.test.js` — Sub-millisecond buzzer resolution (13 tests)
+- `hostSessionPersistence.test.js` — localStorage save/load/clear (12 tests)
 - `aiGenerate.test.js` — AI Quiz generation and parsing (12 tests)
-- `packManagement.test.js` — Admin pack CRUD (6 tests)
-- `questionValidation.test.js` — Question schema checks (5 tests)
-- `authHelpers.test.js` — Role and permission checks (2 tests)
+- `useHostQuizPersistence.test.js` — Session restore/persistence hook (8 tests)
+- `mediaDetector.test.js` — Media URL detection (7 tests)
+- `useTournamentSync.test.js` — Tournament DB sync hook (5 tests)
+- `certificateGenerator.test.js` — Canvas certificate generation (4 tests)
+- `exportResults.test.js` — CSV/PDF export logic (4 tests)
+- `AIGenerateModal.test.jsx` — AI generation UI logic (11 tests)
+- `TournamentResultsView.test.jsx` — Tournament UI results (4 tests)
+- `TieBreakerModal.test.jsx` — Tie-breaker UI logic (3 tests)
+- `AuthContext.test.js` — Auth provider initialization (1 test)
 
 ### Coverage Goals
-- Core state machines (`useReducer`).
-- RBAC helper functions.
-- Supabase utility wrappers.
+- Integration tests for Host multiplayer broadcast.
+- UI snapshot testing for Topic Grid.
 
 ---
 
@@ -107,8 +110,10 @@ The project utilizes an AI-first development approach. Follow this workflow when
 - Ensure the AI understands the **Two-Gate Security Model** and **State Machine** architecture.
 
 ### 2. Implementation Standards
-- **Vanilla CSS**: Avoid utility frameworks unless requested. Use design tokens.
-- **Component Focused**: Keep components reusable and state-blind where possible.
+- **Path Aliases**: Always use `@/` aliases for imports within `apps/quiz-app/src/`. Configure in `jsconfig.json` for VS Code support.
+- **Barrel Exports**: Use the centralized `@qwizzeria/supabase-client` entry point for all Supabase interactions to ensure consistent client configuration.
+- **Vanilla CSS**: Avoid utility frameworks unless requested. Use design tokens from `global.css`.
+- **Component Focused**: Keep components reusable and state-blind. Logic should be extracted to custom hooks or reducers (see `HostQuiz.jsx` decomposition).
 - **Error Handling**: Every feature must include loading/error states with retry capability.
 
 ### 3. Pre-Completion Checklist (MANDATORY)
@@ -132,7 +137,7 @@ The project includes a GitHub Actions pipeline (`.github/workflows/ci.yml`) that
 1. `npm ci` — Install dependencies
 2. `npm run lint` — Lint all packages
 3. `npm run build` — Build all packages
-4. `npm run test` — Run test suite (96 tests)
+4. `npm run test` — Run test suite (149 tests)
 
 Production deployment is configured for **Vercel** via `vercel.json` (output: `apps/quiz-app/dist`). Set `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` as environment variables in the Vercel dashboard.
 

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
-import { fetchPublicPackById, fetchPackPlayQuestions } from '@qwizzeria/supabase-client/src/packs.js';
+import { fetchPublicPackById, fetchPackPlayQuestions } from '@qwizzeria/supabase-client';
 import PackPlayJeopardy from '../components/PackPlayJeopardy';
 import PackPlaySequential from '../components/PackPlaySequential';
 import SEO from '../components/SEO';

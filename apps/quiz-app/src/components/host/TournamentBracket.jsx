@@ -1,5 +1,5 @@
-import { getRoundName, isMatchPlayable, getChampion } from '../../utils/tournamentBracket';
-import '../../styles/TournamentBracket.css';
+import { getRoundName, isMatchPlayable, getChampion } from '@/utils/tournamentBracket';
+import '@/styles/TournamentBracket.css';
 
 /**
  * Check if an in_progress match is stale (no update for threshold).

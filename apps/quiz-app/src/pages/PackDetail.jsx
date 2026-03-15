@@ -1,8 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
-import { fetchPublicPackById } from '@qwizzeria/supabase-client/src/packs.js';
-import { fetchPackLeaderboard } from '@qwizzeria/supabase-client/src/leaderboard.js';
+import { fetchPublicPackById, fetchPackLeaderboard } from '@qwizzeria/supabase-client';
 import LoginModal from '../components/LoginModal';
 import SEO from '../components/SEO';
 import '../styles/PackDetail.css';

@@ -41,3 +41,14 @@ export function getSupabase() {
   }
   return supabaseInstance;
 }
+
+// Re-export all modules for barrel imports
+export * from './auth.js';
+export * from './questions.js';
+export * from './packs.js';
+export * from './users.js';
+export * from './leaderboard.js';
+export * from './buzzer.js';
+export * from './tournaments.js';
+export * from './realtime.js';
+export * from './aiGenerate.js';

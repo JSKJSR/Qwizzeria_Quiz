@@ -55,7 +55,7 @@ packages/
 - **AI**: Claude 3.5 Sonnet (via Anthropic API).
 - **Payments**: Stripe (subscriptions, billing portal).
 - **Orchestration**: Turborepo, npm workspaces.
-- **Testing**: Vitest (96 tests across 10 files).
+- **Testing**: Vitest (149 tests across 14 files).
 - **CI/CD**: GitHub Actions (lint → build → test) + Vercel deployment.
 
 ---
@@ -82,7 +82,7 @@ npm install
 - `npm run dev`: Start all development servers.
 - `npm run build`: Build for production.
 - `npm run lint`: Run linting across the monorepo.
-- `npm run test`: Execute the test suite (96 tests).
+- `npm run test`: Execute the test suite (149 tests).
 
 ---
 

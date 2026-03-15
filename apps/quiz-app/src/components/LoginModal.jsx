@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
-import { resetPasswordForEmail } from '@qwizzeria/supabase-client/src/auth.js';
+import { resetPasswordForEmail } from '@qwizzeria/supabase-client';
 import '../styles/LoginModal.css';
 
 export default function LoginModal({ onClose, onSuccess, initialMode }) {

@@ -8,7 +8,7 @@ import {
   subscribeBuzzerChannel,
   sendBuzzerEvent,
   unsubscribeBuzzer,
-} from '@qwizzeria/supabase-client/src/buzzer.js';
+} from '@qwizzeria/supabase-client';
 import { rankBuzzes, determineBuzzWinner, isValidBuzz } from '../utils/buzzerTimestamp';
 import { playBuzzSound, playBuzzerOpenSound, playTieSound } from '../utils/buzzerSound';
 

@@ -1,4 +1,4 @@
-import '../../styles/HostQuiz.css';
+import '@/styles/HostQuiz.css';
 
 export default function HostTopicGrid({ topics, completedQuestionIds, skippedQuestionIds = [], onSelectQuestion, packTitle, packSubtitle }) {
   if (!topics || topics.length === 0) {

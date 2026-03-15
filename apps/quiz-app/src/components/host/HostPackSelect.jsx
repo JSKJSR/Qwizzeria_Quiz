@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
-import { browseHostPacks, fetchPackCategories, fetchPackPlayQuestions } from '@qwizzeria/supabase-client/src/packs.js';
-import { useAuth } from '../../hooks/useAuth';
+import { browseHostPacks, fetchPackCategories, fetchPackPlayQuestions } from '@qwizzeria/supabase-client';
+import { useAuth } from '@/hooks/useAuth';
 
 export default function HostPackSelect({ onSelectPack }) {
   const { role } = useAuth();

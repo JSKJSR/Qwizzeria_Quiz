@@ -1,7 +1,7 @@
 import { useState, useCallback } from 'react';
-import { useAuth } from '../../hooks/useAuth';
-import { generateQuiz, saveGeneratedPack } from '@qwizzeria/supabase-client/src/aiGenerate.js';
-import '../../styles/AIGenerate.css';
+import { useAuth } from '@/hooks/useAuth';
+import { generateQuiz, saveGeneratedPack } from '@qwizzeria/supabase-client';
+import '@/styles/AIGenerate.css';
 
 const DIFFICULTIES = ['easy', 'medium', 'hard'];
 

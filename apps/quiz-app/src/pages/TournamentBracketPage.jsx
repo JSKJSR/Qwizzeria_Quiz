@@ -3,11 +3,9 @@ import { useParams, useNavigate } from 'react-router-dom';
 import {
   fetchTournament,
   reclaimStaleMatch,
-} from '@qwizzeria/supabase-client/src/tournaments.js';
-import {
   subscribeTournamentMatches,
   unsubscribeTournament,
-} from '@qwizzeria/supabase-client/src/realtime.js';
+} from '@qwizzeria/supabase-client';
 import { useAuth } from '../hooks/useAuth';
 import { isTournamentComplete, getChampion } from '../utils/tournamentBracket';
 import TournamentBracket from '../components/host/TournamentBracket';

@@ -26,7 +26,7 @@ export function generateCertificate({ name, rank, score, quizTitle = 'Quiz', dat
 
   // Build a base64 logo URL at runtime so the certificate works offline
   // We load the logo via fetch then embed it
-  const logoUrl = `${window.location.origin}/qwizzeria-logo.png`;
+  const logoUrl = `${window.location.origin}/qwizzeria-logo_white.jpeg`;
 
   const html = `<!DOCTYPE html>
 <html lang="en">
@@ -121,21 +121,10 @@ export function generateCertificate({ name, rank, score, quizTitle = 'Quiz', dat
 
     /* ---- Logo ---- */
     .cert__logo {
-      width: 72px;
+      width: 180px;
       height: auto;
-      margin-bottom: 10px;
-      opacity: 0.9;
-    }
-
-    /* ---- Organization name ---- */
-    .cert__org {
-      font-family: 'Lato', sans-serif;
-      font-weight: 700;
-      font-size: 14px;
-      letter-spacing: 0.35em;
-      text-transform: uppercase;
-      color: #C45A1A;
-      margin-bottom: 2px;
+      margin-bottom: 12px;
+      opacity: 0.95;
     }
 
     /* ---- Title ---- */
@@ -223,14 +212,6 @@ export function generateCertificate({ name, rank, score, quizTitle = 'Quiz', dat
       color: #999;
     }
 
-    .cert__tagline {
-      font-family: 'Playfair Display', serif;
-      font-style: italic;
-      font-size: 11px;
-      color: #aaa;
-      letter-spacing: 0.05em;
-    }
-
     .cert__bottom-org {
       font-size: 10px;
       letter-spacing: 0.3em;
@@ -251,10 +232,9 @@ export function generateCertificate({ name, rank, score, quizTitle = 'Quiz', dat
       src="${logoUrl}"
       alt="Qwizzeria"
       class="cert__logo"
-      onerror="this.src='${window.location.origin}/qwizzeria-logo.svg'"
+      onerror="this.src='${window.location.origin}/qwizzeria-logo.png'"
     />
 
-    <div class="cert__org">Qwizzeria</div>
     <div class="cert__title">Certificate of Achievement</div>
 
     <div class="cert__rank">${info.ordinal}</div>
@@ -274,7 +254,6 @@ export function generateCertificate({ name, rank, score, quizTitle = 'Quiz', dat
 
     <div class="cert__footer">
       ${date ? `<div class="cert__date">${escapeHTML(date)}</div>` : ''}
-      <div class="cert__tagline">I learn, therefore I am</div>
       <div class="cert__bottom-org">Qwizzeria Quiz Platform</div>
     </div>
   </div>

@@ -1,5 +1,5 @@
 import { useState, useRef, useCallback, useEffect, useImperativeHandle, forwardRef } from 'react';
-import '../../styles/TimerControl.css';
+import '@/styles/TimerControl.css';
 
 const TimerControl = forwardRef(function TimerControl({ onExpire, onTick }, ref) {
   const [minutes, setMinutes] = useState(0);

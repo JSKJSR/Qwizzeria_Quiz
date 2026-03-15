@@ -1,8 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
-import { fetchResumableSession } from '@qwizzeria/supabase-client/src/questions.js';
-import { fetchPackPlayQuestions } from '@qwizzeria/supabase-client/src/packs.js';
+import { fetchResumableSession, fetchPackPlayQuestions } from '@qwizzeria/supabase-client';
 import PackPlayJeopardy from '../components/PackPlayJeopardy';
 import PackPlaySequential from '../components/PackPlaySequential';
 import FreeQuiz from '../components/FreeQuiz';

@@ -3,7 +3,7 @@ import {
     fetchAllUsersWithEmail,
     fetchUserManagementKPIs,
     updateUserRole,
-} from '@qwizzeria/supabase-client/src/users.js';
+} from '@qwizzeria/supabase-client';
 
 const ROLES = ['user', 'premium', 'editor', 'admin', 'superadmin'];
 

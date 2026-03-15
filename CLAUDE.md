@@ -96,6 +96,8 @@ Access restricted via role checks (editor, admin, superadmin).
 - **Resume**: Sessions store metadata (question_ids, format) in JSONB; ResumePlay restores state
 - **Leaderboard**: Global (all_time/this_week/this_month) + per-pack top 10 via Postgres RPCs
 - **User profiles**: user_profiles table with display_name, stats via get_user_stats RPC
+- **Path aliases**: `@/` maps to `apps/quiz-app/src/` (configured in vite.config.js + jsconfig.json). Use `@/hooks/useAuth` instead of `../../hooks/useAuth`.
+- **Barrel exports**: `import { fn } from '@qwizzeria/supabase-client'` — all modules re-exported from index.js. Deep paths (`/src/packs.js`) still work for backward compat.
 - **Supabase**: Initialized conditionally in main.jsx — app works without credentials
 
 ## Database Tables
@@ -142,13 +144,18 @@ Access restricted via role checks (editor, admin, superadmin).
 - `npm run dev` — Start the quiz-app dev server (Player + Admin CMS) at :5173
 - `npm run build` — Build all packages
 - `npm run lint` — Lint all packages
-- `cd apps/quiz-app && npx vitest run` — Run tests (96 tests across 10 files)
+- `cd apps/quiz-app && npx vitest run` — Run tests (149 tests across 14 files)
 
 ## Key Component Files
 
 - `apps/quiz-app/src/components/TopicGrid.jsx` — Flat card grid for Free Quiz + Pack Play (shared)
 - `apps/quiz-app/src/components/host/HostTopicGrid.jsx` — Flat card grid for Host Quiz
-- `apps/quiz-app/src/components/host/HostQuiz.jsx` — Host quiz orchestrator (useReducer state machine)
+- `apps/quiz-app/src/components/host/HostQuiz.jsx` — Host quiz orchestrator (handlers + render, ~615 lines)
+- `apps/quiz-app/src/components/host/hostQuizReducer.js` — Extracted reducer, ACTIONS, buildTopics, initialState (~478 lines)
+- `apps/quiz-app/src/hooks/useHostQuizPersistence.js` — Session restore on mount + debounced persistence
+- `apps/quiz-app/src/hooks/useTournamentSync.js` — Tournament DB creation + match pack persistence
+- `apps/quiz-app/src/components/host/TieBreakerModal.jsx` — Tie-breaker winner selection modal
+- `apps/quiz-app/src/components/host/TournamentResultsView.jsx` — Tournament results with bracket recap
 - `apps/quiz-app/src/components/host/HostScoreboard.jsx` — Integrated top bar (logo + timer + scores + END QUIZ)
 - `apps/quiz-app/src/components/host/TimerControl.jsx` — Self-contained countdown timer
 - `apps/quiz-app/src/components/host/HostAnswerView.jsx` — Answer display + participant scoring
@@ -183,7 +190,8 @@ Access restricted via role checks (editor, admin, superadmin).
 - Phase 6: Dashboard Layout + Host Quiz (sidebar layout, auth routing, host quiz with pack select, multiplayer, integrated scoreboard bar with self-contained timer, flat card grid layout for all quiz modes)
 - Phase 7: RBAC (DB-backed roles in user_profiles, Two-Gate security: feature_access + content_permissions, updated RLS policies to use is_admin()/get_role(), editor CMS access, premium as DB role, User Management UI)
 - Phase 8: Polish & Quality (test coverage 53 tests, error UI with retry on all pages, skeleton loading states, WCAG accessibility improvements, CI/CD pipeline, landing page pack carousel, host pack cover images, simplified RLS for active pack showcase)
-- Phase 9: AI Quiz Generation (Supabase Edge Function + Claude API, AIGenerateModal with preview/edit, "Generate with AI" in HostPackSelect, rate limiting, Pro-gate, 96 tests across 10 files)
+- Phase 9: AI Quiz Generation (Supabase Edge Function + Claude API, AIGenerateModal with preview/edit, "Generate with AI" in HostPackSelect, rate limiting, Pro-gate)
+- Phase 10: Codebase Improvements (HostQuiz.jsx decomposed from 1283→615 lines, reducer/hooks/components extracted, 149 tests across 14 files, `@/` path aliases, barrel exports for supabase-client)
 
 ## Full Documentation
 
