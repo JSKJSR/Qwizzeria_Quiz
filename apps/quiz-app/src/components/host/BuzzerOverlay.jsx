@@ -51,10 +51,11 @@ export default function BuzzerOverlay({
   });
   const [guideOpen, setGuideOpen] = useState(false);
 
-  // Auto-expand panel when timer expires and collection is locked (show names inline)
+  // Auto-expand panel and open responses modal when timer expires and collection is locked
   useEffect(() => {
     if (autoShowResponses) {
       setExpanded(true);
+      setShowResponsesModal(true);
       onAutoShowResponsesHandled?.();
     }
   }, [autoShowResponses, onAutoShowResponsesHandled]);
@@ -221,25 +222,50 @@ export default function BuzzerOverlay({
             </div>
           )}
 
-          {/* ─── Idle State: Dual Action Buttons ─── */}
+          {/* ─── Idle State: Mode Selector ─── */}
           {!isOpen && !hasBuzzes && (
             <div className="buzzer-fab__section">
-              <div className="buzzer-fab__dual-actions">
-                <button
-                  className="buzzer-fab__open-btn"
-                  onClick={() => { setAwarded(false); onOpenBuzzer(allowedUserIds || null); }}
-                >
-                  Open Buzzer
-                </button>
-                <button
-                  className="buzzer-fab__open-input-btn"
-                  onClick={() => onOpenInput(allowedUserIds || null)}
-                  disabled={!hasSelectedQuestion}
-                  title={hasSelectedQuestion ? 'Collect text answers for this question' : 'Select a question from the grid first'}
-                >
-                  {hasSelectedQuestion ? 'Collect Answers' : 'Select question first'}
-                </button>
+              {/* Participant readiness */}
+              <div className="buzzer-fab__readiness">
+                {participants.length === 0 ? (
+                  <div className="buzzer-fab__readiness-warning">
+                    No participants connected yet
+                  </div>
+                ) : (
+                  <div className="buzzer-fab__readiness-count">
+                    {participants.length} participant{participants.length !== 1 ? 's' : ''} connected
+                  </div>
+                )}
               </div>
+
+              {!hasSelectedQuestion ? (
+                <div className="buzzer-fab__mode-disabled">
+                  Select a question from the grid first
+                </div>
+              ) : (
+                <div className="buzzer-fab__mode-selector">
+                  <button
+                    className="buzzer-fab__mode-card buzzer-fab__mode-card--buzzer"
+                    onClick={() => { setAwarded(false); onOpenBuzzer(allowedUserIds || null); }}
+                  >
+                    <svg className="buzzer-fab__mode-icon" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M12 2C8.14 2 5 5.14 5 9c0 2.38 1.19 4.47 3 5.74V17c0 .55.45 1 1 1h6c.55 0 1-.45 1-1v-2.26c1.81-1.27 3-3.36 3-5.74 0-3.86-3.14-7-7-7zM9 20v1c0 .55.45 1 1 1h4c.55 0 1-.45 1-1v-1H9z"/>
+                    </svg>
+                    <span className="buzzer-fab__mode-title">Buzzer</span>
+                    <span className="buzzer-fab__mode-desc">Speed-based — first to buzz wins</span>
+                  </button>
+                  <button
+                    className="buzzer-fab__mode-card buzzer-fab__mode-card--input"
+                    onClick={() => onOpenInput(allowedUserIds || null)}
+                  >
+                    <svg className="buzzer-fab__mode-icon" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
+                    </svg>
+                    <span className="buzzer-fab__mode-title">Collect Answers</span>
+                    <span className="buzzer-fab__mode-desc">Text input — everyone types an answer</span>
+                  </button>
+                </div>
+              )}
             </div>
           )}
 
@@ -301,7 +327,7 @@ export default function BuzzerOverlay({
               <div className="buzzer-fab__guide-flow">Buzzer Flow</div>
               {[
                 'Select question from grid',
-                'Click "Open Buzzer"',
+                'Choose "Buzzer" from the mode selector',
                 'Players buzz → results ranked',
                 'Click "Award" next to winner',
                 'Select next question (auto-resets)',
@@ -315,10 +341,10 @@ export default function BuzzerOverlay({
               <div className="buzzer-fab__guide-flow">Collect Answers Flow</div>
               {[
                 'Select question from grid',
-                'Click "Collect Answers" (timer auto-starts)',
-                'Timer expires → auto-locks & shows who submitted',
-                'Click "View Responses" → reveal answers',
-                '"Go to Grid" or "Back to Question" to continue',
+                'Choose "Collect Answers" (timer auto-starts)',
+                'Timer expires → auto-locks & opens responses',
+                'Reveal answers, then "Go to Grid" to continue',
+                'Participants see live countdown on their device',
               ].map((step, i) => (
                 <div key={i} className="buzzer-fab__guide-step">
                   <span className="buzzer-fab__guide-step-num">{i + 1}</span>

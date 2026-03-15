@@ -295,6 +295,18 @@ export function subscribeBuzzerChannel(roomCode, handlers = {}) {
     });
   }
 
+  if (handlers.onTimerSync) {
+    channel.on('broadcast', { event: 'timer_sync' }, (payload) => {
+      handlers.onTimerSync(payload.payload);
+    });
+  }
+
+  if (handlers.onScorePublish) {
+    channel.on('broadcast', { event: 'score_publish' }, (payload) => {
+      handlers.onScorePublish(payload.payload);
+    });
+  }
+
   if (handlers.onRoomClosed) {
     channel.on('broadcast', { event: 'room_closed' }, () => {
       handlers.onRoomClosed();

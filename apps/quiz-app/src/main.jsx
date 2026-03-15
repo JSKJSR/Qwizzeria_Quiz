@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
 import { HelmetProvider } from 'react-helmet-async';
 import { initSupabase } from '@qwizzeria/supabase-client';
+import { Analytics } from '@vercel/analytics/react';
 import ErrorBoundary from './components/ErrorBoundary';
 import App from './components/App';
 import './styles/global.css';
@@ -21,6 +22,7 @@ createRoot(document.getElementById('root')).render(
       <ErrorBoundary>
         <BrowserRouter>
           <App />
+          <Analytics />
         </BrowserRouter>
       </ErrorBoundary>
     </HelmetProvider>

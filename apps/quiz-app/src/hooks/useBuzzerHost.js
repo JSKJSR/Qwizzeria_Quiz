@@ -336,6 +336,24 @@ export default function useBuzzerHost({ hostUserId, sessionType, sessionRef, ena
   }, []);
 
   /**
+   * Broadcast timer sync to participants (throttled to 1/sec).
+   * @param {number} timeLeftSeconds
+   */
+  const broadcastTimerSync = useCallback((timeLeftSeconds) => {
+    if (!channelRef.current) return;
+    sendBuzzerEvent(channelRef.current, 'timer_sync', { timeLeft: timeLeftSeconds });
+  }, []);
+
+  /**
+   * Publish current scores to all participants.
+   * @param {Array<{name: string, score: number, rank: number}>} rankings
+   */
+  const publishScores = useCallback((rankings) => {
+    if (!channelRef.current) return;
+    sendBuzzerEvent(channelRef.current, 'score_publish', { rankings });
+  }, []);
+
+  /**
    * Close the buzzer room entirely.
    */
   const closeRoom = useCallback(() => {
@@ -384,5 +402,7 @@ export default function useBuzzerHost({ hostUserId, sessionType, sessionRef, ena
     lockInput,
     revealResponses,
     resetInput,
+    broadcastTimerSync,
+    publishScores,
   };
 }

@@ -229,6 +229,24 @@
   color: #fff;
 }
 
+/* ---- Publish scores button ---- */
+.scoreboard__publish-btn {
+  padding: 0.35rem 0.75rem;
+  background: rgba(52, 152, 219, 0.1);
+  border: 1px solid #3498db;
+  border-radius: var(--radius-sm, 8px);
+  color: #3498db;
+  font-size: 0.7rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s ease;
+}
+
+.scoreboard__publish-btn:hover {
+  background: rgba(52, 152, 219, 0.2);
+}
+
 /* ---- Score drawer trigger (5+ participants) ---- */
 .scoreboard__drawer-trigger-area {
   display: flex;
