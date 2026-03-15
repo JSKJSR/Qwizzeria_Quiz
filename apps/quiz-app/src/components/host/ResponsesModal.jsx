@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import '../../styles/ResponsesModal.css';
+import '@/styles/ResponsesModal.css';
 
 /**
  * Generate a CSV string from all responses and trigger a browser download.

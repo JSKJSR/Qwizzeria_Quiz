@@ -1,8 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { fetchAllQuestions, fetchCategories } from '@qwizzeria/supabase-client/src/questions.js';
-import { fetchAdminAnalytics, fetchPackPerformance, fetchHardestQuestions } from '@qwizzeria/supabase-client/src/packs.js';
-import { getSubscriptionAnalytics } from '@qwizzeria/supabase-client/src/users.js';
+import { fetchAllQuestions, fetchCategories, fetchAdminAnalytics, fetchPackPerformance, fetchHardestQuestions, getSubscriptionAnalytics } from '@qwizzeria/supabase-client';
 
 export default function Dashboard() {
   const navigate = useNavigate();

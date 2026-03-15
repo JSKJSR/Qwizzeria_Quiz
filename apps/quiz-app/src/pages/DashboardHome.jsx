@@ -1,10 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
-import { fetchUserHistory } from '@qwizzeria/supabase-client/src/users.js';
-import { fetchUserStats } from '@qwizzeria/supabase-client/src/users.js';
-import { fetchGlobalLeaderboard } from '@qwizzeria/supabase-client/src/leaderboard.js';
-import { abandonQuizSession } from '@qwizzeria/supabase-client/src/questions.js';
+import { fetchUserHistory, fetchUserStats, fetchGlobalLeaderboard, abandonQuizSession } from '@qwizzeria/supabase-client';
 import SEO from '../components/SEO';
 import '../styles/DashboardHome.css';
 

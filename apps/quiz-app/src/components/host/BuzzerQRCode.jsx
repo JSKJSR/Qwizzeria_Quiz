@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react';
 import { QRCodeSVG } from 'qrcode.react';
-import '../../styles/BuzzerQRCode.css';
+import '@/styles/BuzzerQRCode.css';
 
 /**
  * Small inline QR code (scoreboard) that expands to a full-screen modal on click.

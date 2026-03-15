@@ -6,8 +6,9 @@ import {
   addQuestionToPack,
   removeQuestionFromPack,
   updatePackQuestionOrder,
-} from '@qwizzeria/supabase-client/src/packs.js';
-import { fetchAllQuestions, fetchCategories } from '@qwizzeria/supabase-client/src/questions.js';
+  fetchAllQuestions,
+  fetchCategories,
+} from '@qwizzeria/supabase-client';
 
 export default function PackQuestionsManager() {
   const { id: packId } = useParams();

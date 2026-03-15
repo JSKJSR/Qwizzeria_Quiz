@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../hooks/useAuth';
-import { fetchGlobalLeaderboard } from '@qwizzeria/supabase-client/src/leaderboard.js';
+import { fetchGlobalLeaderboard } from '@qwizzeria/supabase-client';
 import SEO from '../components/SEO';
 import '../styles/Leaderboard.css';
 

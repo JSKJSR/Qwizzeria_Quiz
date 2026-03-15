@@ -8,7 +8,7 @@ import {
   subscribeBuzzerChannel,
   sendBuzzerEvent,
   unsubscribeBuzzer,
-} from '@qwizzeria/supabase-client/src/buzzer.js';
+} from '@qwizzeria/supabase-client';
 import SEO from '../components/SEO';
 import '../styles/Buzzer.css';
 

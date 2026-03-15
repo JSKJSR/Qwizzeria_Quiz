@@ -1,7 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { getSupabase } from '@qwizzeria/supabase-client';
-import { onAuthStateChange, signOut as authSignOut, signInWithEmail, signUpWithEmail } from '@qwizzeria/supabase-client/src/auth.js';
-import { fetchUserRole, hasMinRole, getSubscriptionState } from '@qwizzeria/supabase-client/src/users.js';
+import { getSupabase, onAuthStateChange, signOut as authSignOut, signInWithEmail, signUpWithEmail, fetchUserRole, hasMinRole, getSubscriptionState } from '@qwizzeria/supabase-client';
 import { AuthContext } from '../contexts/AuthContext';
 
 const DEFAULT_SUBSCRIPTION = { status: 'expired', tier: 'free', gated: true };

@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
-import { fetchShowcasePacks } from '@qwizzeria/supabase-client/src/packs.js';
+import { fetchShowcasePacks } from '@qwizzeria/supabase-client';
 import LoginModal from './LoginModal';
 import MiniQuizHook from './MiniQuizHook';
 import SEO from './SEO';

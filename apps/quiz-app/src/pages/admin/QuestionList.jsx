@@ -4,8 +4,8 @@ import {
   fetchAllQuestions,
   fetchCategories,
   deleteQuestion,
-} from '@qwizzeria/supabase-client/src/questions.js';
-import { CATEGORIES } from '../../utils/categoryData';
+} from '@qwizzeria/supabase-client';
+import { CATEGORIES } from '@/utils/categoryData';
 
 function exportQuestionsCSV(questions) {
   const headers = [

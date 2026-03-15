@@ -1,9 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
-import { fetchUserProfile, upsertUserProfile, fetchUserStats } from '@qwizzeria/supabase-client/src/users.js';
-import { getSupabase } from '@qwizzeria/supabase-client';
-import { updatePassword, deleteOwnAccount } from '@qwizzeria/supabase-client/src/auth.js';
+import { fetchUserProfile, upsertUserProfile, fetchUserStats, getSupabase, updatePassword, deleteOwnAccount } from '@qwizzeria/supabase-client';
 import SEO from '../components/SEO';
 import '../styles/Profile.css';
 

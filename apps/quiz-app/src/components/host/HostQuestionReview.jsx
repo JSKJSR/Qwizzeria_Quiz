@@ -1,4 +1,4 @@
-import '../../styles/HostQuestionReview.css';
+import '@/styles/HostQuestionReview.css';
 
 export default function HostQuestionReview({ topics, completedQuestionIds, skippedQuestions, onConfirmEnd }) {
   const skippedIds = new Set(skippedQuestions.map(q => q.id));

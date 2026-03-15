@@ -4,7 +4,7 @@ import {
   fetchAllPacks,
   fetchPackCategories,
   deletePack,
-} from '@qwizzeria/supabase-client/src/packs.js';
+} from '@qwizzeria/supabase-client';
 
 export default function PackList() {
   const navigate = useNavigate();

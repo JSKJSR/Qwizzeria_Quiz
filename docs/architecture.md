@@ -17,8 +17,10 @@ Developed using **Turborepo** and npm workspaces, the codebase is split into ind
 - **`supabase-client/`**: A centralized package wrapping the Supabase SDK. It manages:
   - Global authentication state.
   - CRUD operations for questions and packs.
+  - AI quiz generation client (`aiGenerate.js`).
   - Aggregated leaderboard and analytics queries via Postgres RPCs.
   - Database schema migrations (located in `packages/supabase-client/migrations`).
+  - **Barrel Exports**: All core logic is re-exported from `index.js` for clean imports.
 - **`shared-types/`**: Shared TypeScript interfaces to ensure type safety across the monorepo. (Work in progress/Partial).
 
 ---
@@ -26,6 +28,13 @@ Developed using **Turborepo** and npm workspaces, the codebase is split into ind
 ## 🎮 Quiz Engine
 
 Each quiz mode (Free Quiz, Pack Play, Host Quiz) is powered by a **state-machine-driven engine** implemented with React's `useReducer` and `useContext`.
+
+### AI Generation Engine
+The Host Quiz integrates an AI generation flow powered by **Claude 3.5 Sonnet**:
+- **Supabase Edge Functions**: Calls the Anthropic API securely with service-role bypass.
+- **Client Implementation**: `supabase-client/src/aiGenerate.js` provides `generateQuiz` and `saveGeneratedPack`.
+- **UI Interaction**: `AIGenerateModal.jsx` handles the complex prompt -> generation -> preview -> edit -> save/use flow.
+- **Rate Limiting**: Enforced via `ai_generation_log` table tracking (5/hour, 20/day per user; admin bypass).
 
 ### Key States
 - **`loading`**: Fetching questions and initializing the session.
@@ -35,7 +44,8 @@ Each quiz mode (Free Quiz, Pack Play, Host Quiz) is powered by a **state-machine
 - **`results`**: Final score tally and medals.
 
 ### Real-time Buzzer & Host UI
-The Host Quiz features a redesigned **Host UI** with responsive layouts, collapsible scoreboards (Drawers), hero-sized Timer Controls, and a high-contrast Light/Dark mode toggle implementation.
+The Host Quiz features a modular **Host UI** with responsive layouts, collapsible scoreboards (Drawers), hero-sized Timer Controls, and a high-contrast Light/Dark mode toggle implementation.
+- **Decomposition**: The core `HostQuiz.jsx` component is decomposed (from 1200+ to ~600 lines) with state management extracted to `hostQuizReducer.js` and lifecycle logic to specialized hooks (`useHostQuizPersistence`, `useTournamentSync`).
 Additionally, it supports a live **Buzzer Overlay** synchronized via Supabase Realtime using the `useBuzzerHost` hook. Participants join a session via the `/buzzer` route using a host-generated room code.
 - **Precision Logging**: Utilizes sub-millisecond timestamps (`buzzerTimestamp.js`) to determine the exact order of player buzzes.
 - **Feedback**: Provides immediate auditory (`buzzerSound.js`) and visual cues on both the player device and host screen.
@@ -59,6 +69,7 @@ Host Quiz supports a **Tournament Mode** for single-elimination bracket competit
 ## 🚀 Performance Optimizations
 
 - **Vite 6**: Rapid HMR and optimized production bundling.
+- **Path Aliases**: Uses `@/` aliases (e.g., `@/hooks/useAuth`) for clean, relative-path-independent imports.
 - **Supabase Real-time**: Enables high-speed synchronization for Host Mode without complex WebSocket boilerplate.
 - **Postgres RPCs**: Moving complex aggregation logic (leaderboards, analytics, **user search**) to the database layer to minimize network payload.
 - **Flat CSS Grid**: Highly performant layout rendering for large topic grids.
@@ -68,7 +79,7 @@ Host Quiz supports a **Tournament Mode** for single-elimination bracket competit
 
 ## 🧪 Quality & Accessibility
 
-- **Test Coverage**: 66 tests across 6 files (Vitest + jsdom) — tournament bracket logic, session persistence, media detection, auth, supabase client, and sub-millisecond buzzer resolution.
+- **Test Coverage**: 149 tests across 14 files (Vitest + jsdom) — includes core state machines (reducers), AI generation logic, tournament brackets, session persistence, media detection, auth, and sub-millisecond buzzer resolution.
 - **Error Handling**: All data-fetching pages display error UI with retry buttons (no silent failures).
 - **WCAG Compliance**: focus-visible states, WCAG-AA contrast ratios, 44px minimum touch targets, `prefers-reduced-motion` support, semantic ARIA labels on interactive elements.
 - **CI/CD**: GitHub Actions pipeline (lint → build → test) on every push/PR; Vercel deployment config.

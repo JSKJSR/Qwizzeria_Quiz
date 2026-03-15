@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getSupabase } from '@qwizzeria/supabase-client';
-import { updatePassword } from '@qwizzeria/supabase-client/src/auth.js';
+import { getSupabase, updatePassword } from '@qwizzeria/supabase-client';
 import '../styles/ResetPassword.css';
 
 export default function ResetPassword() {

@@ -1,7 +1,7 @@
 import { useState } from 'react';
-import { exportResultsCSV, exportResultsPDF } from '../../utils/exportResults';
-import { generateCertificate } from '../../utils/certificateGenerator';
-import '../../styles/HostResultsView.css';
+import { exportResultsCSV, exportResultsPDF } from '@/utils/exportResults';
+import { generateCertificate } from '@/utils/certificateGenerator';
+import '@/styles/HostResultsView.css';
 
 const MEDAL_ICONS = ['&#129351;', '&#129352;', '&#129353;']; // gold, silver, bronze
 

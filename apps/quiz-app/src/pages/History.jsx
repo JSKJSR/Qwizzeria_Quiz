@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
-import { fetchUserHistory, fetchSessionDetail } from '@qwizzeria/supabase-client/src/users.js';
+import { fetchUserHistory, fetchSessionDetail } from '@qwizzeria/supabase-client';
 import SEO from '../components/SEO';
 import '../styles/History.css';
 

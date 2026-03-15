@@ -4,8 +4,8 @@ import {
   fetchQuestionById,
   createQuestion,
   updateQuestion,
-} from '@qwizzeria/supabase-client/src/questions.js';
-import { CATEGORY_MAP, CATEGORIES, isValidCategory, isValidSubCategory } from '../../utils/categoryData';
+} from '@qwizzeria/supabase-client';
+import { CATEGORY_MAP, CATEGORIES, isValidCategory, isValidSubCategory } from '@/utils/categoryData';
 
 const EMPTY_FORM = {
   question_text: '',

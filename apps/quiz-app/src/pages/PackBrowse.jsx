@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
-import { browsePublicPacks, fetchPackCategories } from '@qwizzeria/supabase-client/src/packs.js';
+import { browsePublicPacks, fetchPackCategories } from '@qwizzeria/supabase-client';
 import SEO from '../components/SEO';
 import '../styles/PackBrowse.css';
 

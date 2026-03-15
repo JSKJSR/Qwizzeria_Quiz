@@ -1,6 +1,6 @@
 import { NavLink, Outlet } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
-import { hasMinRole } from '@qwizzeria/supabase-client/src/users.js';
+import { hasMinRole } from '@qwizzeria/supabase-client';
 import '../styles/AdminCms.css';
 
 export default function AdminLayout() {

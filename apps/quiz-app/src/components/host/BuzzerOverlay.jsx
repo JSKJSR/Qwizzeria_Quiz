@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import ResponsesModal from './ResponsesModal';
-import { getHostHint } from '../../utils/hostHintText';
-import '../../styles/BuzzerOverlay.css';
+import { getHostHint } from '@/utils/hostHintText';
+import '@/styles/BuzzerOverlay.css';
 
 /**
  * BuzzerOverlay — floating buzzer/input controls (bottom-right).

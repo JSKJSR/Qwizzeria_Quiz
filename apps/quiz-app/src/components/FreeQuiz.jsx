@@ -1,7 +1,7 @@
 import { useReducer, useEffect, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
-import { fetchGridQuestions, createQuizSession, recordAttempt, completeQuizSession, abandonQuizSession, updateSessionMetadata } from '@qwizzeria/supabase-client/src/questions.js';
+import { fetchGridQuestions, createQuizSession, recordAttempt, completeQuizSession, abandonQuizSession, updateSessionMetadata } from '@qwizzeria/supabase-client';
 import { detectMediaType } from '../utils/mediaDetector';
 import TopicGrid from './TopicGrid';
 import QuestionView from './QuestionView';
