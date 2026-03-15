@@ -1,9 +1,11 @@
 import { useState } from 'react';
+import { exportResultsCSV, exportResultsPDF } from '../../utils/exportResults';
+import { generateCertificate, downloadCertificate } from '../../utils/certificateGenerator';
 import '../../styles/HostResultsView.css';
 
 const MEDAL_ICONS = ['&#129351;', '&#129352;', '&#129353;']; // gold, silver, bronze
 
-export default function HostResultsView({ participants, skippedQuestions = [], onPlayAgain, onNewQuiz }) {
+export default function HostResultsView({ participants, skippedQuestions = [], onPlayAgain, onNewQuiz, quizTitle = 'Quiz Results' }) {
   const sorted = [...participants].sort((a, b) => b.score - a.score);
   const [skippedExpanded, setSkippedExpanded] = useState(true);
 
@@ -34,6 +36,24 @@ export default function HostResultsView({ participants, skippedQuestions = [], o
               </div>
               <div className="host-results__name">{p.name}</div>
               <div className="host-results__score">{p.score} pts</div>
+              {isTop3 && (
+                <button
+                  className="host-results__cert-btn"
+                  onClick={() => {
+                    const dataUrl = generateCertificate({
+                      name: p.name,
+                      rank,
+                      score: p.score,
+                      quizTitle,
+                      date: new Date().toLocaleDateString(),
+                    });
+                    downloadCertificate(dataUrl, `${p.name}_certificate.png`);
+                  }}
+                  title={`Download certificate for ${p.name}`}
+                >
+                  Certificate
+                </button>
+              )}
             </div>
           );
         })}
@@ -66,6 +86,21 @@ export default function HostResultsView({ participants, skippedQuestions = [], o
           )}
         </div>
       )}
+
+      <div className="host-results__export-actions">
+        <button
+          className="host-results__btn host-results__btn--export"
+          onClick={() => exportResultsCSV(participants, quizTitle)}
+        >
+          Export CSV
+        </button>
+        <button
+          className="host-results__btn host-results__btn--export"
+          onClick={() => exportResultsPDF(participants, quizTitle, skippedQuestions)}
+        >
+          Print PDF
+        </button>
+      </div>
 
       <div className="host-results__actions">
         <button className="host-results__btn host-results__btn--primary" onClick={onPlayAgain}>

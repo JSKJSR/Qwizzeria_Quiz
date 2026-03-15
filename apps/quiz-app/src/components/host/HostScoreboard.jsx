@@ -35,12 +35,15 @@ export default function HostScoreboard({
   buzzerCopied,
   timerRef,
   onTimerExpire,
+  onTimerTick,
+  onPublishScores,
 }) {
   const maxScore = Math.max(...participants.map(p => p.score), 0);
   const hasScores = maxScore > 0;
   const [openPopover, setOpenPopover] = useState(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [lightMode, setLightMode] = useHostTheme();
+  const [published, setPublished] = useState(false);
   const popoverRef = useRef(null);
 
   const useDrawer = participants.length > INLINE_THRESHOLD;
@@ -137,7 +140,7 @@ export default function HostScoreboard({
 
         {/* Center zone: Timer */}
         <div className="scoreboard__center">
-          <TimerControl ref={timerRef} onExpire={onTimerExpire} />
+          <TimerControl ref={timerRef} onExpire={onTimerExpire} onTick={onTimerTick} />
         </div>
 
         {/* Right zone: Scores + End button */}
@@ -164,6 +167,18 @@ export default function HostScoreboard({
                 <span className="scoreboard__drawer-chevron">{drawerOpen ? '\u25B2' : '\u25BC'}</span>
               </button>
             </div>
+          )}
+          {onPublishScores && (
+            <button
+              className="scoreboard__publish-btn"
+              onClick={() => {
+                onPublishScores();
+                setPublished(true);
+                setTimeout(() => setPublished(false), 2000);
+              }}
+            >
+              {published ? 'Published!' : 'Publish'}
+            </button>
           )}
           <label className="scoreboard__theme-toggle">
             <span className="scoreboard__theme-label">Light Mode</span>

@@ -149,6 +149,44 @@
   line-height: 1.4;
 }
 
+/* Certificate button */
+.host-results__cert-btn {
+  padding: 0.25rem 0.5rem;
+  background: rgba(241, 196, 15, 0.1);
+  color: #f1c40f;
+  border: 1px solid rgba(241, 196, 15, 0.3);
+  border-radius: 4px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s ease;
+  flex-shrink: 0;
+}
+
+.host-results__cert-btn:hover {
+  background: rgba(241, 196, 15, 0.2);
+}
+
+/* Export actions */
+.host-results__export-actions {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: center;
+  margin-bottom: 1rem;
+}
+
+.host-results__btn--export {
+  background: transparent;
+  border: 1px solid var(--border-color, #2a1520);
+  color: var(--text-secondary, #b0a0a5);
+  font-size: 0.85rem;
+}
+
+.host-results__btn--export:hover {
+  border-color: var(--accent-primary, #e85c1a);
+  color: var(--text-primary, #f0f0f0);
+}
+
 .host-results__actions {
   display: flex;
   gap: 1rem;

@@ -106,6 +106,13 @@ export default function BuzzerPage() {
   const [questionHistory, setQuestionHistory] = useState([]); // [{id, text}]
   const [savedFlash, setSavedFlash] = useState(false);
 
+  // Timer sync state
+  const [timerLeft, setTimerLeft] = useState(null);
+
+  // Score publish state
+  const [scoreOverlay, setScoreOverlay] = useState(null); // [{name, score, rank}] or null
+  const scoreOverlayTimerRef = useRef(null);
+
   // Stable refs — never cause re-renders, survive all phase changes
   const roomRef = useRef(null);             // set once on successful join
   const channelRef = useRef(null);          // set once after joined=true
@@ -232,6 +239,7 @@ export default function BuzzerPage() {
 
       onInputLock: () => {
         setInputLocked(true);
+        setTimerLeft(null);
       },
 
       onInputReset: () => {
@@ -244,7 +252,18 @@ export default function BuzzerPage() {
         setViewingQuestionId(null);
         setQuestionHistory([]);
         isAllowedRef.current = false;
+        setTimerLeft(null);
         setPhase('waiting');
+      },
+
+      // Timer sync from host
+      onTimerSync: ({ timeLeft }) => {
+        setTimerLeft(timeLeft);
+      },
+
+      // Score publish from host
+      onScorePublish: ({ rankings }) => {
+        setScoreOverlay(rankings);
       },
 
       // Host closed the room entirely
@@ -323,6 +342,19 @@ export default function BuzzerPage() {
       clearInterval(intervalId);
     };
   }, [joined]);
+
+  // ── SCORE OVERLAY AUTO-DISMISS ──────────────────────────────────────────────
+  useEffect(() => {
+    if (!scoreOverlay) return;
+    if (scoreOverlayTimerRef.current) clearTimeout(scoreOverlayTimerRef.current);
+    scoreOverlayTimerRef.current = setTimeout(() => {
+      setScoreOverlay(null);
+      scoreOverlayTimerRef.current = null;
+    }, 5000);
+    return () => {
+      if (scoreOverlayTimerRef.current) clearTimeout(scoreOverlayTimerRef.current);
+    };
+  }, [scoreOverlay]);
 
   // ── BUZZ HANDLER ─────────────────────────────────────────────────────────────
   const handleBuzz = useCallback(() => {
@@ -549,6 +581,32 @@ export default function BuzzerPage() {
           </div>
         )}
 
+        {/* SCORE OVERLAY — shown when host publishes scores */}
+        {scoreOverlay && (
+          <div
+            className="buzzer-page__score-overlay"
+            onClick={() => setScoreOverlay(null)}
+            role="button"
+            tabIndex={0}
+            onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') setScoreOverlay(null); }}
+          >
+            <div className="buzzer-page__score-overlay-content">
+              <h3 className="buzzer-page__score-overlay-title">Leaderboard</h3>
+              {scoreOverlay.map((entry, i) => (
+                <div
+                  key={i}
+                  className={`buzzer-page__score-row ${entry.name === displayName ? 'buzzer-page__score-row--self' : ''}`}
+                >
+                  <span className="buzzer-page__score-rank">#{entry.rank}</span>
+                  <span className="buzzer-page__score-name">{entry.name}</span>
+                  <span className="buzzer-page__score-pts">{entry.score} pts</span>
+                </div>
+              ))}
+              <p className="buzzer-page__score-dismiss">Tap to dismiss</p>
+            </div>
+          </div>
+        )}
+
         {/* INPUT_READY — host opened input, type answer */}
         {phase === 'input_ready' && (
           <div className="buzzer-page__center">
@@ -577,6 +635,13 @@ export default function BuzzerPage() {
                     {myResponses[q.id] && ' \u2713'}
                   </button>
                 ))}
+              </div>
+            )}
+
+            {/* Timer countdown */}
+            {timerLeft !== null && (
+              <div className={`buzzer-page__timer ${timerLeft <= 10 ? 'buzzer-page__timer--critical' : timerLeft <= 30 ? 'buzzer-page__timer--warning' : 'buzzer-page__timer--running'}`}>
+                {String(Math.floor(timerLeft / 60)).padStart(2, '0')}:{String(timerLeft % 60).padStart(2, '0')}
               </div>
             )}
 

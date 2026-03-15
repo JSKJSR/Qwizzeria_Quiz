@@ -1,7 +1,7 @@
 import { useState, useRef, useCallback, useEffect, useImperativeHandle, forwardRef } from 'react';
 import '../../styles/TimerControl.css';
 
-const TimerControl = forwardRef(function TimerControl({ onExpire }, ref) {
+const TimerControl = forwardRef(function TimerControl({ onExpire, onTick }, ref) {
   const [minutes, setMinutes] = useState(0);
   const [seconds, setSeconds] = useState(30);
   const [timeLeft, setTimeLeft] = useState(null); // null = use input values; number = countdown active/done
@@ -9,9 +9,14 @@ const TimerControl = forwardRef(function TimerControl({ onExpire }, ref) {
   const intervalRef = useRef(null);
   const audioContextRef = useRef(null);
   const onExpireRef = useRef(onExpire);
+  const onTickRef = useRef(onTick);
+  const lastTickRef = useRef(null);
   useEffect(() => {
     onExpireRef.current = onExpire;
   }, [onExpire]);
+  useEffect(() => {
+    onTickRef.current = onTick;
+  }, [onTick]);
 
   // Effective display time: countdown value if started, otherwise derived from inputs
   const displayTime = timeLeft !== null ? timeLeft : minutes * 60 + seconds;
@@ -60,10 +65,16 @@ const TimerControl = forwardRef(function TimerControl({ onExpire }, ref) {
       const startedAt = Date.now();
       const startValue = startTime;
       stopInterval();
+      lastTickRef.current = null;
       intervalRef.current = setInterval(() => {
         const elapsed = Math.floor((Date.now() - startedAt) / 1000);
         const remaining = Math.max(0, startValue - elapsed);
         setTimeLeft(remaining);
+        // Throttle onTick to once per second
+        if (onTickRef.current && remaining !== lastTickRef.current) {
+          lastTickRef.current = remaining;
+          onTickRef.current(remaining);
+        }
         if (remaining <= 0) {
           clearInterval(intervalRef.current);
           intervalRef.current = null;
@@ -96,12 +107,16 @@ const TimerControl = forwardRef(function TimerControl({ onExpire }, ref) {
       const startedAt = Date.now();
       const startValue = startTime;
 
+      lastTickRef.current = null;
       stopInterval();
       intervalRef.current = setInterval(() => {
         const elapsed = Math.floor((Date.now() - startedAt) / 1000);
         const remaining = Math.max(0, startValue - elapsed);
         setTimeLeft(remaining);
-
+        if (onTickRef.current && remaining !== lastTickRef.current) {
+          lastTickRef.current = remaining;
+          onTickRef.current(remaining);
+        }
         if (remaining <= 0) {
           clearInterval(intervalRef.current);
           intervalRef.current = null;

@@ -1000,6 +1000,7 @@ export default function HostQuiz() {
           skippedQuestions={skippedQuestions}
           onPlayAgain={handlePlayAgain}
           onNewQuiz={handleNewQuiz}
+          quizTitle={state.pack?.title}
         />
       </div>
     );
@@ -1105,6 +1106,12 @@ export default function HostQuiz() {
           buzzerCopied={buzzerCopied}
           timerRef={timerRef}
           onTimerExpire={handleTimerExpire}
+          onTimerTick={buzzerEnabled ? buzzer.broadcastTimerSync : undefined}
+          onPublishScores={buzzerEnabled ? () => {
+            const sorted = [...matchParticipants].sort((a, b) => b.score - a.score);
+            const rankings = sorted.map((p, i) => ({ name: p.name, score: p.score, rank: i + 1 }));
+            buzzer.publishScores(rankings);
+          } : undefined}
         />
 
         {buzzerEnabled && buzzer.roomCode && (
@@ -1198,6 +1205,12 @@ export default function HostQuiz() {
         buzzerCopied={buzzerCopied}
         timerRef={timerRef}
         onTimerExpire={handleTimerExpire}
+        onTimerTick={buzzerEnabled ? buzzer.broadcastTimerSync : undefined}
+        onPublishScores={buzzerEnabled ? () => {
+          const sorted = [...participants].sort((a, b) => b.score - a.score);
+          const rankings = sorted.map((p, i) => ({ name: p.name, score: p.score, rank: i + 1 }));
+          buzzer.publishScores(rankings);
+        } : undefined}
       />
 
       {buzzerEnabled && buzzer.roomCode && (
