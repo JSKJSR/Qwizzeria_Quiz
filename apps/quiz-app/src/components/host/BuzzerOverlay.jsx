@@ -327,7 +327,7 @@ export default function BuzzerOverlay({
               <div className="buzzer-fab__guide-flow">Buzzer Flow</div>
               {[
                 'Select question from grid',
-                'Click "Open Buzzer"',
+                'Choose "Buzzer" from the mode selector',
                 'Players buzz → results ranked',
                 'Click "Award" next to winner',
                 'Select next question (auto-resets)',
@@ -341,10 +341,10 @@ export default function BuzzerOverlay({
               <div className="buzzer-fab__guide-flow">Collect Answers Flow</div>
               {[
                 'Select question from grid',
-                'Click "Collect Answers" (timer auto-starts)',
-                'Timer expires → auto-locks & shows who submitted',
-                'Click "View Responses" → reveal answers',
-                '"Go to Grid" or "Back to Question" to continue',
+                'Choose "Collect Answers" (timer auto-starts)',
+                'Timer expires → auto-locks & opens responses',
+                'Reveal answers, then "Go to Grid" to continue',
+                'Participants see live countdown on their device',
               ].map((step, i) => (
                 <div key={i} className="buzzer-fab__guide-step">
                   <span className="buzzer-fab__guide-step-num">{i + 1}</span>

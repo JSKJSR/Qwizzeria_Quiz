@@ -527,13 +527,19 @@ export default function Guide() {
         <GuideStep
           number={6}
           title="Scoreboard & Timer"
-          description="The top bar tracks live scores for all players. Use the countdown timer with audio alerts to keep things moving."
+          description="The top bar tracks live scores for all players. Use the countdown timer with audio alerts to keep things moving. With buzzer enabled, participants see a live countdown on their devices too."
           visual={<ScorebarVisual />}
         />
         <GuideStep
           number={7}
-          title="Results"
-          description="End the quiz to see final standings. Gold, silver, and bronze medals are awarded to the top three."
+          title="Publish Scores"
+          description="Click 'Publish' in the scoreboard to broadcast the current standings to all connected participants. They'll see a leaderboard overlay on their devices for 5 seconds."
+          visual={<ScorebarVisual />}
+        />
+        <GuideStep
+          number={8}
+          title="Results & Export"
+          description="End the quiz to see final standings with medals. Export results as CSV or print as PDF. Download certificates for the top 3 players."
           visual={<PodiumVisual />}
         />
         <GuideTip>
@@ -556,8 +562,8 @@ export default function Guide() {
         />
         <GuideStep
           number={3}
-          title="Host Opens the Buzzer"
-          description="For each question, click 'Open Buzzer'. Players see a green BUZZ button on their device. After awarding a point, click 'Next Round' to reset and open the buzzer in one step — no separate reset needed."
+          title="Choose Buzzer or Collect Answers"
+          description="Select a question from the grid, then choose your mode: 'Buzzer' for speed-based buzzing, or 'Collect Answers' for text input. The overlay shows how many participants are connected — if zero, you'll see a warning."
           visual={<BuzzerHostFlowVisual />}
         />
         <GuideStep
@@ -597,13 +603,13 @@ export default function Guide() {
         <GuideStep
           number={1}
           title="Collect Answers"
-          description="Click 'Collect Answers' in the buzzer overlay — right next to 'Open Buzzer'. No mode switching needed. Participants see a text field and submit their answers."
+          description="Select 'Collect Answers' from the mode selector. The timer auto-starts and participants see a text field with a live countdown on their device. Colors change from green to yellow to red as time runs out."
           visual={<InputAnswerVisual />}
         />
         <GuideStep
           number={2}
-          title="Lock & View"
-          description="Click 'Lock & View' to stop accepting answers and immediately see all responses. Answers are hidden by default — click 'Reveal All' to show them all at once, game-show style!"
+          title="Auto-Open Responses"
+          description="When the timer expires, answers are automatically locked and the responses modal opens — no manual clicking needed. Answers are hidden by default — click 'Reveal All' to show them game-show style!"
           visual={<InputRevealVisual />}
         />
         <GuideTip>

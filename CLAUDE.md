@@ -77,11 +77,17 @@ Access restricted via role checks (editor, admin, superadmin).
 - **Host quiz**: HostQuiz.jsx useReducer (packSelect/setup/grid/question/answer/results)
   - Pack selection from DB packs, 2-8 participants
   - Integrated scoreboard top bar: logo + self-contained timer + participant scores + END QUIZ button
-  - Timer: Self-contained component with editable min/sec inputs, MM:SS display, play/pause/reset SVG buttons, Web Audio API beeps (3× 800Hz), color states (green running → yellow ≤30s → red ≤10s → red pulse expired)
+  - Timer: Self-contained component with editable min/sec inputs, MM:SS display, play/pause/reset SVG buttons, Web Audio API beeps (3× 800Hz), color states (green running → yellow ≤30s → red ≤10s → red pulse expired), `onTick` prop for broadcasting timer sync to participants
   - Flat card grid for question selection (same visual style as pack play)
   - Answer view with participant point-awarding buttons
   - Session persistence in localStorage (24h expiry) for quiz state and buzzer rooms
   - Full-screen overlay (`position: fixed; inset: 0; z-index: 200`)
+  - **Mode selector**: BuzzerOverlay idle state shows two mode cards (Buzzer / Collect Answers) instead of side-by-side buttons, with participant readiness count and zero-participant warning
+  - **Auto-open responses**: When timer expires during input collection, ResponsesModal auto-opens (no manual click)
+  - **Timer sync**: Host broadcasts timer ticks via Supabase Broadcast; participants see live MM:SS countdown with color states
+  - **Score publish**: "Publish" button in scoreboard broadcasts rankings to participant devices (5s auto-dismiss overlay)
+  - **Export results**: CSV download + PDF print from HostResultsView
+  - **Certificates**: Canvas-based PNG certificates for top 3 finishers (1200×800, Qwizzeria branding)
 - **Landing page**: LandingPageB with hero section + pack carousel (fetches all active packs via `fetchShowcasePacks`)
 - **Pack visibility**: Packs default to `is_public=false, status='draft'`. Must set `status='active'` (via Admin CMS) for packs to be visible. RLS allows all active packs to be read by everyone (including anonymous); app-layer role checks control who can actually play (premium/host gating).
 - **Session tracking**: createQuizSession → recordAttempt → completeQuizSession (non-blocking)
@@ -134,7 +140,7 @@ Access restricted via role checks (editor, admin, superadmin).
 - `npm run dev` — Start all dev servers (quiz-app :5173, admin-cms :5174)
 - `npm run build` — Build all packages
 - `npm run lint` — Lint all packages
-- `cd apps/quiz-app && npx vitest run` — Run tests (71 tests across 6 files)
+- `cd apps/quiz-app && npx vitest run` — Run tests (79 tests across 8 files)
 
 ## Key Component Files
 
@@ -159,6 +165,8 @@ Access restricted via role checks (editor, admin, superadmin).
 - `apps/quiz-app/src/components/host/BuzzerOverlay.jsx` — Host buzzer controls overlay
 - `apps/quiz-app/src/utils/buzzerTimestamp.js` — Buzz ranking, tie detection, validation
 - `apps/quiz-app/src/utils/buzzerSound.js` — Web Audio buzzer sound effects
+- `apps/quiz-app/src/utils/exportResults.js` — CSV download + PDF print for quiz results
+- `apps/quiz-app/src/utils/certificateGenerator.js` — Canvas-based PNG certificate generation for top 3
 
 ## Completed Phases
 

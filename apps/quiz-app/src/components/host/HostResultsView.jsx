@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { exportResultsCSV, exportResultsPDF } from '../../utils/exportResults';
-import { generateCertificate, downloadCertificate } from '../../utils/certificateGenerator';
+import { generateCertificate } from '../../utils/certificateGenerator';
 import '../../styles/HostResultsView.css';
 
 const MEDAL_ICONS = ['&#129351;', '&#129352;', '&#129353;']; // gold, silver, bronze
@@ -39,17 +39,14 @@ export default function HostResultsView({ participants, skippedQuestions = [], o
               {isTop3 && (
                 <button
                   className="host-results__cert-btn"
-                  onClick={() => {
-                    const dataUrl = generateCertificate({
-                      name: p.name,
-                      rank,
-                      score: p.score,
-                      quizTitle,
-                      date: new Date().toLocaleDateString(),
-                    });
-                    downloadCertificate(dataUrl, `${p.name}_certificate.png`);
-                  }}
-                  title={`Download certificate for ${p.name}`}
+                  onClick={() => generateCertificate({
+                    name: p.name,
+                    rank,
+                    score: p.score,
+                    quizTitle,
+                    date: new Date().toLocaleDateString(),
+                  })}
+                  title={`Print certificate for ${p.name}`}
                 >
                   Certificate
                 </button>

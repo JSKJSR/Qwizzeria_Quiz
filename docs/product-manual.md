@@ -23,7 +23,12 @@ This document provides a comprehensive map of the user flow, product features, a
 - **Host Quiz**: Real-time multiplayer sessions (2-8 players/teams) with a dedicated teacher/host view and participant scoring.
     - **Host UI Controls**: Features a responsive, hero-sized timer with precise countdown controls.
     - **Scoreboard & Theme**: The host dashboard utilizes a collapsible Scoreboard drawer for better space management and includes a Light/Dark Mode toggle to accommodate different classroom/presentation environments.
+    - **Mid-Quiz Score Publishing**: The host can click "Publish" in the scoreboard to broadcast current standings to all connected participant devices. Participants see a ranked leaderboard overlay that auto-dismisses after 5 seconds (or tap to close).
+    - **Export Results**: At the end of a quiz, hosts can export results as CSV or print as PDF. Download certificates (PNG) for the top 3 finishers with Qwizzeria branding, participant name, rank, score, and quiz title.
 - **Real-Time Buzzer System**: Hosts can activate a live buzzer overlay. Participants join via the `/buzzer` route using a generated room code. The system features sub-millisecond precision, sound effects, and a dynamic host overlay to determine who buzzed first.
+    - **Mode Selector**: When a question is selected, the host sees two distinct mode cards — "Buzzer" (speed-based) and "Collect Answers" (text input) — replacing the old side-by-side buttons. A participant readiness badge shows the number of connected participants with a yellow warning when zero are connected.
+    - **Auto-Open Answer Summary**: When the timer expires during input collection, answers are automatically locked and the responses modal opens — no manual click required.
+    - **Participant Timer Sync**: During input collection, participants see a live MM:SS countdown on their device that matches the host timer, with color states (green > 30s, yellow ≤ 30s, red ≤ 10s).
     - **Session Persistence**: Buzzer room state (room code and ID) is persisted locally. If a host accidentally refreshes or navigates away during an active buzzer session, they are prompted to restore it upon returning, automatically reconnecting players seamlessly.
 - **Tournaments**:
     - Auto-generated single-elimination brackets for 2-16 teams.

@@ -13,6 +13,7 @@
   "dependencies": {
     "@qwizzeria/supabase-client": "^0.0.0",
     "@supabase/supabase-js": "^2.95.3",
+    "@vercel/analytics": "^2.0.1",
     "qrcode.react": "^4.2.0",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",

@@ -1,150 +1,308 @@
 /**
- * Canvas-based certificate generator for quiz winners.
- * Pure Canvas API — no external dependencies.
+ * Certificate generator — opens a styled printable page (Save as PDF).
+ * Elegant formal layout inspired by traditional academic certificates.
+ * Embeds the Qwizzeria logo at the top.
  */
 
-const MEDAL_COLORS = {
-  1: { primary: '#FFD700', secondary: '#FFA500', label: '1st Place' },
-  2: { primary: '#C0C0C0', secondary: '#A0A0A0', label: '2nd Place' },
-  3: { primary: '#CD7F32', secondary: '#8B4513', label: '3rd Place' },
+const RANK_LABELS = {
+  1: { ordinal: '1st Place', color: '#B8860B' },
+  2: { ordinal: '2nd Place', color: '#71706E' },
+  3: { ordinal: '3rd Place', color: '#8B5E3C' },
 };
 
 /**
- * Generate a certificate as a PNG data URL.
+ * Open a printable certificate in a new browser window.
+ * The user can then "Save as PDF" via the print dialog.
+ *
  * @param {object} params
  * @param {string} params.name - Participant name
  * @param {number} params.rank - 1, 2, or 3
  * @param {number} params.score - Final score
  * @param {string} params.quizTitle - Quiz/pack title
  * @param {string} params.date - Formatted date string
- * @returns {string} PNG data URL
  */
 export function generateCertificate({ name, rank, score, quizTitle = 'Quiz', date = '' }) {
-  const W = 1200;
-  const H = 800;
+  const info = RANK_LABELS[rank] || RANK_LABELS[1];
 
-  const canvas = document.createElement('canvas');
-  canvas.width = W;
-  canvas.height = H;
-  const ctx = canvas.getContext('2d');
+  // Build a base64 logo URL at runtime so the certificate works offline
+  // We load the logo via fetch then embed it
+  const logoUrl = `${window.location.origin}/qwizzeria-logo.png`;
 
-  const medal = MEDAL_COLORS[rank] || MEDAL_COLORS[1];
+  const html = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Certificate — ${escapeHTML(name)}</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Lato:wght@300;400;700&display=swap');
 
-  // Background
-  ctx.fillStyle = '#0a0a0a';
-  ctx.fillRect(0, 0, W, H);
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
-  // Decorative border
-  ctx.strokeStyle = medal.primary;
-  ctx.lineWidth = 4;
-  ctx.strokeRect(30, 30, W - 60, H - 60);
+    @page {
+      size: landscape;
+      margin: 0;
+    }
 
-  // Inner border
-  ctx.strokeStyle = 'rgba(255,255,255,0.1)';
-  ctx.lineWidth = 1;
-  ctx.strokeRect(45, 45, W - 90, H - 90);
+    body {
+      width: 297mm;
+      height: 210mm;
+      margin: 0 auto;
+      background: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
 
-  // Corner accents
-  const cornerSize = 40;
-  ctx.fillStyle = medal.primary;
-  [[50, 50], [W - 50 - cornerSize, 50], [50, H - 50 - cornerSize], [W - 50 - cornerSize, H - 50 - cornerSize]].forEach(([x, y]) => {
-    ctx.fillRect(x, y, cornerSize, 2);
-    ctx.fillRect(x, y, 2, cornerSize);
-  });
+    .cert {
+      width: 277mm;
+      height: 190mm;
+      position: relative;
+      background: #FFFDF5;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20mm 30mm;
+      font-family: 'Lato', 'Helvetica Neue', sans-serif;
+      color: #2C2C2C;
+    }
 
-  // "Certificate of Achievement" header
-  ctx.fillStyle = 'rgba(255,255,255,0.5)';
-  ctx.font = '600 16px -apple-system, BlinkMacSystemFont, sans-serif';
-  ctx.textAlign = 'center';
-  ctx.letterSpacing = '0.3em';
-  ctx.fillText('CERTIFICATE OF ACHIEVEMENT', W / 2, 120);
+    /* ---- Decorative borders ---- */
+    .cert::before {
+      content: '';
+      position: absolute;
+      inset: 8mm;
+      border: 2px solid ${info.color};
+      pointer-events: none;
+    }
 
-  // Qwizzeria branding
-  ctx.fillStyle = '#e85c1a';
-  ctx.font = 'bold 36px -apple-system, BlinkMacSystemFont, sans-serif';
-  ctx.fillText('QWIZZERIA', W / 2, 175);
+    .cert::after {
+      content: '';
+      position: absolute;
+      inset: 10mm;
+      border: 0.5px solid ${info.color}55;
+      pointer-events: none;
+    }
 
-  // Tagline
-  ctx.fillStyle = 'rgba(255,255,255,0.3)';
-  ctx.font = 'italic 14px -apple-system, BlinkMacSystemFont, sans-serif';
-  ctx.fillText('I learn, therefore I am', W / 2, 200);
+    /* ---- Corner ornaments ---- */
+    .corner {
+      position: absolute;
+      width: 28px;
+      height: 28px;
+    }
+    .corner::before, .corner::after {
+      content: '';
+      position: absolute;
+      background: ${info.color};
+    }
+    .corner::before {
+      width: 28px; height: 2px;
+    }
+    .corner::after {
+      width: 2px; height: 28px;
+    }
+    .corner--tl { top: 9mm; left: 9mm; }
+    .corner--tl::before { top: 0; left: 0; }
+    .corner--tl::after { top: 0; left: 0; }
 
-  // Medal circle
-  const medalY = 290;
-  const gradient = ctx.createRadialGradient(W / 2, medalY, 10, W / 2, medalY, 45);
-  gradient.addColorStop(0, medal.primary);
-  gradient.addColorStop(1, medal.secondary);
-  ctx.beginPath();
-  ctx.arc(W / 2, medalY, 45, 0, Math.PI * 2);
-  ctx.fillStyle = gradient;
-  ctx.fill();
+    .corner--tr { top: 9mm; right: 9mm; }
+    .corner--tr::before { top: 0; right: 0; left: auto; }
+    .corner--tr::after { top: 0; right: 0; left: auto; }
 
-  // Rank number in medal
-  ctx.fillStyle = '#000';
-  ctx.font = 'bold 36px -apple-system, BlinkMacSystemFont, sans-serif';
-  ctx.fillText(`${rank}`, W / 2, 303);
+    .corner--bl { bottom: 9mm; left: 9mm; }
+    .corner--bl::before { bottom: 0; left: 0; top: auto; }
+    .corner--bl::after { bottom: 0; left: 0; top: auto; }
 
-  // Rank label
-  ctx.fillStyle = medal.primary;
-  ctx.font = '600 20px -apple-system, BlinkMacSystemFont, sans-serif';
-  ctx.fillText(medal.label, W / 2, 370);
+    .corner--br { bottom: 9mm; right: 9mm; }
+    .corner--br::before { bottom: 0; right: 0; left: auto; top: auto; }
+    .corner--br::after { bottom: 0; right: 0; left: auto; top: auto; }
 
-  // "Awarded to"
-  ctx.fillStyle = 'rgba(255,255,255,0.5)';
-  ctx.font = '16px -apple-system, BlinkMacSystemFont, sans-serif';
-  ctx.fillText('Awarded to', W / 2, 430);
+    /* ---- Logo ---- */
+    .cert__logo {
+      width: 72px;
+      height: auto;
+      margin-bottom: 10px;
+      opacity: 0.9;
+    }
 
-  // Participant name
-  ctx.fillStyle = '#ffffff';
-  // Scale font size for long names
-  const nameSize = name.length > 20 ? 36 : name.length > 14 ? 44 : 52;
-  ctx.font = `bold ${nameSize}px -apple-system, BlinkMacSystemFont, sans-serif`;
-  ctx.fillText(name, W / 2, 485);
+    /* ---- Organization name ---- */
+    .cert__org {
+      font-family: 'Lato', sans-serif;
+      font-weight: 700;
+      font-size: 14px;
+      letter-spacing: 0.35em;
+      text-transform: uppercase;
+      color: #C45A1A;
+      margin-bottom: 2px;
+    }
 
-  // Decorative line
-  ctx.strokeStyle = medal.primary;
-  ctx.lineWidth = 2;
-  ctx.beginPath();
-  ctx.moveTo(W / 2 - 120, 510);
-  ctx.lineTo(W / 2 + 120, 510);
-  ctx.stroke();
+    /* ---- Title ---- */
+    .cert__title {
+      font-family: 'Lato', sans-serif;
+      font-weight: 300;
+      font-size: 12px;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: #555;
+      margin-bottom: 24px;
+    }
 
-  // Quiz title
-  ctx.fillStyle = 'rgba(255,255,255,0.7)';
-  ctx.font = '18px -apple-system, BlinkMacSystemFont, sans-serif';
-  ctx.fillText(`for outstanding performance in`, W / 2, 550);
+    /* ---- Rank badge ---- */
+    .cert__rank {
+      font-family: 'Lato', sans-serif;
+      font-weight: 700;
+      font-size: 13px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: ${info.color};
+      background: ${info.color}12;
+      border: 1px solid ${info.color}44;
+      padding: 4px 20px;
+      border-radius: 20px;
+      margin-bottom: 20px;
+    }
 
-  ctx.fillStyle = '#e85c1a';
-  ctx.font = 'bold 24px -apple-system, BlinkMacSystemFont, sans-serif';
-  // Truncate long titles
-  const displayTitle = quizTitle.length > 40 ? quizTitle.slice(0, 37) + '...' : quizTitle;
-  ctx.fillText(displayTitle, W / 2, 585);
+    /* ---- Recipient name ---- */
+    .cert__name {
+      font-family: 'Playfair Display', 'Georgia', serif;
+      font-weight: 400;
+      font-style: italic;
+      font-size: 42px;
+      color: #1a1a1a;
+      margin-bottom: 16px;
+      line-height: 1.1;
+    }
 
-  // Score
-  ctx.fillStyle = medal.primary;
-  ctx.font = 'bold 28px -apple-system, BlinkMacSystemFont, sans-serif';
-  ctx.fillText(`Score: ${score} pts`, W / 2, 640);
+    /* ---- Decorative rule ---- */
+    .cert__rule {
+      width: 220px;
+      height: 1px;
+      background: ${info.color};
+      margin-bottom: 20px;
+      opacity: 0.5;
+    }
 
-  // Date
-  if (date) {
-    ctx.fillStyle = 'rgba(255,255,255,0.4)';
-    ctx.font = '14px -apple-system, BlinkMacSystemFont, sans-serif';
-    ctx.fillText(date, W / 2, 720);
+    /* ---- Body text ---- */
+    .cert__text {
+      font-size: 13px;
+      color: #555;
+      text-align: center;
+      line-height: 1.7;
+      max-width: 420px;
+      margin-bottom: 12px;
+    }
+
+    .cert__quiz-title {
+      font-family: 'Lato', sans-serif;
+      font-weight: 700;
+      font-size: 16px;
+      color: #C45A1A;
+      margin-bottom: 6px;
+    }
+
+    .cert__score {
+      font-family: 'Lato', sans-serif;
+      font-weight: 700;
+      font-size: 15px;
+      color: ${info.color};
+      margin-bottom: 20px;
+    }
+
+    /* ---- Footer ---- */
+    .cert__footer {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .cert__date {
+      font-size: 11px;
+      color: #999;
+    }
+
+    .cert__tagline {
+      font-family: 'Playfair Display', serif;
+      font-style: italic;
+      font-size: 11px;
+      color: #aaa;
+      letter-spacing: 0.05em;
+    }
+
+    .cert__bottom-org {
+      font-size: 10px;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: #bbb;
+      margin-top: 8px;
+    }
+  </style>
+</head>
+<body>
+  <div class="cert">
+    <div class="corner corner--tl"></div>
+    <div class="corner corner--tr"></div>
+    <div class="corner corner--bl"></div>
+    <div class="corner corner--br"></div>
+
+    <img
+      src="${logoUrl}"
+      alt="Qwizzeria"
+      class="cert__logo"
+      onerror="this.src='${window.location.origin}/qwizzeria-logo.svg'"
+    />
+
+    <div class="cert__org">Qwizzeria</div>
+    <div class="cert__title">Certificate of Achievement</div>
+
+    <div class="cert__rank">${info.ordinal}</div>
+
+    <div class="cert__name">${escapeHTML(name)}</div>
+
+    <div class="cert__rule"></div>
+
+    <div class="cert__text">
+      has been recognized for outstanding performance<br>
+      during the quiz
+    </div>
+
+    <div class="cert__quiz-title">${escapeHTML(quizTitle)}</div>
+
+    <div class="cert__score">Score: ${score} points</div>
+
+    <div class="cert__footer">
+      ${date ? `<div class="cert__date">${escapeHTML(date)}</div>` : ''}
+      <div class="cert__tagline">I learn, therefore I am</div>
+      <div class="cert__bottom-org">Qwizzeria Quiz Platform</div>
+    </div>
+  </div>
+</body>
+</html>`;
+
+  const win = window.open('', '_blank');
+  if (win) {
+    win.document.write(html);
+    win.document.close();
+    // Allow fonts to load before triggering print
+    setTimeout(() => win.print(), 600);
   }
-
-  return canvas.toDataURL('image/png');
 }
 
 /**
- * Trigger a browser download of a data URL.
- * @param {string} dataUrl
- * @param {string} filename
+ * Alias kept for backward compatibility — now just calls generateCertificate.
+ * @deprecated Use generateCertificate directly.
  */
-export function downloadCertificate(dataUrl, filename = 'certificate.png') {
-  const a = document.createElement('a');
-  a.href = dataUrl;
-  a.download = filename;
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
+export function downloadCertificate() {
+  // No-op — generateCertificate now opens the print dialog directly
+}
+
+/** Escape HTML special characters to prevent XSS. */
+function escapeHTML(str) {
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
 }

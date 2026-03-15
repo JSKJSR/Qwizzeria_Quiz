@@ -1,92 +1,78 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-// Mock canvas context
-function createMockContext() {
-  return {
-    fillRect: vi.fn(),
-    strokeRect: vi.fn(),
-    fillText: vi.fn(),
-    beginPath: vi.fn(),
-    arc: vi.fn(),
-    fill: vi.fn(),
-    moveTo: vi.fn(),
-    lineTo: vi.fn(),
-    stroke: vi.fn(),
-    createRadialGradient: vi.fn(() => ({
-      addColorStop: vi.fn(),
-    })),
-    fillStyle: '',
-    strokeStyle: '',
-    lineWidth: 0,
-    font: '',
-    textAlign: '',
-    letterSpacing: '',
-  };
-}
-
 describe('certificateGenerator', () => {
-  let mockCtx;
+  let mockWindow;
 
   beforeEach(() => {
-    mockCtx = createMockContext();
-    vi.spyOn(document, 'createElement').mockImplementation((tag) => {
-      if (tag === 'canvas') {
-        return {
-          width: 0,
-          height: 0,
-          getContext: () => mockCtx,
-          toDataURL: () => 'data:image/png;base64,mockdata',
-        };
-      }
-      if (tag === 'a') {
-        return { href: '', download: '', click: vi.fn() };
-      }
-      return {};
-    });
-    vi.spyOn(document.body, 'appendChild').mockImplementation(() => {});
-    vi.spyOn(document.body, 'removeChild').mockImplementation(() => {});
+    mockWindow = {
+      document: {
+        write: vi.fn(),
+        close: vi.fn(),
+      },
+      print: vi.fn(),
+    };
+    vi.spyOn(window, 'open').mockReturnValue(mockWindow);
   });
 
-  it('returns a data URL string', async () => {
+  it('opens a new window with certificate HTML', async () => {
     const { generateCertificate } = await import('./certificateGenerator.js');
-    const result = generateCertificate({
+    generateCertificate({
       name: 'Alice',
       rank: 1,
       score: 100,
       quizTitle: 'Geography Quiz',
       date: '2026-03-15',
     });
-    expect(result).toMatch(/^data:image\/png/);
-  });
 
-  it('handles long names without error', async () => {
-    const { generateCertificate } = await import('./certificateGenerator.js');
-    const result = generateCertificate({
-      name: 'A Very Long Participant Name That Goes On And On',
-      rank: 2,
-      score: 50,
-      quizTitle: 'Test Quiz',
-    });
-    expect(result).toMatch(/^data:image\/png/);
+    expect(window.open).toHaveBeenCalledWith('', '_blank');
+    expect(mockWindow.document.write).toHaveBeenCalledTimes(1);
+
+    const html = mockWindow.document.write.mock.calls[0][0];
+    expect(html).toContain('Alice');
+    expect(html).toContain('Geography Quiz');
+    expect(html).toContain('1st Place');
+    expect(html).toContain('100 points');
+    expect(html).toContain('2026-03-15');
+    expect(html).toContain('qwizzeria-logo');
+    expect(html).toContain('Certificate of Achievement');
   });
 
   it('handles all three medal ranks', async () => {
     const { generateCertificate } = await import('./certificateGenerator.js');
-    for (const rank of [1, 2, 3]) {
-      const result = generateCertificate({
+    const rankLabels = ['1st Place', '2nd Place', '3rd Place'];
+
+    for (let rank = 1; rank <= 3; rank++) {
+      mockWindow.document.write.mockClear();
+
+      generateCertificate({
         name: 'Player',
         rank,
         score: 30,
         quizTitle: 'Quiz',
       });
-      expect(result).toMatch(/^data:image\/png/);
+
+      const html = mockWindow.document.write.mock.calls[0][0];
+      expect(html).toContain(rankLabels[rank - 1]);
     }
   });
 
-  it('downloadCertificate triggers download', async () => {
+  it('escapes HTML in name and title', async () => {
+    const { generateCertificate } = await import('./certificateGenerator.js');
+    generateCertificate({
+      name: '<script>alert("xss")</script>',
+      rank: 1,
+      score: 50,
+      quizTitle: 'Test & "Quiz"',
+    });
+
+    const html = mockWindow.document.write.mock.calls[0][0];
+    expect(html).not.toContain('<script>');
+    expect(html).toContain('&lt;script&gt;');
+    expect(html).toContain('Test &amp; &quot;Quiz&quot;');
+  });
+
+  it('downloadCertificate is a no-op for backward compat', async () => {
     const { downloadCertificate } = await import('./certificateGenerator.js');
-    downloadCertificate('data:image/png;base64,test', 'cert.png');
-    expect(document.body.appendChild).toHaveBeenCalled();
-    expect(document.body.removeChild).toHaveBeenCalled();
+    expect(() => downloadCertificate()).not.toThrow();
   });
 });

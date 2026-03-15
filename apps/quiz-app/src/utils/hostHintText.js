@@ -29,7 +29,7 @@ export function getHostHint({ isOpen, isInputMode, hasBuzzes, totalResponseCount
 
   // Question selected, idle
   if (hasSelectedQuestion) {
-    return 'Open Buzzer or Collect Answers';
+    return 'Choose Buzzer or Collect Answers';
   }
 
   // Default — no question selected
