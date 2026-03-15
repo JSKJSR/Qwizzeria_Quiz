@@ -1,17 +1,15 @@
 import { useState, useEffect, useCallback } from 'react';
 import { browseHostPacks, fetchPackCategories, fetchPackPlayQuestions } from '@qwizzeria/supabase-client/src/packs.js';
 import { useAuth } from '../../hooks/useAuth';
-import AIGenerateModal from './AIGenerateModal';
 
 export default function HostPackSelect({ onSelectPack }) {
-  const { role, isPremium } = useAuth();
+  const { role } = useAuth();
   const [packs, setPacks] = useState([]);
   const [categories, setCategories] = useState([]);
   const [categoryFilter, setCategoryFilter] = useState('');
   const [loading, setLoading] = useState(true);
   const [loadingPack, setLoadingPack] = useState(null);
   const [error, setError] = useState(null);
-  const [showAIModal, setShowAIModal] = useState(false);
 
   useEffect(() => {
     fetchPackCategories().then(setCategories).catch(() => {});
@@ -59,11 +57,6 @@ export default function HostPackSelect({ onSelectPack }) {
     }
   }, [loadingPack, onSelectPack]);
 
-  const handleAIConfirm = useCallback((pack, questions) => {
-    setShowAIModal(false);
-    onSelectPack(pack, questions);
-  }, [onSelectPack]);
-
   return (
     <div className="host-pack-select">
       <h1 className="host-pack-select__title">Select a Quiz Pack</h1>
@@ -95,19 +88,6 @@ export default function HostPackSelect({ onSelectPack }) {
         <p className="host-pack-select__empty">No packs available. Create some in the Admin CMS first.</p>
       ) : (
         <div className="host-pack-select__grid">
-          <button
-            className="host-pack-select__card host-pack-select__ai-card"
-            onClick={() => setShowAIModal(true)}
-            disabled={!!loadingPack}
-          >
-            <div className="host-pack-select__ai-card-icon">&#9889;</div>
-            <div className="host-pack-select__card-body">
-              <div className="host-pack-select__card-title">Generate with AI</div>
-              <div className="host-pack-select__card-meta">
-                {isPremium ? 'Create a quiz on any topic' : 'Pro feature'}
-              </div>
-            </div>
-          </button>
           {packs.map((pack) => (
             <button
               key={pack.id}
@@ -140,13 +120,6 @@ export default function HostPackSelect({ onSelectPack }) {
             </button>
           ))}
         </div>
-      )}
-
-      {showAIModal && (
-        <AIGenerateModal
-          onClose={() => setShowAIModal(false)}
-          onConfirm={handleAIConfirm}
-        />
       )}
     </div>
   );

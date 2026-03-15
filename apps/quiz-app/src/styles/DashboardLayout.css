@@ -90,6 +90,24 @@
   flex-shrink: 0;
 }
 
+.dashboard__nav-link--disabled {
+  opacity: 0.5;
+  cursor: default;
+  pointer-events: none;
+}
+
+.dashboard__nav-badge {
+  font-size: 0.6rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 0.15rem 0.4rem;
+  border-radius: 4px;
+  background: rgba(232, 92, 26, 0.15);
+  color: var(--accent-primary, #e85c1a);
+  white-space: nowrap;
+}
+
 /* Sidebar footer — user info */
 .dashboard__sidebar-footer {
   padding: 1rem 1.5rem;
