@@ -139,10 +139,10 @@ Access restricted via role checks (editor, admin, superadmin).
 
 ## Commands
 
-- `npm run dev` — Start all dev servers (quiz-app :5173, admin-cms :5174)
+- `npm run dev` — Start the quiz-app dev server (Player + Admin CMS) at :5173
 - `npm run build` — Build all packages
 - `npm run lint` — Lint all packages
-- `cd apps/quiz-app && npx vitest run` — Run tests (90 tests across 9 files)
+- `cd apps/quiz-app && npx vitest run` — Run tests (96 tests across 10 files)
 
 ## Key Component Files
 

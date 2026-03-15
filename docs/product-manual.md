@@ -30,7 +30,11 @@ This document provides a comprehensive map of the user flow, product features, a
     - **Auto-Open Answer Summary**: When the timer expires during input collection, answers are automatically locked and the responses modal opens — no manual click required.
     - **Participant Timer Sync**: During input collection, participants see a live MM:SS countdown on their device that matches the host timer, with color states (green > 30s, yellow ≤ 30s, red ≤ 10s).
     - **Session Persistence**: Buzzer room state (room code and ID) is persisted locally. If a host accidentally refreshes or navigates away during an active buzzer session, they are prompted to restore it upon returning, automatically reconnecting players seamlessly.
+- **AI Quiz Generation**: Professional hosts can generate custom quiz packs on any topic instantly.
+    - **Workflow**: Enter a topic/prompt -> Preview generated questions -> Edit or delete individual questions -> "Use Without Saving" for one-off events or "Save & Use" to persist the pack to the database.
+    - **Customization**: Supports question count and difficulty levels (accessible to Admins).
 - **Tournaments**:
+
     - Auto-generated single-elimination brackets for 2-16 teams.
     - Match play via dedicated URLs.
     - Real-time sync across devices using Supabase Realtime (spectators see live updates).
@@ -56,11 +60,11 @@ The Admin CMS is integrated into the application and accessible at `/admin` for 
 
 Qwizzeria implements a hybrid SaaS and One-Time Purchase model powered by Stripe.
 
-- **3-Day Free Trial**: Short trial with restricted Host mode limits (up to 3 connected players).
+- **3-Day Free Trial**: Full access to all features (including AI generation) for 3 days.
 - **Free**: $0. Access to Daily Free Quiz and Profile/Dashboard.
-- **Player Tier (formerly Basic)**: $3.99/mo. Unlocks the entire Quiz Pack library, History, and Global Leaderboards.
-- **Host / Game Master Tier (formerly Pro)**: $12.99/mo. Unlocks local/party Game Hosting, Real-Time Buzzer, and Tournament brackets for up to 16 teams.
-- **Game Night Pass**: A $4.99 one-time purchase granting 48-hour access to the Host Tier features, designed for impulse event buyers.
-- **Premium Packs Upsell**: Individually branded quiz packs available for $2.99 a la carte.
+- **Player Tier**: $3.99/mo. Unlocks the entire Quiz Pack library, History, and Global Leaderboards.
+- **Host Tier**: $12.99/mo. Unlocks local/party Game Hosting, AI Quiz Generation (Claude 3.5), Real-Time Buzzer, and Tournament brackets.
+- **Game Night Pass**: A $4.99 one-time purchase granting 48-hour access to the Host Tier features.
+- **Premium Packs**: Individually branded quiz packs available for $2.99 a la carte.
 
 *Grace Period*: 3-day access window for `past_due` subscriptions before full gating. Editors/Admins bypass these checks automatically.

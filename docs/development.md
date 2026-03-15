@@ -79,18 +79,44 @@ npm run test
 cd apps/quiz-app && npx vitest run
 ```
 
-### Current Coverage (71 tests, 6 files)
+### Current Coverage (96 tests, 10 files)
 - `mediaDetector.test.js` — Media URL detection (7 tests)
 - `tournamentBracket.test.js` — Bracket generation, seeding, advancement (36 tests)
 - `hostSessionPersistence.test.js` — localStorage save/load/clear (12 tests)
 - `AuthContext.test.js` — Auth provider initialization (1 test)
 - `supabaseClient.test.js` — Supabase client configuration (2 tests)
 - `buzzerTimestamp.test.js` — Sub-millisecond buzzer resolution (13 tests)
+- `aiGenerate.test.js` — AI Quiz generation and parsing (12 tests)
+- `packManagement.test.js` — Admin pack CRUD (6 tests)
+- `questionValidation.test.js` — Question schema checks (5 tests)
+- `authHelpers.test.js` — Role and permission checks (2 tests)
 
 ### Coverage Goals
 - Core state machines (`useReducer`).
 - RBAC helper functions.
 - Supabase utility wrappers.
+
+---
+
+## 🤖 AI-Driven Development Workflow
+
+The project utilizes an AI-first development approach. Follow this workflow when using AI agents or contributors:
+
+### 1. Planning & Context
+- Provide the AI with the updated `CLAUDE.md` and the four documentation pillars in `docs/`.
+- Ensure the AI understands the **Two-Gate Security Model** and **State Machine** architecture.
+
+### 2. Implementation Standards
+- **Vanilla CSS**: Avoid utility frameworks unless requested. Use design tokens.
+- **Component Focused**: Keep components reusable and state-blind where possible.
+- **Error Handling**: Every feature must include loading/error states with retry capability.
+
+### 3. Pre-Completion Checklist (MANDATORY)
+Before finalizing any feature or bugfix, the following must be verified:
+- **Security**: Scan for hardcoded secrets, API keys, or passwords. Check for SQL/Shell injection.
+- **Quality**: Run the full test suite (`npm run test`). Ensure no linting errors (`npm run lint`).
+- **Performance**: Verify that new components don't cause unnecessary re-renders in the Topic Grid.
+- **Documentation**: Update [Product Manual](./product-manual.md) and [Architecture Guide](./architecture.md) for any new features.
 
 ---
 
@@ -106,7 +132,7 @@ The project includes a GitHub Actions pipeline (`.github/workflows/ci.yml`) that
 1. `npm ci` — Install dependencies
 2. `npm run lint` — Lint all packages
 3. `npm run build` — Build all packages
-4. `npm run test` — Run test suite (71 tests)
+4. `npm run test` — Run test suite (96 tests)
 
 Production deployment is configured for **Vercel** via `vercel.json` (output: `apps/quiz-app/dist`). Set `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` as environment variables in the Vercel dashboard.
 

@@ -19,6 +19,9 @@ This document covers data storage, access control, and the shared backend utilit
 - **`host_tournaments`**: Bracket state and participants (JSONB).
 - **`host_tournament_matches`**: Isolated individual match states. Uses `claimed_by` for optimistic locking in multi-tab play.
 
+### AI Generation
+- **`ai_generation_log`**: Audit log for AI quiz generation (user_id, topic, question_count, difficulty). Used for rate limiting (5/hr, 20/day) and quality tracking.
+
 ### Billing
 - **`subscriptions`**: Stripe subscription states mapped to user UUIDs. Supports `player`, `host`, and `pass` tier structures.
 
@@ -29,7 +32,7 @@ This document covers data storage, access control, and the shared backend utilit
 Qwizzeria implements a **Two-Gate security model**.
 
 ### Gate 1: Feature Access (`feature_access` table)
-Controls module entry. Examples: `host_quiz`, `admin_cms`, `pack_premium`.
+Controls module entry. Examples: `host_quiz`, `admin_cms`, `pack_premium`, `ai_generation`.
 
 ### Gate 2: Content Permissions (`content_permissions` table)
 Controls granular access. Examples: `read`, `write`, `manage` specific categories or packs.

@@ -10,7 +10,7 @@ export default function HostParticipantSetup({ pack, questionCount, onStart, onC
   const [mode, setMode] = useState('standard');
   const [questionsPerMatch, setQuestionsPerMatch] = useState(DEFAULT_QUESTIONS_PER_MATCH);
   const [perMatchPacks, setPerMatchPacks] = useState(false);
-  const [buzzerEnabled, setBuzzerEnabled] = useState(false);
+  const [buzzerEnabled, setBuzzerEnabled] = useState(true);
 
   const isTournament = mode === 'tournament';
   const effectiveMax = MAX_PLAYERS;
