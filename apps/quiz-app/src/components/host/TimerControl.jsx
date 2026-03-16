@@ -6,6 +6,7 @@ const TimerControl = forwardRef(function TimerControl({ onExpire, onTick }, ref)
   const [seconds, setSeconds] = useState(30);
   const [timeLeft, setTimeLeft] = useState(null); // null = use input values; number = countdown active/done
   const [isRunning, setIsRunning] = useState(false);
+  const isRunningRef = useRef(false);
   const intervalRef = useRef(null);
   const audioContextRef = useRef(null);
   const onExpireRef = useRef(onExpire);
@@ -57,11 +58,12 @@ const TimerControl = forwardRef(function TimerControl({ onExpire, onTick }, ref)
   // Expose start/reset to parent via ref
   useImperativeHandle(ref, () => ({
     start() {
-      if (isRunning) return; // already running
+      if (isRunningRef.current) return; // already running
       const startTime = timeLeft !== null ? timeLeft : minutes * 60 + seconds;
       if (startTime <= 0) return;
       setTimeLeft(startTime);
       setIsRunning(true);
+      isRunningRef.current = true;
       const startedAt = Date.now();
       const startValue = startTime;
       stopInterval();
@@ -79,6 +81,7 @@ const TimerControl = forwardRef(function TimerControl({ onExpire, onTick }, ref)
           clearInterval(intervalRef.current);
           intervalRef.current = null;
           setIsRunning(false);
+          isRunningRef.current = false;
           playAlarmSound();
           onExpireRef.current?.();
         }
@@ -87,15 +90,17 @@ const TimerControl = forwardRef(function TimerControl({ onExpire, onTick }, ref)
     reset() {
       stopInterval();
       setIsRunning(false);
+      isRunningRef.current = false;
       setTimeLeft(null);
     },
-  }), [isRunning, timeLeft, minutes, seconds, stopInterval, playAlarmSound]);
+  }), [timeLeft, minutes, seconds, stopInterval, playAlarmSound]);
 
   function handleStartPause() {
     if (isRunning) {
       // Pause
       stopInterval();
       setIsRunning(false);
+      isRunningRef.current = false;
     } else {
       // Start
       const startTime = timeLeft !== null ? timeLeft : minutes * 60 + seconds;
@@ -103,6 +108,7 @@ const TimerControl = forwardRef(function TimerControl({ onExpire, onTick }, ref)
 
       setTimeLeft(startTime);
       setIsRunning(true);
+      isRunningRef.current = true;
 
       const startedAt = Date.now();
       const startValue = startTime;
@@ -121,6 +127,7 @@ const TimerControl = forwardRef(function TimerControl({ onExpire, onTick }, ref)
           clearInterval(intervalRef.current);
           intervalRef.current = null;
           setIsRunning(false);
+          isRunningRef.current = false;
           playAlarmSound();
           onExpireRef.current?.();
         }
@@ -131,6 +138,7 @@ const TimerControl = forwardRef(function TimerControl({ onExpire, onTick }, ref)
   function handleReset() {
     stopInterval();
     setIsRunning(false);
+    isRunningRef.current = false;
     setTimeLeft(null);
   }
 

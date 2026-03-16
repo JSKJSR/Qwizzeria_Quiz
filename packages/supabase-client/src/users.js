@@ -1,4 +1,5 @@
 import { getSupabase } from './index.js';
+import { logAdminAction } from './auditLog.js';
 
 /**
  * Fetch user profile by user ID.
@@ -179,6 +180,9 @@ export async function updateUserRole(userId, role) {
     .single();
 
   if (error) throw new Error(`Failed to update role: ${error.message}`);
+
+  logAdminAction({ action: 'update_user_role', tableName: 'user_profiles', recordId: userId, payload: { role } });
+
   return data;
 }
 

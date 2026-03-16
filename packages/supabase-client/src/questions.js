@@ -1,4 +1,5 @@
 import { getSupabase } from './index.js';
+import { logAdminAction } from './auditLog.js';
 
 /**
  * Fetch N random public+active questions for the free quiz.
@@ -346,6 +347,8 @@ export async function createQuestion(questionData) {
     throw new Error(`Failed to create question: ${error.message}`);
   }
 
+  logAdminAction({ action: 'create_question', tableName: 'questions_master', recordId: data.id, payload: questionData });
+
   return data;
 }
 
@@ -366,6 +369,8 @@ export async function updateQuestion(id, questionData) {
     throw new Error(`Failed to update question: ${error.message}`);
   }
 
+  logAdminAction({ action: 'update_question', tableName: 'questions_master', recordId: id, payload: questionData });
+
   return data;
 }
 
@@ -383,6 +388,8 @@ export async function deleteQuestion(id) {
   if (error) {
     throw new Error(`Failed to delete question: ${error.message}`);
   }
+
+  logAdminAction({ action: 'delete_question', tableName: 'questions_master', recordId: id });
 }
 
 /**
@@ -399,6 +406,8 @@ export async function bulkCreateQuestions(questionsArray) {
   if (error) {
     throw new Error(`Failed to bulk create questions: ${error.message}`);
   }
+
+  logAdminAction({ action: 'bulk_create_questions', tableName: 'questions_master', payload: { count: data.length } });
 
   return data;
 }

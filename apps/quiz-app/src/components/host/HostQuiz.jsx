@@ -475,7 +475,10 @@ export default function HostQuiz() {
               timerRef.current?.reset();
               timerRef.current?.start();
             }}
-            onLockInput={buzzer.lockInput}
+            onLockInput={() => {
+              buzzer.lockInput();
+              timerRef.current?.reset();
+            }}
             onRevealResponses={buzzer.revealResponses}
             onResetInput={buzzer.resetInput}
             autoShowResponses={autoShowResponses}
@@ -574,7 +577,10 @@ export default function HostQuiz() {
             timerRef.current?.reset();
             timerRef.current?.start();
           }}
-          onLockInput={buzzer.lockInput}
+          onLockInput={() => {
+            buzzer.lockInput();
+            timerRef.current?.reset();
+          }}
           onRevealResponses={buzzer.revealResponses}
           onResetInput={buzzer.resetInput}
           autoShowResponses={autoShowResponses}

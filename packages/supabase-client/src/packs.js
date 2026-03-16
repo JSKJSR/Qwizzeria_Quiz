@@ -1,4 +1,5 @@
 import { getSupabase } from './index.js';
+import { logAdminAction } from './auditLog.js';
 
 // ============================================================
 // Admin functions
@@ -78,6 +79,8 @@ export async function createPack(packData) {
     throw new Error(`Failed to create pack: ${error.message}`);
   }
 
+  logAdminAction({ action: 'create_pack', tableName: 'quiz_packs', recordId: data.id, payload: packData });
+
   return data;
 }
 
@@ -98,6 +101,8 @@ export async function updatePack(id, packData) {
     throw new Error(`Failed to update pack: ${error.message}`);
   }
 
+  logAdminAction({ action: 'update_pack', tableName: 'quiz_packs', recordId: id, payload: packData });
+
   return data;
 }
 
@@ -115,6 +120,8 @@ export async function deletePack(id) {
   if (error) {
     throw new Error(`Failed to delete pack: ${error.message}`);
   }
+
+  logAdminAction({ action: 'delete_pack', tableName: 'quiz_packs', recordId: id });
 }
 
 /**
@@ -151,6 +158,8 @@ export async function addQuestionToPack(packId, questionId, sortOrder = 0) {
   if (error) {
     throw new Error(`Failed to add question to pack: ${error.message}`);
   }
+
+  logAdminAction({ action: 'add_question_to_pack', tableName: 'pack_questions', recordId: data.id, payload: { pack_id: packId, question_id: questionId } });
 
   // Update question_count on the pack
   try {
@@ -196,6 +205,8 @@ export async function bulkAddQuestionsToPack(packId, questionIds) {
     throw new Error(`Failed to bulk add questions to pack: ${error.message}`);
   }
 
+  logAdminAction({ action: 'bulk_add_questions_to_pack', tableName: 'pack_questions', payload: { pack_id: packId, count: data.length } });
+
   // Update question_count on the pack
   try {
     await supabase.rpc('update_pack_question_count', { target_pack_id: packId });
@@ -226,6 +237,8 @@ export async function removeQuestionFromPack(packQuestionId, packId) {
   if (error) {
     throw new Error(`Failed to remove question from pack: ${error.message}`);
   }
+
+  logAdminAction({ action: 'remove_question_from_pack', tableName: 'pack_questions', recordId: packQuestionId, payload: { pack_id: packId } });
 
   // Update question_count
   const { count } = await supabase
@@ -258,6 +271,8 @@ export async function updatePackQuestionOrder(updates) {
   if (failed) {
     throw new Error(`Failed to update question order: ${failed.error.message}`);
   }
+
+  logAdminAction({ action: 'update_pack_question_order', tableName: 'pack_questions', payload: { count: updates.length } });
 }
 
 /**

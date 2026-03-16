@@ -52,3 +52,4 @@ export * from './buzzer.js';
 export * from './tournaments.js';
 export * from './realtime.js';
 export * from './aiGenerate.js';
+export * from './auditLog.js';
