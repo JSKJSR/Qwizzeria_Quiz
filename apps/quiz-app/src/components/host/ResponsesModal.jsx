@@ -212,20 +212,27 @@ export default function ResponsesModal({
           {totalResponseCount > 0 && (
             <>
               <div className="responses-modal__footer-divider" />
-              <button
-                className="responses-modal__clear-all-btn"
-                onClick={() => {
-                  if (confirmClear) {
-                    onResetInput();
-                    setConfirmClear(false);
-                  } else {
-                    setConfirmClear(true);
-                    setTimeout(() => setConfirmClear(false), 3000);
-                  }
-                }}
-              >
-                {confirmClear ? 'Confirm Clear?' : 'Clear All Responses'}
-              </button>
+              <div className="responses-modal__clear-section">
+                {confirmClear && (
+                  <span className="responses-modal__clear-warning">
+                    This will permanently delete all {totalResponseCount} collected response{totalResponseCount !== 1 ? 's' : ''} across {questionsWithResponses} question{questionsWithResponses !== 1 ? 's' : ''}.
+                  </span>
+                )}
+                <button
+                  className={`responses-modal__clear-all-btn${confirmClear ? ' responses-modal__clear-all-btn--confirm' : ''}`}
+                  onClick={() => {
+                    if (confirmClear) {
+                      onResetInput();
+                      setConfirmClear(false);
+                    } else {
+                      setConfirmClear(true);
+                      setTimeout(() => setConfirmClear(false), 3000);
+                    }
+                  }}
+                >
+                  {confirmClear ? 'Confirm Clear?' : 'Clear All Responses'}
+                </button>
+              </div>
             </>
           )}
         </div>

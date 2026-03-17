@@ -10,7 +10,7 @@
   align-items: center;
   justify-content: flex-start;
   padding: 2rem;
-  z-index: 100;
+  z-index: 160;
   animation: fadeIn 0.2s ease;
   overflow-y: auto;
 }
@@ -155,6 +155,20 @@
 .question-view__skip-btn:hover {
   border-color: var(--accent-primary);
   color: var(--text-secondary);
+}
+
+@media (max-width: 1024px) {
+  .question-view {
+    inset: 120px 0 0 0;
+    padding: 1.5rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .question-view {
+    inset: 130px 0 0 0;
+    padding: 1rem;
+  }
 }
 
 /* Question view watermark — now using CSS background, hide the img element */

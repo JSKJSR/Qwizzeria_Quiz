@@ -364,6 +364,27 @@
   background: var(--border-color, #2a1520);
 }
 
+/* Clear section wrapper */
+.responses-modal__clear-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.responses-modal__clear-warning {
+  font-size: 0.75rem;
+  color: #e74c3c;
+  text-align: center;
+  line-height: 1.35;
+  animation: clearWarningFadeIn 0.2s ease-out;
+}
+
+@keyframes clearWarningFadeIn {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
 /* Clear All — small, muted danger button */
 .responses-modal__clear-all-btn {
   padding: 0.3rem 0.75rem;
@@ -380,6 +401,13 @@
   background: rgba(231, 76, 60, 0.1);
   color: #e74c3c;
   border-color: rgba(231, 76, 60, 0.4);
+}
+
+.responses-modal__clear-all-btn--confirm {
+  background: rgba(231, 76, 60, 0.15);
+  color: #e74c3c;
+  border-color: rgba(231, 76, 60, 0.5);
+  font-weight: 600;
 }
 
 /* ---- Responsive ---- */
