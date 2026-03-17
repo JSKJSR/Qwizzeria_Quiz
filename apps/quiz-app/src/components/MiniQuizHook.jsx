@@ -94,6 +94,7 @@ export default function MiniQuizHook() {
   const [activeCategory, setActiveCategory] = useState(null);
   const [selectedOption, setSelectedOption] = useState(null);
   const [isCorrect, setIsCorrect] = useState(false);
+  const [questionSeed, setQuestionSeed] = useState(0);
 
   const currentQuestion = useMemo(() => {
     const pool = activeCategory
@@ -101,10 +102,11 @@ export default function MiniQuizHook() {
       : CURATED_QUESTIONS;
     return pool[Math.floor(Math.random() * pool.length)];
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeCategory, phase === 'ask' ? Date.now() : 0]);
+  }, [activeCategory, questionSeed]);
 
   const handleCategoryClick = useCallback((cat) => {
     setActiveCategory(cat);
+    setQuestionSeed((s) => s + 1);
     setPhase('ask');
     setSelectedOption(null);
   }, []);
@@ -121,6 +123,7 @@ export default function MiniQuizHook() {
     const cats = shuffleArray(CATEGORIES);
     const next = cats.find((c) => c !== activeCategory) || cats[0];
     setActiveCategory(next);
+    setQuestionSeed((s) => s + 1);
     setPhase('ask');
     setSelectedOption(null);
   }, [activeCategory]);
