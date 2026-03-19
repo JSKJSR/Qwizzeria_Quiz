@@ -21,6 +21,7 @@ export default function PackForm() {
     is_public: false,
     is_host: false,
     status: 'draft',
+    config: {},
   });
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(isEdit);
@@ -45,6 +46,7 @@ export default function PackForm() {
           is_public: pack.is_public || false,
           is_host: pack.is_host || false,
           status: pack.status || 'draft',
+          config: pack.config || {},
         });
       })
       .catch((err) => setError(err.message))
@@ -186,6 +188,48 @@ export default function PackForm() {
             Host
           </label>
         </div>
+
+        {/* Doubles Settings */}
+        <fieldset style={{ border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', padding: '1rem', marginTop: '1rem' }}>
+          <legend style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', fontWeight: 600, padding: '0 0.5rem' }}>Doubles Settings</legend>
+          <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer', marginBottom: '1rem' }}>
+            <input
+              type="checkbox"
+              checked={form.config?.doubles_enabled || false}
+              onChange={(e) => handleChange('config', { ...form.config, doubles_enabled: e.target.checked })}
+            />
+            Enable Doubles Mode
+          </label>
+          {form.config?.doubles_enabled && (
+            <div style={{ display: 'flex', gap: '1.5rem', flexWrap: 'wrap' }}>
+              <div className="form-group" style={{ flex: '1', minWidth: '160px' }}>
+                <label className="form-label">Timer per Part (minutes)</label>
+                <input
+                  type="number"
+                  className="form-input"
+                  value={form.config?.doubles_timer_minutes ?? 60}
+                  onChange={(e) => handleChange('config', { ...form.config, doubles_timer_minutes: parseInt(e.target.value) || 60 })}
+                  min="1"
+                  max="180"
+                />
+              </div>
+              <div className="form-group" style={{ flex: '1', minWidth: '160px' }}>
+                <label className="form-label">Part 1 / Part 2 Split (question index)</label>
+                <input
+                  type="number"
+                  className="form-input"
+                  value={form.config?.doubles_split_index ?? ''}
+                  onChange={(e) => handleChange('config', { ...form.config, doubles_split_index: parseInt(e.target.value) || undefined })}
+                  min="1"
+                  placeholder="Default: midpoint"
+                />
+                <small style={{ color: 'var(--text-secondary)', fontSize: '0.78rem' }}>
+                  Questions before this index = Part 1, remaining = Part 2. Leave blank for midpoint.
+                </small>
+              </div>
+            </div>
+          )}
+        </fieldset>
 
         <div className="form-actions" style={{ display: 'flex', gap: '1rem', marginTop: '1.5rem' }}>
           <button

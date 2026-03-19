@@ -490,6 +490,66 @@ export async function incrementPackPlayCount(packId) {
 }
 
 // ============================================================
+// Doubles quiz functions
+// ============================================================
+
+/**
+ * Fetch all active packs with doubles_enabled in their config.
+ */
+export async function fetchDoublesPacks() {
+  const supabase = getSupabase();
+
+  const { data, error } = await supabase
+    .from('quiz_packs')
+    .select('id, title, description, cover_image_url, category, question_count, config, pack_questions(count)')
+    .eq('status', 'active')
+    .not('config', 'is', null)
+    .order('title', { ascending: true });
+
+  if (error) {
+    throw new Error(`Failed to fetch doubles packs: ${error.message}`);
+  }
+
+  // Filter client-side for doubles_enabled since JSONB filtering varies
+  const doublesPacks = (data || [])
+    .filter(p => p.config?.doubles_enabled === true)
+    .map(({ pack_questions, ...rest }) => ({
+      ...rest,
+      question_count: pack_questions?.[0]?.count ?? rest.question_count,
+    }));
+
+  return doublesPacks;
+}
+
+/**
+ * Fetch a single doubles pack by ID with validation.
+ */
+export async function fetchDoublesPackById(id) {
+  const supabase = getSupabase();
+
+  const { data, error } = await supabase
+    .from('quiz_packs')
+    .select('id, title, description, cover_image_url, category, question_count, config, pack_questions(count)')
+    .eq('id', id)
+    .eq('status', 'active')
+    .single();
+
+  if (error) {
+    throw new Error(`Failed to fetch doubles pack: ${error.message}`);
+  }
+
+  if (!data.config?.doubles_enabled) {
+    throw new Error('This pack is not configured for doubles play.');
+  }
+
+  const { pack_questions, ...rest } = data;
+  return {
+    ...rest,
+    question_count: pack_questions?.[0]?.count ?? rest.question_count,
+  };
+}
+
+// ============================================================
 // Admin Analytics RPCs
 // ============================================================
 

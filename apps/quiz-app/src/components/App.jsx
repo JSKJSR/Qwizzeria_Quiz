@@ -16,6 +16,7 @@ import History from '../pages/History';
 import Leaderboard from '../pages/Leaderboard';
 import ResumePlay from '../pages/ResumePlay';
 import HostQuizPage from '../pages/HostQuizPage';
+import DoublesPage from '../pages/DoublesPage';
 import Guide from '../pages/Guide';
 import Pricing from '../pages/Pricing';
 import TournamentBracketPage from '../pages/TournamentBracketPage';
@@ -67,6 +68,7 @@ export default function App() {
             {/* Pro tier routes */}
             <Route element={<TierRoute requiredTier="pro" />}>
               <Route path="/host" element={<HostQuizPage />} />
+              <Route path="/doubles" element={<DoublesPage />} />
             </Route>
           </Route>
 
