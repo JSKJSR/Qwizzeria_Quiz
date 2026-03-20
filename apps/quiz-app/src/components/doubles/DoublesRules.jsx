@@ -22,6 +22,10 @@ export default function DoublesRules({ packTitle, timerMinutes, part1Count, part
         </ul>
       </div>
 
+      <div className="doubles-rules__warning">
+        <strong>Important:</strong> Once you start the quiz, you cannot go back or reset it. The timer begins immediately and cannot be paused.
+      </div>
+
       <label className="doubles-rules__accept">
         <input
           type="checkbox"

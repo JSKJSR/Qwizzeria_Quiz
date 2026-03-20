@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import useCountdownTimer from '@/hooks/useCountdownTimer';
 import DoublesQuestionView from './DoublesQuestionView';
 
@@ -13,6 +13,7 @@ export default function DoublesPartView({
   onTimerExpired,
 }) {
   const { timerDisplay, timerClass } = useCountdownTimer(timerMinutes, timerStartedAt, onTimerExpired);
+  const [showConfirm, setShowConfirm] = useState(false);
 
   // Navigation guard
   useEffect(() => {
@@ -25,6 +26,20 @@ export default function DoublesPartView({
   }, []);
 
   const answeredCount = questions.filter(q => responses[q.id]?.trim()).length;
+  const unansweredCount = questions.length - answeredCount;
+
+  const handleSubmitClick = useCallback(() => {
+    setShowConfirm(true);
+  }, []);
+
+  const handleConfirm = useCallback(() => {
+    setShowConfirm(false);
+    onSubmit();
+  }, [onSubmit]);
+
+  const handleCancel = useCallback(() => {
+    setShowConfirm(false);
+  }, []);
 
   return (
     <div className="doubles-part">
@@ -42,7 +57,7 @@ export default function DoublesPartView({
         <button
           type="button"
           className="doubles-btn doubles-btn--submit"
-          onClick={onSubmit}
+          onClick={handleSubmitClick}
         >
           Submit Part {partNumber}
         </button>
@@ -64,6 +79,39 @@ export default function DoublesPartView({
           </div>
         ))}
       </div>
+
+      {/* Submit confirmation modal */}
+      {showConfirm && (
+        <div className="doubles-confirm-overlay" onClick={handleCancel}>
+          <div className="doubles-confirm" onClick={(e) => e.stopPropagation()}>
+            <h3 className="doubles-confirm__title">Submit Part {partNumber}?</h3>
+            <p className="doubles-confirm__text">
+              Once submitted, you will <strong>not be able to edit</strong> your responses for Part {partNumber}.
+            </p>
+            {unansweredCount > 0 && (
+              <p className="doubles-confirm__warning">
+                You have <strong>{unansweredCount} unanswered</strong> {unansweredCount === 1 ? 'question' : 'questions'}.
+              </p>
+            )}
+            <div className="doubles-confirm__actions">
+              <button
+                type="button"
+                className="doubles-btn doubles-btn--secondary"
+                onClick={handleCancel}
+              >
+                Go Back
+              </button>
+              <button
+                type="button"
+                className="doubles-btn doubles-btn--primary"
+                onClick={handleConfirm}
+              >
+                Submit
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
