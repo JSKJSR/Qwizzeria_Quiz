@@ -34,11 +34,13 @@ This document provides a comprehensive map of the user flow, product features, a
     - **Workflow**: Enter a topic/prompt -> Preview generated questions -> Edit or delete individual questions -> "Use Without Saving" for one-off events or "Save & Use" to persist the pack to the database.
     - **Customization**: Supports question count and difficulty levels (accessible to Admins).
 - **Tournaments**:
+- **Auto-generated single-elimination brackets for 2-16 teams.**
+- **Match play via dedicated URLs.**
+- **Real-time sync across devices using Supabase Realtime (spectators see live updates).**
+- **Multi-tab parallel play for simultaneous matches.**
 
-    - Auto-generated single-elimination brackets for 2-16 teams.
-    - Match play via dedicated URLs.
-    - Real-time sync across devices using Supabase Realtime (spectators see live updates).
-    - Multi-tab parallel play for simultaneous matches.
+### 4. Help & Guidance
+- **How to Play Guide (`/guide`)**: Interactive, visual step-by-step guide for hosting, buzzer mode, and tournaments. Features live-animated SVG visuals to demonstrate complex flows like reaction-time buzzing and bracket advancement.
 
 ---
 

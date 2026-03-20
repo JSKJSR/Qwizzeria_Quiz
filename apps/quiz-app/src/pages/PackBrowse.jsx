@@ -7,7 +7,7 @@ import '../styles/PackBrowse.css';
 
 export default function PackBrowse() {
   const navigate = useNavigate();
-  const { role, isPremium: isPremiumUser } = useAuth();
+  const { role, subscription, hasTier } = useAuth();
   const [packs, setPacks] = useState([]);
   const [categories, setCategories] = useState([]);
   const [categoryFilter, setCategoryFilter] = useState('');
@@ -21,15 +21,15 @@ export default function PackBrowse() {
 
   useEffect(() => {
     let cancelled = false;
-    browsePublicPacks({ category: categoryFilter || undefined, userRole: role })
+    browsePublicPacks({ category: categoryFilter || undefined, userRole: role, subscriptionTier: subscription?.tier })
       .then((data) => { if (!cancelled) { setError(null); setPacks(data); } })
       .catch(() => { if (!cancelled) { setPacks([]); setError('Failed to load quiz packs. Please try again.'); } })
       .finally(() => { if (!cancelled) setLoading(false); });
     return () => { cancelled = true; };
-  }, [categoryFilter, role, retryKey]);
+  }, [categoryFilter, role, subscription?.tier, retryKey]);
 
   const handleCardClick = (pack) => {
-    if (pack.is_premium && !isPremiumUser) return;
+    if (pack.is_premium && !hasTier('basic')) return;
     navigate(`/packs/${pack.id}`);
   };
 
@@ -76,7 +76,7 @@ export default function PackBrowse() {
       ) : (
         <div className="pack-browse__grid">
           {packs.map((pack) => {
-            const isLocked = pack.is_premium && !isPremiumUser;
+            const isLocked = pack.is_premium && !hasTier('basic');
             return (
               <div
                 key={pack.id}
@@ -92,6 +92,7 @@ export default function PackBrowse() {
                     className="pack-browse__card-image"
                     src={pack.cover_image_url}
                     alt={pack.title}
+                    loading="lazy"
                     onError={(e) => { e.target.style.display = 'none'; }}
                   />
                 ) : (

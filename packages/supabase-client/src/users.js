@@ -126,7 +126,7 @@ export async function getSubscriptionAnalytics() {
 // RBAC Functions
 // ============================================================
 
-const ROLE_HIERARCHY = ['user', 'premium', 'editor', 'admin', 'superadmin'];
+const ROLE_HIERARCHY = ['user', 'editor', 'admin', 'superadmin'];
 
 /**
  * Check if a role meets or exceeds a minimum required role.

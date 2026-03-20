@@ -13,7 +13,7 @@ async function getAuthToken() {
 
 export default function Profile() {
   const navigate = useNavigate();
-  const { user, signOut, subscription, isTrial } = useAuth();
+  const { user, signOut, subscription, isTrial, refreshSubscription } = useAuth();
 
   const [, setProfile] = useState(null);
   const [stats, setStats] = useState(null);
@@ -23,6 +23,15 @@ export default function Profile() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [retryKey, setRetryKey] = useState(0);
+
+  // Refresh subscription when returning from Stripe portal
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') refreshSubscription();
+    };
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
+  }, [refreshSubscription]);
 
   // Subscription state
   const [portalLoading, setPortalLoading] = useState(false);

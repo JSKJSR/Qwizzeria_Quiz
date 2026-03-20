@@ -11,11 +11,11 @@ import {
 
 export default function HostQuizSection() {
   return (
-    <GuideSection title="Host a Quiz" icon={'\uD83C\uDFAE'} defaultOpen>
+    <GuideSection title="Host a Quiz" icon={'\uD83C\uDFAE'}>
       <GuideStep
         number={1}
         title="Select a Quiz Pack"
-        description="Browse available packs and pick one for your quiz. Each pack contains themed questions organized by category."
+        description="Browse available packs or generate one with AI. Each pack contains themed questions organized by category. Hosting requires a Pro subscription."
         visual={<PackCardsVisual />}
       />
       <GuideStep
@@ -62,6 +62,9 @@ export default function HostQuizSection() {
       />
       <GuideTip>
         You can pause the timer at any time. The timer beeps 3 times when it expires!
+      </GuideTip>
+      <GuideTip>
+        Your quiz session is saved automatically with 24-hour expiry. If the page refreshes, you can pick up right where you left off.
       </GuideTip>
     </GuideSection>
   );

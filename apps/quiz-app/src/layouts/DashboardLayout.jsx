@@ -3,6 +3,7 @@ import { Outlet, NavLink, useLocation } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import SidebarTrialWidget from '../components/SidebarTrialWidget';
 import TrialBanner from '../components/TrialBanner';
+import SubscriptionSuccessBanner from '../components/SubscriptionSuccessBanner';
 import '../styles/DashboardLayout.css';
 import '../styles/SubscriptionGate.css';
 
@@ -166,6 +167,7 @@ export default function DashboardLayout() {
 
       {/* Main content */}
       <main className="dashboard__content">
+        <SubscriptionSuccessBanner />
         <TrialBanner />
         <Outlet />
       </main>

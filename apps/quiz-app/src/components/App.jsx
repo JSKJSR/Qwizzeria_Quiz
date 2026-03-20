@@ -1,9 +1,8 @@
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route } from 'react-router-dom';
 import AuthProvider from './AuthProvider';
 import AuthRedirect from './AuthRedirect';
 import ProtectedRoute from './ProtectedRoute';
 import AdminRoute from './AdminRoute';
-import DoublesRoute from './DoublesRoute';
 import { TierRoute } from './SubscriptionGate';
 import DashboardLayout from '../layouts/DashboardLayout';
 import AdminLayout from '../layouts/AdminLayout';
@@ -24,6 +23,7 @@ import TournamentBracketPage from '../pages/TournamentBracketPage';
 import TournamentMatchPage from '../pages/TournamentMatchPage';
 import BuzzerPage from '../pages/BuzzerPage';
 import ResetPassword from '../pages/ResetPassword';
+import NotFound from '../pages/NotFound';
 
 // Admin pages
 import AdminDashboard from '../pages/admin/Dashboard';
@@ -34,6 +34,7 @@ import AdminPackList from '../pages/admin/PackList';
 import PackForm from '../pages/admin/PackForm';
 import PackQuestionsManager from '../pages/admin/PackQuestionsManager';
 import UserList from '../pages/admin/UserList';
+import RolesAndTiersGuide from '../pages/admin/RolesAndTiersGuide';
 
 export default function App() {
   return (
@@ -71,8 +72,8 @@ export default function App() {
               <Route path="/host" element={<HostQuizPage />} />
             </Route>
 
-            {/* Doubles: role-gated (premium+) */}
-            <Route element={<DoublesRoute />}>
+            {/* Doubles: pro tier */}
+            <Route element={<TierRoute requiredTier="pro" />}>
               <Route path="/doubles" element={<DoublesPage />} />
             </Route>
           </Route>
@@ -99,11 +100,12 @@ export default function App() {
               <Route path="packs/:id/edit" element={<PackForm />} />
               <Route path="packs/:id/questions" element={<PackQuestionsManager />} />
               <Route path="users" element={<UserList />} />
+              <Route path="guide" element={<RolesAndTiersGuide />} />
             </Route>
           </Route>
         </Route>
 
-        <Route path="*" element={<Navigate to="/" replace />} />
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </AuthProvider>
   );

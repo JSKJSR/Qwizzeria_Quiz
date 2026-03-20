@@ -181,6 +181,28 @@
   color: var(--text-primary, #f0f0f0);
 }
 
+/* Downgrade warning */
+.pricing__downgrade-warning {
+  font-size: 0.8rem;
+  color: var(--accent-warning, #e8a825);
+  text-align: center;
+  margin-bottom: 0.5rem;
+  padding: 0.5rem;
+  background: rgba(232, 168, 37, 0.08);
+  border-radius: 6px;
+}
+
+/* Accessibility: focus-visible */
+.pricing__btn:focus-visible,
+.pricing__text-btn:focus-visible {
+  outline: 2px solid var(--accent-primary, #e85c1a);
+  outline-offset: 2px;
+}
+
+.pricing__btn--manage:focus-visible {
+  outline-color: var(--text-primary, #f0f0f0);
+}
+
 @media (max-width: 900px) {
   .pricing__cards {
     grid-template-columns: 1fr;

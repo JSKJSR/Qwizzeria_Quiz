@@ -12,7 +12,7 @@ export default function PlayPacksSection() {
       <GuideStep
         number={1}
         title="Browse & Choose"
-        description="Find a pack you like from the dashboard or library. Click 'Play' to start your session."
+        description="Browse the pack library by category. Basic tier and above can play all public packs. Premium packs are available to paying subscribers."
         visual={<PackCardsVisual />}
       />
       <GuideStep

@@ -10,7 +10,7 @@ import '../styles/PackPlay.css';
 export default function PackPlay() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { user, role, isPremium: isPremiumUser } = useAuth();
+  const { user, role, subscription, hasTier } = useAuth();
 
   const [pack, setPack] = useState(null);
   const [questions, setQuestions] = useState([]);
@@ -23,12 +23,12 @@ export default function PackPlay() {
       setLoading(true);
       try {
         const [packData, qs] = await Promise.all([
-          fetchPublicPackById(id, { userRole: role }),
+          fetchPublicPackById(id, { userRole: role, subscriptionTier: subscription?.tier }),
           fetchPackPlayQuestions(id),
         ]);
 
         // Premium gate check
-        if (packData.is_premium && !isPremiumUser) {
+        if (packData.is_premium && !hasTier('basic')) {
           navigate(`/packs/${id}`, { replace: true });
           return;
         }
@@ -42,7 +42,7 @@ export default function PackPlay() {
       }
     }
     load();
-  }, [id, role, isPremiumUser, navigate]);
+  }, [id, role, subscription?.tier, hasTier, navigate]);
 
   if (loading) {
     return (

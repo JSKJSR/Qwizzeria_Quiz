@@ -150,6 +150,7 @@ export default function LandingPageB() {
                     className="landing-b__pack-image"
                     src={pack.cover_image_url}
                     alt={pack.title}
+                    loading="lazy"
                     onError={(e) => { e.target.style.display = 'none'; }}
                   />
                 ) : (

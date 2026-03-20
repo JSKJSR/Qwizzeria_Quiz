@@ -1,0 +1,386 @@
+/* Roles & Tiers Guide */
+.rtg {
+  max-width: 900px;
+}
+
+.rtg-section {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius);
+  margin-bottom: 1.5rem;
+  overflow: hidden;
+}
+
+.rtg-section__title {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  padding: 1.25rem 1.5rem;
+  margin: 0;
+  border-bottom: 1px solid var(--border-color);
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.rtg-section__number {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--accent-primary);
+  color: #fff;
+  font-size: 0.8rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.rtg-section__body {
+  padding: 1.5rem;
+}
+
+.rtg-intro {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin: 0 0 1.5rem;
+}
+
+/* Tier Cards */
+.rtg-tier-cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.rtg-tier-card {
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius);
+  overflow: hidden;
+  text-align: center;
+}
+
+.rtg-tier-card--highlight {
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 0 1px var(--accent-primary);
+}
+
+.rtg-tier-card__header {
+  padding: 1rem 0.75rem 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.rtg-tier-card__header--free {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.rtg-tier-card__header--basic {
+  background: rgba(52, 152, 219, 0.08);
+}
+
+.rtg-tier-card__header--pro {
+  background: rgba(232, 92, 26, 0.08);
+}
+
+.rtg-tier-card__name {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.rtg-tier-card__price {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.rtg-tier-card__period {
+  font-size: 0.75rem;
+  font-weight: 400;
+  color: var(--text-muted);
+}
+
+.rtg-tier-card__desc {
+  padding: 0.5rem 0.75rem 0.75rem;
+  margin: 0;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+/* Tier Badges */
+.rtg-tier-badge {
+  display: inline-block;
+  padding: 0.15rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.rtg-tier-badge--free {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text-secondary);
+}
+
+.rtg-tier-badge--basic {
+  background: rgba(52, 152, 219, 0.15);
+  color: #3498db;
+}
+
+.rtg-tier-badge--pro {
+  background: rgba(232, 92, 26, 0.15);
+  color: #e85c1a;
+}
+
+/* Status Badges */
+.rtg-status-badge {
+  display: inline-block;
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.rtg-status-badge--green {
+  background: rgba(46, 204, 113, 0.12);
+  color: #2ecc71;
+}
+
+.rtg-status-badge--orange {
+  background: rgba(232, 92, 26, 0.12);
+  color: #e85c1a;
+}
+
+.rtg-status-badge--yellow {
+  background: rgba(241, 196, 15, 0.12);
+  color: #f1c40f;
+}
+
+.rtg-status-badge--red {
+  background: rgba(231, 76, 60, 0.12);
+  color: #e74c3c;
+}
+
+.rtg-status-badge--muted {
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--text-muted);
+}
+
+/* Tables */
+.rtg-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 1.5rem;
+  font-size: 0.85rem;
+}
+
+.rtg-table th {
+  text-align: left;
+  padding: 0.6rem 0.75rem;
+  color: var(--text-muted);
+  font-weight: 600;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  border-bottom: 2px solid var(--border-color);
+  white-space: nowrap;
+}
+
+.rtg-table td {
+  padding: 0.6rem 0.75rem;
+  color: var(--text-secondary);
+  border-bottom: 1px solid var(--border-color);
+  line-height: 1.5;
+}
+
+.rtg-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.rtg-table tbody tr:hover {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.rtg-table--compact td,
+.rtg-table--compact th {
+  padding: 0.5rem 0.75rem;
+}
+
+.rtg-check {
+  color: #2ecc71;
+  font-weight: 700;
+  text-align: center;
+}
+
+.rtg-cross {
+  color: var(--text-muted);
+  text-align: center;
+  opacity: 0.4;
+}
+
+/* Headings */
+.rtg-h3 {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 1.5rem 0 0.75rem;
+}
+
+.rtg-h3:first-child {
+  margin-top: 0;
+}
+
+/* Steps */
+.rtg-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1.25rem;
+}
+
+.rtg-step {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.6rem 0.75rem;
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: var(--radius);
+  border-left: 3px solid var(--accent-primary);
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.rtg-step__num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--accent-primary);
+  color: #fff;
+  font-size: 0.7rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+/* Lists */
+.rtg-list {
+  margin: 0 0 1.25rem;
+  padding-left: 1.25rem;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.8;
+}
+
+/* Callouts */
+.rtg-callout {
+  border-left: 3px solid var(--accent-primary);
+  background: rgba(232, 92, 26, 0.04);
+  padding: 1rem 1.25rem;
+  border-radius: 0 var(--radius) var(--radius) 0;
+  margin-bottom: 1rem;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.rtg-callout strong {
+  color: var(--text-primary);
+}
+
+.rtg-callout ul,
+.rtg-callout ol {
+  margin: 0.5rem 0 0;
+  padding-left: 1.25rem;
+}
+
+.rtg-callout li {
+  margin-bottom: 0.25rem;
+}
+
+.rtg-callout--tip {
+  border-left-color: #3498db;
+  background: rgba(52, 152, 219, 0.04);
+}
+
+.rtg-callout--important {
+  border-left-color: #f1c40f;
+  background: rgba(241, 196, 15, 0.04);
+}
+
+/* FAQ */
+.rtg-faq {
+  border-bottom: 1px solid var(--border-color);
+  padding: 1rem 0;
+}
+
+.rtg-faq:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.rtg-faq:first-child {
+  padding-top: 0;
+}
+
+.rtg-faq__question {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--accent-primary);
+  margin: 0 0 0.5rem;
+  font-style: italic;
+}
+
+.rtg-faq__answer {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.rtg-faq__answer p {
+  margin: 0 0 0.5rem;
+}
+
+.rtg-faq__answer p:last-child {
+  margin-bottom: 0;
+}
+
+.rtg-faq__answer ol {
+  margin: 0.25rem 0 0;
+  padding-left: 1.25rem;
+}
+
+.rtg-faq__answer li {
+  margin-bottom: 0.25rem;
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+  .rtg-tier-cards {
+    grid-template-columns: 1fr;
+  }
+
+  .rtg-table {
+    font-size: 0.8rem;
+  }
+
+  .rtg-table th,
+  .rtg-table td {
+    padding: 0.5rem;
+  }
+
+  .rtg-section__body {
+    padding: 1rem;
+  }
+}

@@ -154,7 +154,6 @@ export default function AuthProvider({ children }) {
     }
   }, [user]);
 
-  const isPremium = hasMinRole(role, 'premium');
   const isEditor = hasMinRole(role, 'editor');
   const isAdmin = hasMinRole(role, 'admin');
   const isSuperadmin = role === 'superadmin';
@@ -172,7 +171,7 @@ export default function AuthProvider({ children }) {
 
   return (
     <AuthContext.Provider value={{
-      user, role, isPremium, isEditor, isAdmin, isSuperadmin, loading,
+      user, role, isEditor, isAdmin, isSuperadmin, loading,
       signIn, signUp, signOut,
       subscription, isTrial, isGated, hasTier, refreshSubscription,
     }}>

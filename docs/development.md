@@ -79,20 +79,21 @@ npm run test
 cd apps/quiz-app && npx vitest run
 ```
 
-### Current Coverage (149 tests, 14 files)
+### Current Coverage (168 tests, 15 files)
 - `hostQuizReducer.test.js` — Core host state machine (39 tests)
 - `tournamentBracket.test.js` — Bracket generation, seeding, advancement (36 tests)
+- `doublesReducer.test.js` — Doubles/Match state machine (19 tests)
 - `buzzerTimestamp.test.js` — Sub-millisecond buzzer resolution (13 tests)
 - `hostSessionPersistence.test.js` — localStorage save/load/clear (12 tests)
-- `aiGenerate.test.js` — AI Quiz generation and parsing (12 tests)
+- `AIGenerateModal.test.jsx` — AI generation UI logic (11 tests)
 - `useHostQuizPersistence.test.js` — Session restore/persistence hook (8 tests)
 - `mediaDetector.test.js` — Media URL detection (7 tests)
 - `useTournamentSync.test.js` — Tournament DB sync hook (5 tests)
 - `certificateGenerator.test.js` — Canvas certificate generation (4 tests)
 - `exportResults.test.js` — CSV/PDF export logic (4 tests)
-- `AIGenerateModal.test.jsx` — AI generation UI logic (11 tests)
 - `TournamentResultsView.test.jsx` — Tournament UI results (4 tests)
 - `TieBreakerModal.test.jsx` — Tie-breaker UI logic (3 tests)
+- `supabaseClient.test.js` — Supabase SDK wrapper connection checks (2 tests)
 - `AuthContext.test.js` — Auth provider initialization (1 test)
 
 ### Coverage Goals
@@ -114,6 +115,10 @@ The project utilizes an AI-first development approach. Follow this workflow when
 - **Barrel Exports**: Use the centralized `@qwizzeria/supabase-client` entry point for all Supabase interactions to ensure consistent client configuration.
 - **Vanilla CSS**: Avoid utility frameworks unless requested. Use design tokens from `global.css`.
 - **Component Focused**: Keep components reusable and state-blind. Logic should be extracted to custom hooks or reducers (see `HostQuiz.jsx` decomposition).
+- **Hardening Policy (Phase 10)**: Any component reaching >500 lines MUST be decomposed. The preferred pattern is the **"Trio"**: 
+    1.  **State Machine** (`reducer.js`) for complex transitions.
+    2.  **Logic Hook** (`useFeature.js`) for effects and handlers.
+    3.  **UI Library** (`FeatureUI.jsx`) for presentational elements.
 - **Error Handling**: Every feature must include loading/error states with retry capability.
 
 ### 3. Pre-Completion Checklist (MANDATORY)
@@ -137,7 +142,7 @@ The project includes a GitHub Actions pipeline (`.github/workflows/ci.yml`) that
 1. `npm ci` — Install dependencies
 2. `npm run lint` — Lint all packages
 3. `npm run build` — Build all packages
-4. `npm run test` — Run test suite (149 tests)
+4. `npm run test` — Run test suite (168 tests)
 
 Production deployment is configured for **Vercel** via `vercel.json` (output: `apps/quiz-app/dist`). Set `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` as environment variables in the Vercel dashboard.
 

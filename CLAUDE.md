@@ -63,8 +63,8 @@ Access restricted via role checks (editor, admin, superadmin).
 ## Key Architecture
 
 - **Auth**: AuthProvider wraps quiz-app; `useAuth()` hook for user/role/signOut
-- **Roles**: DB-backed roles in `user_profiles.role`: `user`, `premium`, `editor`, `admin`, `superadmin`
-- **Premium**: `useAuth().isPremium` — true for `premium`+ roles (DB-level, not app_metadata)
+- **Roles**: DB-backed roles in `user_profiles.role`: `user`, `editor`, `admin`, `superadmin` (operational/staff access only)
+- **Subscription tiers**: `free`, `basic`, `pro` — controls player feature access via `subscriptions` table + `useEntitlement` hook
 - **Admin access**: `useAuth().isAdmin` — true for `admin`/`superadmin`; `useAuth().isEditor` for `editor`+
 - **Admin CMS access**: `editor` gets questions/packs; `admin`+ gets analytics, bulk import; `superadmin` gets user management
 - **Dashboard layout**: Sidebar (260px) + content area, mobile hamburger at ≤768px
@@ -100,6 +100,19 @@ Access restricted via role checks (editor, admin, superadmin).
 - **Barrel exports**: `import { fn } from '@qwizzeria/supabase-client'` — all modules re-exported from index.js. Deep paths (`/src/packs.js`) still work for backward compat.
 - **Supabase**: Initialized conditionally in main.jsx — app works without credentials
 
+## Subscription & Tier System
+
+- **Tier config**: `apps/quiz-app/src/config/tiers.js` — single source of truth for tier hierarchy, pricing, feature-to-tier mapping
+- **Tiers**: Free ($0) → Basic ($4.99/mo) → Pro ($9.99/mo). Staff roles bypass all gating.
+- **Trial**: 14-day Pro trial computed from `user_profiles.created_at` (no Stripe trial)
+- **Gating hook**: `useEntitlement(feature)` — returns `{ allowed, requiredTier, currentTier, reason }`
+- **Gating components**: `TierRoute` (layout route), `SubscriptionGate` (wrapper), `UpgradeWall` (contextual messaging)
+- **Stripe**: Checkout (create-checkout.js), Webhook (webhook.js with idempotency via `stripe_webhook_log`), Portal (create-portal.js)
+- **Subscription state**: `get_subscription_state` RPC — staff bypass, subscription row check, trial computation
+- **Post-payment**: `SubscriptionSuccessBanner` polls `refreshSubscription()` after checkout return; Profile refreshes on `visibilitychange`
+- **TrialBanner**: Shows for all trial days (softer tone days 6-14, urgent ≤5 days)
+- **Adding/changing tiers**: Edit `config/tiers.js` → all UI auto-adapts. See `docs/tier-strategy.md` for details.
+
 ## Database Tables
 
 - `questions_master` — All quiz questions (question_text, answer_text, category, media_url, points, status, is_public)
@@ -108,16 +121,20 @@ Access restricted via role checks (editor, admin, superadmin).
 - `quiz_sessions` — Play sessions (user_id, is_free_quiz, quiz_pack_id, score, status, metadata JSONB)
 - `question_attempts` — Per-question results (session_id, question_id, is_correct, time_spent_ms)
 - `ai_generation_log` — AI quiz generation audit log (user_id, topic, question_count, difficulty, created_at). Rate limiting via time-window queries.
-- `user_profiles` — User display names, avatars, and role (id FK → auth.users, role CHECK user/premium/editor/admin/superadmin)
-- `feature_access` — Gate 1: which features (free_quiz, pack_browse, pack_premium, host_quiz, admin_cms) a user can access
-- `content_permissions` — Gate 2: granular read/write/manage access to specific packs or categories
+- `user_profiles` — User display names, avatars, and role (id FK → auth.users, role CHECK user/editor/admin/superadmin)
+- `subscriptions` — Stripe subscriptions (user_id, tier, status, stripe_customer_id, stripe_subscription_id, current_period_start/end, cancel_at_period_end, trial_start/end)
+- `stripe_webhook_log` — Webhook idempotency + audit (event_id UNIQUE, event_type, status, error_message)
+- `feature_access` — Legacy Gate 1 table (defined but unused — superseded by tier system)
+- `content_permissions` — Gate 2: granular read/write/manage access to specific packs or categories (used in RLS for editor access)
 
-## RBAC — Two-Gate Security Model
+## Authorization Model
 
-- **Gate 1 (Feature Access):** `feature_access` table controls which features a user can enter. Admin/superadmin bypass.
-- **Gate 2 (Content Permissions):** `content_permissions` table controls read/write/manage access to specific packs/categories.
-- **Role precedence:** superadmin > admin > editor > premium > user. Admin+ bypasses both gates.
-- **Helper functions:** `is_admin()`, `is_superadmin()`, `get_role()`, `has_feature_access(feature_key)`, `has_content_permission(type, id, level)`
+Two independent systems control access:
+
+- **Roles** (`user_profiles.role`): `user` < `editor` < `admin` < `superadmin`. Controls staff/CMS access and DB-level security (RLS). Staff roles (editor+) bypass all subscription gating.
+- **Tiers** (`subscriptions.tier`): `free` < `basic` < `pro`. Controls player feature access. Managed by Stripe webhooks. `useEntitlement` hook + `config/tiers.js` is the single source of truth.
+- **Content Permissions** (`content_permissions` table): Granular read/write/manage grants for editors on specific packs/categories. Used in RLS only; no admin UI (requires manual SQL).
+- **Helper functions:** `is_admin()`, `is_superadmin()`, `get_role()`, `has_content_permission(type, id, level)`
 
 ## RLS Policies (Key)
 
@@ -130,6 +147,8 @@ Access restricted via role checks (editor, admin, superadmin).
 
 ## Postgres RPC Functions
 
+- `get_subscription_state(target_user_id)` — Subscription/trial/gating state (staff bypass, subscription check, trial computation)
+- `get_subscription_analytics()` — Subscription analytics (admin-only)
 - `get_user_stats(target_user_id)` — Aggregated user quiz stats
 - `get_global_leaderboard(time_filter, result_limit)` — Global leaderboard
 - `get_pack_leaderboard(target_pack_id, result_limit)` — Per-pack top scores
@@ -144,7 +163,7 @@ Access restricted via role checks (editor, admin, superadmin).
 - `npm run dev` — Start the quiz-app dev server (Player + Admin CMS) at :5173
 - `npm run build` — Build all packages
 - `npm run lint` — Lint all packages
-- `cd apps/quiz-app && npx vitest run` — Run tests (149 tests across 14 files)
+- `cd apps/quiz-app && npx vitest run` — Run tests (168 tests across 15 files)
 
 ## Key Component Files
 
@@ -163,6 +182,12 @@ Access restricted via role checks (editor, admin, superadmin).
 - `apps/quiz-app/src/components/host/AIGenerateModal.jsx` — AI quiz generation modal (input/generating/preview/error states)
 - `apps/quiz-app/src/components/host/HostPackSelect.jsx` — Browse & select packs from DB + "Generate with AI" card
 - `apps/quiz-app/src/components/host/HostParticipantSetup.jsx` — Player names (2-8)
+- `apps/quiz-app/src/config/tiers.js` — Centralized tier config (TIERS, FEATURE_TIERS, tierSatisfies, getTierList)
+- `apps/quiz-app/src/hooks/useEntitlement.js` — Feature entitlement hook (allowed, requiredTier, reason)
+- `apps/quiz-app/src/components/SubscriptionGate.jsx` — TierRoute (layout) + SubscriptionGate (wrapper)
+- `apps/quiz-app/src/components/UpgradeWall.jsx` — Contextual upgrade prompt (trial_expired/canceled/tier_insufficient)
+- `apps/quiz-app/src/components/SubscriptionSuccessBanner.jsx` — Post-checkout success banner with polling
+- `apps/quiz-app/src/components/TrialBanner.jsx` — Trial countdown banner (all days, urgent ≤5)
 - `apps/quiz-app/src/components/ProtectedRoute.jsx` — Auth guard (Outlet pattern)
 - `apps/quiz-app/src/components/AuthRedirect.jsx` — Landing or redirect to /dashboard
 - `apps/quiz-app/src/layouts/DashboardLayout.jsx` — Sidebar + content layout
@@ -171,13 +196,18 @@ Access restricted via role checks (editor, admin, superadmin).
 - `packages/supabase-client/src/packs.js` — Pack CRUD, browsing, play, showcase, admin analytics RPCs
 - `packages/supabase-client/src/aiGenerate.js` — AI quiz generation client (generateQuiz + saveGeneratedPack)
 - `packages/supabase-client/src/buzzer.js` — Buzzer room CRUD + Supabase Broadcast channel
-- `apps/quiz-app/src/pages/BuzzerPage.jsx` — Participant buzzer page (full-screen, auth required)
+- `apps/quiz-app/src/pages/BuzzerPage.jsx` — Decomposed participant buzzer page (orchestrator, 105 lines)
+- `apps/quiz-app/src/components/buzzer/` — Buzzer participant sub-components (Reducer, Hook, UI)
 - `apps/quiz-app/src/hooks/useBuzzerHost.js` — Host-side buzzer hook (room lifecycle, buzz ranking)
 - `apps/quiz-app/src/components/host/BuzzerOverlay.jsx` — Host buzzer controls overlay
 - `apps/quiz-app/src/utils/buzzerTimestamp.js` — Buzz ranking, tie detection, validation
 - `apps/quiz-app/src/utils/buzzerSound.js` — Web Audio buzzer sound effects
 - `apps/quiz-app/src/utils/exportResults.js` — CSV download + PDF print for quiz results
 - `apps/quiz-app/src/utils/certificateGenerator.js` — Canvas-based PNG certificate generation for top 3
+- `apps/quiz-app/src/pages/Guide.jsx` — Guide page orchestrator (7 sections)
+- `apps/quiz-app/src/components/guide/` — Guide sub-components (Base, Visuals, Sections: GettingStarted, FreeQuiz, PlayPacks, HostQuiz, AIGenerate, BuzzerMode, Tournament)
+- `apps/quiz-app/src/pages/admin/UserList.jsx` — Decomposed admin user management (orchestrator, 184 lines)
+- `apps/quiz-app/src/components/admin/users/` — User management sub-components (KPIs, Table, Filters, Modal, Utils)
 
 ## Completed Phases
 
@@ -188,10 +218,11 @@ Access restricted via role checks (editor, admin, superadmin).
 - Phase 4: Quiz Packs + Premium (pack CRUD, browse, detail, Jeopardy + Sequential play, premium gate)
 - Phase 5: Retention + Competition + Admin Intelligence (profile, history, resume, leaderboards, admin analytics)
 - Phase 6: Dashboard Layout + Host Quiz (sidebar layout, auth routing, host quiz with pack select, multiplayer, integrated scoreboard bar with self-contained timer, flat card grid layout for all quiz modes)
-- Phase 7: RBAC (DB-backed roles in user_profiles, Two-Gate security: feature_access + content_permissions, updated RLS policies to use is_admin()/get_role(), editor CMS access, premium as DB role, User Management UI)
+- Phase 7: RBAC (DB-backed roles in user_profiles, content_permissions for editor grants, updated RLS policies to use is_admin()/get_role(), editor CMS access, User Management UI)
 - Phase 8: Polish & Quality (test coverage 53 tests, error UI with retry on all pages, skeleton loading states, WCAG accessibility improvements, CI/CD pipeline, landing page pack carousel, host pack cover images, simplified RLS for active pack showcase)
 - Phase 9: AI Quiz Generation (Supabase Edge Function + Claude API, AIGenerateModal with preview/edit, "Generate with AI" in HostPackSelect, rate limiting, Pro-gate)
-- Phase 10: Codebase Improvements (HostQuiz.jsx decomposed from 1283→615 lines, reducer/hooks/components extracted, 149 tests across 14 files, `@/` path aliases, barrel exports for supabase-client)
+- Phase 10: Codebase Improvements (HostQuiz.jsx decomposed from 1283→615 lines, Guide.jsx decomposed from 705→23 lines, BuzzerPage.jsx decomposed from 686→105 lines, UserList.jsx decomposed from 574→184 lines, reducer/hooks/components extracted, 168 tests across 15 files, `@/` path aliases, barrel exports for supabase-client)
+- Phase 11: Tier Strategy Implementation (centralized tier config in `config/tiers.js`, `useEntitlement` hook, webhook security fixes — unknown price rejection/explicit status mapping/customer fallback/idempotency, post-payment UX — success banner with polling/visibilitychange refresh, contextual UpgradeWall messaging, TrialBanner for all trial days, downgrade warnings on Pricing page, `invoice.paid`/`charge.refunded`/`charge.dispute.created` webhook handlers, `stripe_webhook_log` table, WCAG focus-visible/aria-labels/sr-only text, DoublesRoute replaced with TierRoute, `tier-strategy.md` updated, removed vestigial `premium` DB role — pack visibility now uses subscription tier instead of role, `feature_access` table marked legacy)
 
 ## Full Documentation
 
@@ -200,3 +231,4 @@ For detailed guides, see the `docs/` directory:
 - [Architecture Guide](docs/architecture.md) (Frontend UI, React state)
 - [Backend & Security](docs/backend-and-security.md) (Supabase, Roles, DB Schema)
 - [Development Workflow](docs/development.md) (Tests, local setup, CI/CD)
+- [Roles & Tiers Guide](docs/roles-and-tiers-guide.md) (Sales/marketing-friendly guide to roles and pricing)

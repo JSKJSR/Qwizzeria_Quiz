@@ -12,7 +12,7 @@ const DIFFICULTIES = ['easy', 'medium', 'hard'];
  * Props: onClose(), onConfirm(pack, questions)
  */
 export default function AIGenerateModal({ onClose, onConfirm }) {
-  const { user, isPremium } = useAuth();
+  const { user, hasTier } = useAuth();
 
   // Input state
   const [topic, setTopic] = useState('');
@@ -101,7 +101,7 @@ export default function AIGenerateModal({ onClose, onConfirm }) {
   }, []);
 
   // Non-Pro users see upgrade prompt
-  if (!isPremium) {
+  if (!hasTier('pro')) {
     return (
       <div className="ai-modal-overlay" onClick={onClose}>
         <div className="ai-modal" onClick={(e) => e.stopPropagation()}>

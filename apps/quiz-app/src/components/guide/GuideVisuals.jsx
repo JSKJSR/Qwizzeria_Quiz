@@ -1,5 +1,137 @@
 // --- SVG Visuals ---
 
+export function TierCardsVisual() {
+  return (
+    <svg viewBox="0 0 200 120" aria-hidden="true" className="guide__svg">
+      <rect x="5" y="20" width="55" height="80" rx="6" fill="#1a1015" stroke="#2a1520" strokeWidth="1.5" />
+      <text x="32" y="42" textAnchor="middle" fill="#b0a0a5" fontSize="9" fontWeight="bold">Free</text>
+      <text x="32" y="58" textAnchor="middle" fill="#b0a0a5" fontSize="7">$0</text>
+      <text x="32" y="80" textAnchor="middle" fill="#b0a0a5" fontSize="6">Free Quiz</text>
+      <rect x="72" y="15" width="55" height="90" rx="6" fill="#1a1015" stroke="#3498db" strokeWidth="2" />
+      <text x="99" y="37" textAnchor="middle" fill="#3498db" fontSize="9" fontWeight="bold">Basic</text>
+      <text x="99" y="53" textAnchor="middle" fill="#3498db" fontSize="7">$4.99/mo</text>
+      <text x="99" y="72" textAnchor="middle" fill="#b0a0a5" fontSize="6">Packs</text>
+      <text x="99" y="84" textAnchor="middle" fill="#b0a0a5" fontSize="6">Leaderboard</text>
+      <rect x="139" y="15" width="55" height="90" rx="6" fill="#1a1015" stroke="#e85c1a" strokeWidth="2.5" />
+      <text x="166" y="37" textAnchor="middle" fill="#e85c1a" fontSize="9" fontWeight="bold">Pro</text>
+      <text x="166" y="53" textAnchor="middle" fill="#e85c1a" fontSize="7">$9.99/mo</text>
+      <text x="166" y="72" textAnchor="middle" fill="#b0a0a5" fontSize="6">Host Quiz</text>
+      <text x="166" y="84" textAnchor="middle" fill="#b0a0a5" fontSize="6">AI Generate</text>
+    </svg>
+  );
+}
+
+export function TrialVisual() {
+  const radius = 25;
+  const circumference = 2 * Math.PI * radius;
+  const offset = circumference * 0.3;
+  return (
+    <svg viewBox="0 0 200 120" aria-hidden="true" className="guide__svg">
+      <circle cx="100" cy="55" r={radius + 4} fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth="5" />
+      <circle
+        cx="100" cy="55" r={radius + 4}
+        fill="none" stroke="#e85c1a" strokeWidth="5" strokeLinecap="round"
+        strokeDasharray={circumference} strokeDashoffset={offset}
+        transform="rotate(-90 100 55)"
+      />
+      <text x="100" y="52" textAnchor="middle" fill="#f0f0f0" fontSize="16" fontWeight="bold">14</text>
+      <text x="100" y="66" textAnchor="middle" fill="#b0a0a5" fontSize="7">days free</text>
+      <text x="100" y="105" textAnchor="middle" fill="#b0a0a5" fontSize="8">Full Pro access — no card required</text>
+    </svg>
+  );
+}
+
+export function DashboardVisual() {
+  return (
+    <svg viewBox="0 0 200 120" aria-hidden="true" className="guide__svg">
+      {/* Sidebar */}
+      <rect x="5" y="10" width="45" height="100" rx="4" fill="#1a1015" stroke="#2a1520" strokeWidth="1" />
+      <text x="27" y="28" textAnchor="middle" fill="#e85c1a" fontSize="6" fontWeight="bold">Q</text>
+      <rect x="10" y="38" width="35" height="6" rx="2" fill="#2a1520" />
+      <rect x="10" y="50" width="35" height="6" rx="2" fill="#e85c1a" />
+      <rect x="10" y="62" width="35" height="6" rx="2" fill="#2a1520" />
+      <rect x="10" y="74" width="35" height="6" rx="2" fill="#2a1520" />
+      {/* Content */}
+      <rect x="55" y="10" width="140" height="100" rx="4" fill="#1a1015" stroke="#2a1520" strokeWidth="1" />
+      <text x="125" y="30" textAnchor="middle" fill="#f0f0f0" fontSize="8" fontWeight="bold">Welcome back!</text>
+      <rect x="65" y="40" width="55" height="30" rx="4" fill="#2a1520" />
+      <text x="92" y="59" textAnchor="middle" fill="#e85c1a" fontSize="7">Free Quiz</text>
+      <rect x="128" y="40" width="55" height="30" rx="4" fill="#2a1520" />
+      <text x="155" y="59" textAnchor="middle" fill="#3498db" fontSize="7">Packs</text>
+      <rect x="65" y="78" width="55" height="26" rx="4" fill="#2a1520" />
+      <text x="92" y="94" textAnchor="middle" fill="#b0a0a5" fontSize="7">Host</text>
+      <rect x="128" y="78" width="55" height="26" rx="4" fill="#2a1520" />
+      <text x="155" y="94" textAnchor="middle" fill="#b0a0a5" fontSize="7">Guide</text>
+    </svg>
+  );
+}
+
+export function FreeQuizGridVisual() {
+  const cats = ['Science', 'History', 'Music', 'Sports'];
+  return (
+    <svg viewBox="0 0 200 120" aria-hidden="true" className="guide__svg">
+      {cats.map((cat, i) => (
+        <g key={cat}>
+          <rect x={8 + i * 48} y="15" width="42" height="36" rx="5" fill="#1a1015" stroke={i === 1 ? '#e85c1a' : '#2a1520'} strokeWidth={i === 1 ? 2 : 1.5} />
+          <text x={29 + i * 48} y="30" textAnchor="middle" fill="#f0f0f0" fontSize="6">{cat}</text>
+          <text x={29 + i * 48} y="44" textAnchor="middle" fill="#e85c1a" fontSize="10" fontWeight="bold">10</text>
+        </g>
+      ))}
+      {cats.map((cat, i) => (
+        <g key={`r2-${cat}`}>
+          <rect x={8 + i * 48} y="58" width="42" height="36" rx="5" fill="#1a1015" stroke="#2a1520" strokeWidth="1.5" />
+          <text x={29 + i * 48} y="73" textAnchor="middle" fill="#f0f0f0" fontSize="6">{cat}</text>
+          <text x={29 + i * 48} y="87" textAnchor="middle" fill="#e85c1a" fontSize="10" fontWeight="bold">20</text>
+        </g>
+      ))}
+      <text x="100" y="110" textAnchor="middle" fill="#b0a0a5" fontSize="7">Tap any card to play</text>
+    </svg>
+  );
+}
+
+export function SelfAssessVisual() {
+  return (
+    <svg viewBox="0 0 200 120" aria-hidden="true" className="guide__svg">
+      <rect x="20" y="10" width="160" height="40" rx="6" fill="#1a1015" stroke="#2a1520" strokeWidth="1.5" />
+      <text x="100" y="25" textAnchor="middle" fill="#b0a0a5" fontSize="7">Answer:</text>
+      <text x="100" y="42" textAnchor="middle" fill="#f0f0f0" fontSize="9" fontWeight="bold">Mount Everest</text>
+      <rect x="15" y="62" width="55" height="30" rx="6" fill="rgba(46, 204, 113, 0.15)" stroke="#2ecc71" strokeWidth="1.5" />
+      <text x="42" y="81" textAnchor="middle" fill="#2ecc71" fontSize="8" fontWeight="bold">I Knew It</text>
+      <rect x="78" y="62" width="55" height="30" rx="6" fill="rgba(231, 76, 60, 0.15)" stroke="#e74c3c" strokeWidth="1.5" />
+      <text x="105" y="81" textAnchor="middle" fill="#e74c3c" fontSize="7" fontWeight="bold">Didn't Know</text>
+      <rect x="140" y="62" width="45" height="30" rx="6" fill="rgba(255,255,255,0.05)" stroke="#2a1520" strokeWidth="1.5" />
+      <text x="162" y="81" textAnchor="middle" fill="#b0a0a5" fontSize="8">Skip</text>
+      <text x="100" y="110" textAnchor="middle" fill="#b0a0a5" fontSize="7">Honest self-assessment</text>
+    </svg>
+  );
+}
+
+export function AIGenerateVisual() {
+  return (
+    <svg viewBox="0 0 200 120" aria-hidden="true" className="guide__svg">
+      {/* Input */}
+      <rect x="15" y="15" width="170" height="30" rx="6" fill="#1a1015" stroke="#9b59b6" strokeWidth="1.5" />
+      <text x="100" y="34" textAnchor="middle" fill="#b0a0a5" fontSize="8">Enter topic: &quot;Space Exploration&quot;</text>
+      {/* Arrow */}
+      <line x1="100" y1="50" x2="100" y2="62" stroke="#9b59b6" strokeWidth="1.5" markerEnd="url(#aiArrow)" />
+      {/* Generated cards */}
+      {[0, 1, 2, 3].map(i => (
+        <g key={i}>
+          <rect x={15 + i * 45} y="68" width="38" height="36" rx="4" fill="#1a1015" stroke={i < 3 ? '#9b59b6' : '#2a1520'} strokeWidth={i < 3 ? 1.5 : 1} />
+          <text x={34 + i * 45} y="82" textAnchor="middle" fill={i < 3 ? '#f0f0f0' : '#b0a0a5'} fontSize="6">Q{i + 1}</text>
+          <text x={34 + i * 45} y="96" textAnchor="middle" fill={i < 3 ? '#9b59b6' : '#b0a0a5'} fontSize="5">{i < 3 ? 'ready' : '...'}</text>
+        </g>
+      ))}
+      <defs>
+        <marker id="aiArrow" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+          <polygon points="0 0, 8 3, 0 6" fill="#9b59b6" />
+        </marker>
+      </defs>
+      <text x="100" y="115" textAnchor="middle" fill="#b0a0a5" fontSize="7">AI generates questions instantly</text>
+    </svg>
+  );
+}
+
 export function PackCardsVisual() {
   return (
     <svg viewBox="0 0 200 120" aria-hidden="true" className="guide__svg">

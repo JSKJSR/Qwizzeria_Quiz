@@ -60,6 +60,14 @@ export default function AdminLayout() {
             </NavLink>
           )}
           <NavLink
+            to="/admin/guide"
+            className={({ isActive }) =>
+              `admin-sidebar__link${isActive ? ' admin-sidebar__link--active' : ''}`
+            }
+          >
+            Roles & Tiers
+          </NavLink>
+          <NavLink
             to="/dashboard"
             className="admin-sidebar__link admin-sidebar__link--back"
           >

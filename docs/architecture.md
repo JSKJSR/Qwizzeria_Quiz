@@ -10,8 +10,8 @@ Developed using **Turborepo** and npm workspaces, the codebase is split into ind
 
 ### `apps/`
 - **`quiz-app/`**: The primary product (Vite + React 19). It handles:
-  - **Player App**: Landing (with pack showcase carousel), browsing, playing quizzes in **Jeopardy (grid-based)** or **Sequential (linear)** formats, and user profiles.
-  - **Admin CMS**: Integrated management layer accessible at `/admin`. Provides authorized editors and admins with tools to manage the question bank and quiz packs (including direct pack creation via Bulk Import). Includes a **User Management** interface for superadmins.
+  - **Player App**: Landing (with pack showcase carousel), browsing, playing quizzes in **Jeopardy (grid-based)** or **Sequential (linear)** formats, user profiles, and a comprehensive **How to Play Guide**.
+  - **Admin CMS**: Integrated management layer accessible at `/admin`. Provides authorized editors and admins with tools to manage the question bank and quiz packs (including direct pack creation via Bulk Import). Includes a **User Management** interface (`admin/UserList.jsx`) for superadmins, which follows a modular design with sub-components for KPIs, Tables, and Role management.
 
 ### `packages/`
 - **`supabase-client/`**: A centralized package wrapping the Supabase SDK. It manages:
@@ -45,7 +45,11 @@ The Host Quiz integrates an AI generation flow powered by **Claude 3.5 Sonnet**:
 
 ### Real-time Buzzer & Host UI
 The Host Quiz features a modular **Host UI** with responsive layouts, collapsible scoreboards (Drawers), hero-sized Timer Controls, and a high-contrast Light/Dark mode toggle implementation.
-- **Decomposition**: The core `HostQuiz.jsx` component is decomposed (from 1200+ to ~600 lines) with state management extracted to `hostQuizReducer.js` and lifecycle logic to specialized hooks (`useHostQuizPersistence`, `useTournamentSync`).
+- **Decomposition**: The core `HostQuiz.jsx`, `Guide.jsx`, and `BuzzerPage.jsx` components have been decomposed to improve maintainability and performance:
+  - **Host Mode**: Logic extracted to `hostQuizReducer.js` and lifecycle hooks.
+  - **How to Play Guide**: Modularized into sub-sections under `src/components/guide/` with a shared `GuideBase` and SVG visual library.
+  - **Participant Buzzer**: Logic encapsulated in the `useBuzzerParticipant` hook and `buzzerReducer` state machine, with presentational components in `BuzzerUI.jsx`.
+- **User Management**: The Admin User List (`UserList.jsx`) is similarly decomposed into modular components (`UserKpis`, `UserTable`, `UserFilters`) to handle the complexity of identity management.
 Additionally, it supports a live **Buzzer Overlay** synchronized via Supabase Realtime using the `useBuzzerHost` hook. Participants join a session via the `/buzzer` route using a host-generated room code.
 - **Precision Logging**: Utilizes sub-millisecond timestamps (`buzzerTimestamp.js`) to determine the exact order of player buzzes.
 - **Feedback**: Provides immediate auditory (`buzzerSound.js`) and visual cues on both the player device and host screen.
@@ -79,7 +83,7 @@ Host Quiz supports a **Tournament Mode** for single-elimination bracket competit
 
 ## 🧪 Quality & Accessibility
 
-- **Test Coverage**: 149 tests across 14 files (Vitest + jsdom) — includes core state machines (reducers), AI generation logic, tournament brackets, session persistence, media detection, auth, and sub-millisecond buzzer resolution.
+- **Test Coverage**: 168 tests across 15 files (Vitest + jsdom) — includes core state machines (reducers), AI generation logic, tournament brackets, session persistence, media detection, auth, and sub-millisecond buzzer resolution.
 - **Error Handling**: All data-fetching pages display error UI with retry buttons (no silent failures).
 - **WCAG Compliance**: focus-visible states, WCAG-AA contrast ratios, 44px minimum touch targets, `prefers-reduced-motion` support, semantic ARIA labels on interactive elements.
 - **CI/CD**: GitHub Actions pipeline (lint → build → test) on every push/PR; Vercel deployment config.

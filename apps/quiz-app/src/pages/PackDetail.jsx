@@ -10,7 +10,7 @@ import '../styles/Leaderboard.css';
 export default function PackDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { user, role, isPremium: isPremiumUser, loading: authLoading } = useAuth();
+  const { user, role, subscription, hasTier, loading: authLoading } = useAuth();
 
   const [pack, setPack] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -20,7 +20,7 @@ export default function PackDetail() {
 
   useEffect(() => {
     let cancelled = false;
-    fetchPublicPackById(id, { userRole: role })
+    fetchPublicPackById(id, { userRole: role, subscriptionTier: subscription?.tier })
       .then((data) => { if (!cancelled) setPack(data); })
       .catch((err) => { if (!cancelled) setError(err.message); })
       .finally(() => { if (!cancelled) setLoading(false); });
@@ -31,7 +31,7 @@ export default function PackDetail() {
       .catch(() => { });
 
     return () => { cancelled = true; };
-  }, [id, role]);
+  }, [id, role, subscription?.tier]);
 
   if (loading || authLoading) {
     return (
@@ -57,7 +57,7 @@ export default function PackDetail() {
     );
   }
 
-  const showPremiumGate = pack.is_premium && !isPremiumUser;
+  const showPremiumGate = pack.is_premium && !hasTier('basic');
 
   return (
     <div className="pack-detail">
@@ -72,6 +72,7 @@ export default function PackDetail() {
           className="pack-detail__cover"
           src={pack.cover_image_url}
           alt={pack.title}
+          loading="lazy"
           onError={(e) => { e.target.style.display = 'none'; }}
         />
       ) : (

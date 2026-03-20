@@ -1,14 +1,7 @@
 import { Link } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
+import { DISPLAY_FEATURES, FEATURE_TIERS, tierSatisfies, TIERS } from '../config/tiers';
 import '../styles/SubscriptionGate.css';
-
-const TIER_FEATURES = {
-  free: ['Free Quiz', 'Dashboard', 'Profile / Guide'],
-  basic: ['Free Quiz', 'Dashboard', 'Profile / Guide', 'Quiz Packs (browse + play)', 'Quiz History', 'Global Leaderboard'],
-  pro: ['Free Quiz', 'Dashboard', 'Profile / Guide', 'Quiz Packs (browse + play)', 'Quiz History', 'Global Leaderboard', 'Host Quiz (multiplayer)', 'Tournaments'],
-};
-
-const ALL_FEATURES = TIER_FEATURES.pro;
 
 function CheckIcon() {
   return (
@@ -26,18 +19,38 @@ function CrossIcon() {
   );
 }
 
-export default function UpgradeWall({ requiredTier, feature }) {
+export default function UpgradeWall({ requiredTier, feature, reason }) {
   const { isTrial, subscription } = useAuth();
 
-  const title = isTrial
-    ? 'Upgrade to continue'
-    : subscription.status === 'expired' || subscription.status === 'canceled'
-      ? 'Your free trial has ended'
-      : 'Upgrade required';
+  // D fix: contextual messaging based on reason
+  const derivedReason = reason
+    || (subscription.status === 'expired' ? 'trial_expired'
+      : subscription.status === 'canceled' ? 'canceled'
+        : isTrial ? 'trial_active'
+          : 'tier_insufficient');
 
-  const subtitle = requiredTier === 'pro'
-    ? 'This feature requires a Pro subscription.'
-    : 'This feature requires a Basic or Pro subscription.';
+  const TITLES = {
+    trial_expired: 'Your free trial has ended',
+    canceled: 'Your subscription has been canceled',
+    trial_active: 'Upgrade to continue',
+    tier_insufficient: 'Upgrade required',
+  };
+
+  const SUBTITLES = {
+    trial_expired: 'Subscribe to regain access to premium features.',
+    canceled: 'Resubscribe to regain access to your features.',
+    trial_active: requiredTier === 'pro'
+      ? 'This feature requires a Pro subscription.'
+      : 'This feature requires a Basic or Pro subscription.',
+    tier_insufficient: requiredTier === 'pro'
+      ? 'This feature requires a Pro subscription.'
+      : 'This feature requires a Basic or Pro subscription.',
+  };
+
+  const title = TITLES[derivedReason] || TITLES.tier_insufficient;
+  const subtitle = SUBTITLES[derivedReason] || SUBTITLES.tier_insufficient;
+
+  const tierKeys = ['free', 'basic', 'pro'];
 
   return (
     <div className="upgrade-wall">
@@ -54,33 +67,25 @@ export default function UpgradeWall({ requiredTier, feature }) {
 
         {/* Feature comparison */}
         <div className="upgrade-wall__comparison">
-          <div className="upgrade-wall__tier-col">
-            <h3 className="upgrade-wall__tier-name">Free</h3>
-            {ALL_FEATURES.map((f) => (
-              <div key={f} className="upgrade-wall__feature-row">
-                {TIER_FEATURES.free.includes(f) ? <CheckIcon /> : <CrossIcon />}
-                <span>{f}</span>
+          {tierKeys.map((tierKey) => {
+            const isHighlight = tierKey === (requiredTier || 'basic');
+            return (
+              <div key={tierKey} className={`upgrade-wall__tier-col ${isHighlight ? 'upgrade-wall__tier-col--highlight' : ''}`}>
+                <h3 className="upgrade-wall__tier-name">{TIERS[tierKey].name}</h3>
+                {DISPLAY_FEATURES.map((f) => {
+                  const included = tierSatisfies(tierKey, FEATURE_TIERS[f.key] || 'free');
+                  return (
+                    <div key={f.key} className="upgrade-wall__feature-row">
+                      {included
+                        ? <><CheckIcon /><span className="sr-only">Included: </span></>
+                        : <><CrossIcon /><span className="sr-only">Not included: </span></>}
+                      <span>{f.label}</span>
+                    </div>
+                  );
+                })}
               </div>
-            ))}
-          </div>
-          <div className="upgrade-wall__tier-col upgrade-wall__tier-col--highlight">
-            <h3 className="upgrade-wall__tier-name">Basic</h3>
-            {ALL_FEATURES.map((f) => (
-              <div key={f} className="upgrade-wall__feature-row">
-                {TIER_FEATURES.basic.includes(f) ? <CheckIcon /> : <CrossIcon />}
-                <span>{f}</span>
-              </div>
-            ))}
-          </div>
-          <div className="upgrade-wall__tier-col">
-            <h3 className="upgrade-wall__tier-name">Pro</h3>
-            {ALL_FEATURES.map((f) => (
-              <div key={f} className="upgrade-wall__feature-row">
-                <CheckIcon />
-                <span>{f}</span>
-              </div>
-            ))}
-          </div>
+            );
+          })}
         </div>
 
         <div className="upgrade-wall__actions">

@@ -1,60 +1,11 @@
 import { useState } from 'react';
 import { useAuth } from '../hooks/useAuth';
 import { getSupabase } from '@qwizzeria/supabase-client';
+import { getTierList } from '../config/tiers';
 import SEO from '../components/SEO';
 import '../styles/Pricing.css';
 
-const TIERS = [
-  {
-    id: 'free',
-    name: 'Free',
-    price: '$0',
-    period: '',
-    features: [
-      { text: 'Free Quiz', included: true },
-      { text: 'Dashboard', included: true },
-      { text: 'Profile / Guide', included: true },
-      { text: 'Quiz Packs (browse + play)', included: false },
-      { text: 'Quiz History', included: false },
-      { text: 'Global Leaderboard', included: false },
-      { text: 'Host Quiz (multiplayer)', included: false },
-      { text: 'Tournaments', included: false },
-    ],
-  },
-  {
-    id: 'basic',
-    name: 'Basic',
-    price: '$4.99',
-    period: '/month',
-    features: [
-      { text: 'Free Quiz', included: true },
-      { text: 'Dashboard', included: true },
-      { text: 'Profile / Guide', included: true },
-      { text: 'Quiz Packs (browse + play)', included: true },
-      { text: 'Quiz History', included: true },
-      { text: 'Global Leaderboard', included: true },
-      { text: 'Host Quiz (multiplayer)', included: false },
-      { text: 'Tournaments', included: false },
-    ],
-  },
-  {
-    id: 'pro',
-    name: 'Pro',
-    price: '$9.99',
-    period: '/month',
-    popular: true,
-    features: [
-      { text: 'Free Quiz', included: true },
-      { text: 'Dashboard', included: true },
-      { text: 'Profile / Guide', included: true },
-      { text: 'Quiz Packs (browse + play)', included: true },
-      { text: 'Quiz History', included: true },
-      { text: 'Global Leaderboard', included: true },
-      { text: 'Host Quiz (multiplayer)', included: true },
-      { text: 'Tournaments', included: true },
-    ],
-  },
-];
+const TIERS = getTierList();
 
 async function getAuthToken() {
   const supabase = getSupabase();
@@ -117,7 +68,24 @@ export default function Pricing() {
 
   return (
     <div className="pricing">
-      <SEO title="Pricing" path="/pricing" />
+      <SEO
+        title="Pricing"
+        description="Choose your Qwizzeria plan. Free, Basic ($9.99/mo), or Pro ($99.99/mo) — host quizzes, play packs, and compete on leaderboards."
+        path="/pricing"
+        jsonLd={{
+          '@context': 'https://schema.org',
+          '@type': 'Product',
+          name: 'Qwizzeria',
+          description: 'Live quiz hosting and play platform',
+          offers: TIERS.map((tier) => ({
+            '@type': 'Offer',
+            name: tier.name,
+            price: tier.price.replace('$', '') || '0',
+            priceCurrency: 'USD',
+            availability: 'https://schema.org/InStock',
+          })),
+        }}
+      />
       <h1 className="pricing__title">Choose your plan</h1>
 
       {isTrial && (
@@ -130,6 +98,23 @@ export default function Pricing() {
       {subscription.status === 'expired' && (
         <p className="pricing__trial-info">
           Your free trial has ended. Subscribe to regain access to premium features.
+        </p>
+      )}
+
+      {subscription.status === 'canceled' && (
+        <p className="pricing__trial-info">
+          Your subscription has been canceled.
+          {subscription.currentPeriodEnd && new Date(subscription.currentPeriodEnd) > new Date()
+            ? ` You have access until ${new Date(subscription.currentPeriodEnd).toLocaleDateString()}.`
+            : ' Resubscribe to regain access.'}
+        </p>
+      )}
+
+      {isActive && subscription.cancelAtPeriodEnd && (
+        <p className="pricing__trial-info">
+          Your subscription will cancel at the end of the current period
+          {subscription.currentPeriodEnd ? ` (${new Date(subscription.currentPeriodEnd).toLocaleDateString()})` : ''}.
+          You can resubscribe from the Manage Subscription portal.
         </p>
       )}
 
@@ -156,9 +141,9 @@ export default function Pricing() {
                 {tier.features.map((f) => (
                   <li key={f.text} className={`pricing__feature ${f.included ? '' : 'pricing__feature--disabled'}`}>
                     {f.included ? (
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#4ade80" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12" /></svg>
+                      <><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#4ade80" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12" /></svg><span className="sr-only">Included: </span></>
                     ) : (
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#666" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg>
+                      <><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#666" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg><span className="sr-only">Not included: </span></>
                     )}
                     {f.text}
                   </li>
@@ -168,18 +153,22 @@ export default function Pricing() {
               {tier.id === 'free' ? (
                 <div className="pricing__free-msg">Always free for basic features</div>
               ) : isCurrent ? (
-                <button className="pricing__btn pricing__btn--manage" onClick={handleManage} disabled={loadingTier === 'manage'}>
+                <button className="pricing__btn pricing__btn--manage" onClick={handleManage} disabled={loadingTier === 'manage'} aria-label={`Manage ${tier.name} subscription`}>
                   {loadingTier === 'manage' ? 'Loading...' : 'Manage Subscription'}
                 </button>
               ) : isActive && tier.id === 'basic' && currentTier === 'pro' ? (
-                <button className="pricing__btn pricing__btn--manage" onClick={handleManage} disabled={loadingTier === 'manage'}>
-                  {loadingTier === 'manage' ? 'Loading...' : 'Manage Subscription'}
-                </button>
+                <>
+                  <p className="pricing__downgrade-warning">Downgrading will remove access to Host Quiz, Tournaments, and other Pro features.</p>
+                  <button className="pricing__btn pricing__btn--manage" onClick={handleManage} disabled={loadingTier === 'manage'} aria-label={`Downgrade to ${tier.name}`}>
+                    {loadingTier === 'manage' ? 'Loading...' : 'Manage Subscription'}
+                  </button>
+                </>
               ) : (
                 <button
                   className="pricing__btn"
                   onClick={() => handleSubscribe(tier.id)}
                   disabled={loadingTier === tier.id}
+                  aria-label={`Subscribe to ${tier.name} for ${tier.price}${tier.period}`}
                 >
                   {loadingTier === tier.id ? 'Loading...' : 'Subscribe'}
                 </button>

@@ -3,7 +3,7 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import AIGenerateModal from './AIGenerateModal';
 
 // Mock useAuth
-const mockAuth = { user: { id: 'user-1' }, isPremium: true, role: 'premium' };
+const mockAuth = { user: { id: 'user-1' }, hasTier: () => true, role: 'user' };
 vi.mock('../../hooks/useAuth', () => ({
   useAuth: () => mockAuth,
 }));
@@ -27,7 +27,7 @@ describe('AIGenerateModal', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    mockAuth.isPremium = true;
+    mockAuth.hasTier = () => true;
     mockAuth.user = { id: 'user-1' };
   });
 
@@ -170,7 +170,7 @@ describe('AIGenerateModal', () => {
   });
 
   it('shows pro gate for non-premium users', () => {
-    mockAuth.isPremium = false;
+    mockAuth.hasTier = () => false;
 
     render(<AIGenerateModal onClose={onClose} onConfirm={onConfirm} />);
 

@@ -375,10 +375,10 @@ export async function browseHostPacks({ category, userRole } = {}) {
  *
  * @param {object} [opts]
  * @param {string} [opts.category]
- * @param {boolean} [opts.isPremium]
- * @param {string} [opts.userRole] - Caller's role (user/premium/editor/admin/superadmin)
+ * @param {string} [opts.userRole] - Caller's DB role (user/editor/admin/superadmin)
+ * @param {string} [opts.subscriptionTier] - Caller's subscription tier (free/basic/pro)
  */
-export async function browsePublicPacks({ category, isPremium, userRole } = {}) {
+export async function browsePublicPacks({ category, userRole, subscriptionTier } = {}) {
   const supabase = getSupabase();
 
   let query = supabase
@@ -387,22 +387,19 @@ export async function browsePublicPacks({ category, isPremium, userRole } = {}) 
     .eq('status', 'active')
     .order('play_count', { ascending: false });
 
-  // Admin/editor/superadmin: no extra filters — RLS + status=active is sufficient
+  // Staff roles: see all active packs (public, premium, host)
   if (['admin', 'superadmin', 'editor'].includes(userRole)) {
-    // See all active packs (public, premium, host)
-  } else if (userRole === 'premium') {
-    // Premium users see public + premium packs, but NOT host packs
+    // No extra filters — RLS + status=active is sufficient
+  } else if (subscriptionTier === 'basic' || subscriptionTier === 'pro') {
+    // Paid subscribers see public + premium packs, but NOT host packs
     query = query.eq('is_host', false);
   } else {
-    // Regular users: only public, non-host, non-premium
+    // Free/trial-expired users: only public, non-host, non-premium
     query = query.eq('is_public', true).eq('is_host', false).eq('is_premium', false);
   }
 
   if (category) {
     query = query.eq('category', category);
-  }
-  if (isPremium !== undefined && isPremium !== null) {
-    query = query.eq('is_premium', isPremium);
   }
 
   const { data, error } = await query;
@@ -421,9 +418,10 @@ export async function browsePublicPacks({ category, isPremium, userRole } = {}) 
  * Fetch a single pack's metadata (role-aware).
  * @param {string} id - Pack UUID
  * @param {object} [opts]
- * @param {string} [opts.userRole] - Caller's role (user/premium/editor/admin/superadmin)
+ * @param {string} [opts.userRole] - Caller's DB role (user/editor/admin/superadmin)
+ * @param {string} [opts.subscriptionTier] - Caller's subscription tier (free/basic/pro)
  */
-export async function fetchPublicPackById(id, { userRole } = {}) {
+export async function fetchPublicPackById(id, { userRole, subscriptionTier } = {}) {
   const supabase = getSupabase();
 
   let query = supabase
@@ -432,10 +430,10 @@ export async function fetchPublicPackById(id, { userRole } = {}) {
     .eq('id', id)
     .eq('status', 'active');
 
-  // Admin/editor/superadmin: no extra filters — RLS + status=active is sufficient
+  // Staff roles: see any active pack
   if (['admin', 'superadmin', 'editor'].includes(userRole)) {
-    // See any active pack
-  } else if (userRole === 'premium') {
+    // No extra filters
+  } else if (subscriptionTier === 'basic' || subscriptionTier === 'pro') {
     query = query.eq('is_host', false);
   } else {
     query = query.eq('is_public', true).eq('is_host', false).eq('is_premium', false);
