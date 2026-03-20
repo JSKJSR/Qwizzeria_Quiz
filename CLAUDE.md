@@ -59,6 +59,8 @@ Access restricted via role checks (editor, admin, superadmin).
 | `/admin/packs/:id/edit`    | PackForm              | Edit pack (status, is_public, is_premium) |
 | `/admin/packs/:id/questions`| PackQuestionsManager | Add/remove/reorder questions    |
 | `/admin/users`             | UserList              | User management (superadmin only) |
+| `/admin/guide`             | RolesAndTiersGuide    | Roles & tiers reference (editor+) |
+| `/admin/ops`               | AdminOpsManual        | Admin operations manual (admin+)  |
 
 ## Key Architecture
 
@@ -70,7 +72,7 @@ Access restricted via role checks (editor, admin, superadmin).
 - **Dashboard layout**: Sidebar (260px) + content area, mobile hamburger at ≤768px
 - **Auth routing**: AuthRedirect (landing or /dashboard), ProtectedRoute (guards all authenticated routes)
 - **Quiz grid layout**: Flat CSS Grid card layout (`repeat(auto-fill, minmax(220px, 1fr))`) used by all quiz modes — each card shows category name + points in red. Shared `TopicGrid` component for Free Quiz and Pack Play; separate `HostTopicGrid` for Host Quiz (same visual design).
-- **Free quiz**: Local useReducer state machine in FreeQuiz.jsx (loading/grid/question/answer/results/error)
+- **Free quiz**: Local useReducer state machine in FreeQuiz.jsx (loading/grid/question/answer/results/error). Engagement features: streak counter (2+ consecutive correct), score bounce animation, question count selector (9/18/27), keyboard shortcuts (1/2/3 for self-assessment), personal best tracking (localStorage), share score button, play count nudge for anonymous users, stats bar on results (correct/accuracy/best streak).
 - **Pack play formats**:
   - **Jeopardy** (PackPlayJeopardy): Groups questions by category into flat card grid, 10/20/30 pts
   - **Sequential** (PackPlaySequential): Questions one-by-one in sort_order, 10 pts each
@@ -208,6 +210,8 @@ Two independent systems control access:
 - `apps/quiz-app/src/components/guide/` — Guide sub-components (Base, Visuals, Sections: GettingStarted, FreeQuiz, PlayPacks, HostQuiz, AIGenerate, BuzzerMode, Tournament)
 - `apps/quiz-app/src/pages/admin/UserList.jsx` — Decomposed admin user management (orchestrator, 184 lines)
 - `apps/quiz-app/src/components/admin/users/` — User management sub-components (KPIs, Table, Filters, Modal, Utils)
+- `apps/quiz-app/src/pages/admin/AdminOpsManual.jsx` — Admin operations manual page (14 sections)
+- `apps/quiz-app/src/pages/admin/RolesAndTiersGuide.jsx` — Roles & tiers reference page
 
 ## Completed Phases
 
@@ -232,3 +236,4 @@ For detailed guides, see the `docs/` directory:
 - [Backend & Security](docs/backend-and-security.md) (Supabase, Roles, DB Schema)
 - [Development Workflow](docs/development.md) (Tests, local setup, CI/CD)
 - [Roles & Tiers Guide](docs/roles-and-tiers-guide.md) (Sales/marketing-friendly guide to roles and pricing)
+- [Admin Operations Manual](docs/admin-operations-manual.md) (Comprehensive admin/superadmin operations guide)
