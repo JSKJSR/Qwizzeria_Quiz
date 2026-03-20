@@ -1,4 +1,5 @@
-import { useRef, useEffect, useState } from 'react';
+import { useEffect } from 'react';
+import useCountdownTimer from '@/hooks/useCountdownTimer';
 import DoublesQuestionView from './DoublesQuestionView';
 
 export default function DoublesPartView({
@@ -11,32 +12,7 @@ export default function DoublesPartView({
   onSubmit,
   onTimerExpired,
 }) {
-  const intervalRef = useRef(null);
-  const [timeLeft, setTimeLeft] = useState(() => {
-    if (!timerStartedAt) return timerMinutes * 60;
-    const elapsed = Math.floor((Date.now() - new Date(timerStartedAt).getTime()) / 1000);
-    return Math.max(0, timerMinutes * 60 - elapsed);
-  });
-  const expiredRef = useRef(false);
-
-  // Timer countdown
-  useEffect(() => {
-    if (!timerStartedAt) return;
-
-    intervalRef.current = setInterval(() => {
-      const elapsed = Math.floor((Date.now() - new Date(timerStartedAt).getTime()) / 1000);
-      const remaining = Math.max(0, timerMinutes * 60 - elapsed);
-      setTimeLeft(remaining);
-
-      if (remaining <= 0 && !expiredRef.current) {
-        expiredRef.current = true;
-        clearInterval(intervalRef.current);
-        onTimerExpired();
-      }
-    }, 1000);
-
-    return () => clearInterval(intervalRef.current);
-  }, [timerStartedAt, timerMinutes, onTimerExpired]);
+  const { timerDisplay, timerClass } = useCountdownTimer(timerMinutes, timerStartedAt, onTimerExpired);
 
   // Navigation guard
   useEffect(() => {
@@ -50,17 +26,6 @@ export default function DoublesPartView({
 
   const answeredCount = questions.filter(q => responses[q.id]?.trim()).length;
 
-  const displayMinutes = Math.floor(timeLeft / 60);
-  const displaySeconds = timeLeft % 60;
-  const timerDisplay = `${String(displayMinutes).padStart(2, '0')}:${String(displaySeconds).padStart(2, '0')}`;
-
-  const getTimerClass = () => {
-    if (timeLeft <= 0) return 'doubles-timer--expired';
-    if (timeLeft <= 60) return 'doubles-timer--critical';
-    if (timeLeft <= 300) return 'doubles-timer--warning';
-    return '';
-  };
-
   return (
     <div className="doubles-part">
       {/* Sticky top bar */}
@@ -71,7 +36,7 @@ export default function DoublesPartView({
             {answeredCount}/{questions.length} answered
           </span>
         </div>
-        <div className={`doubles-timer ${getTimerClass()}`}>
+        <div className={`doubles-timer ${timerClass}`}>
           {timerDisplay}
         </div>
         <button

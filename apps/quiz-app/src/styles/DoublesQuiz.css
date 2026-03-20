@@ -51,18 +51,6 @@
   cursor: not-allowed;
 }
 
-.doubles-btn--small {
-  padding: 0.4rem 0.85rem;
-  font-size: 0.82rem;
-  background: rgba(255, 255, 255, 0.08);
-  color: var(--text-primary, #e0e0e0);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 6px;
-}
-.doubles-btn--small:hover {
-  background: rgba(255, 255, 255, 0.14);
-}
-
 .doubles-btn--submit {
   background: #e85c1a;
   color: #fff;
@@ -672,12 +660,6 @@
 
   .doubles-question__input {
     font-size: 1rem;
-  }
-
-  .doubles-part__grid-btn {
-    width: 32px;
-    height: 32px;
-    font-size: 0.72rem;
   }
 
   .doubles-review__correct,

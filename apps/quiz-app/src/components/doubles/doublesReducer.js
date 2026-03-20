@@ -83,12 +83,6 @@ export function reducer(state, action) {
       };
 
     case ACTIONS.SUBMIT_PART:
-      return {
-        ...state,
-        phase: 'part1Review',
-        part1Locked: true,
-      };
-
     case ACTIONS.TIMER_EXPIRED:
       return {
         ...state,
@@ -110,12 +104,6 @@ export function reducer(state, action) {
       };
 
     case ACTIONS.SUBMIT_PART2:
-      return {
-        ...state,
-        phase: 'part2Review',
-        part2Locked: true,
-      };
-
     case ACTIONS.TIMER_EXPIRED_PART2:
       return {
         ...state,

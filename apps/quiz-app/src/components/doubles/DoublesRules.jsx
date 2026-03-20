@@ -13,7 +13,7 @@ export default function DoublesRules({ packTitle, timerMinutes, part1Count, part
           <li>The quiz has <strong>two parts</strong>: Part 1 ({part1Count} questions) and Part 2 ({part2Count} questions).</li>
           <li>You have <strong>{timerMinutes} minutes</strong> per part.</li>
           <li>Type your answer for each question in the text field provided.</li>
-          <li>You can navigate freely between questions using Previous/Next or the question grid.</li>
+          <li>All questions are visible in a scrollable list &mdash; answer in any order.</li>
           <li>Your responses are <strong>auto-saved</strong> as you type.</li>
           <li>When the timer expires, your part is <strong>automatically submitted</strong>.</li>
           <li>You can also submit manually before the timer runs out.</li>

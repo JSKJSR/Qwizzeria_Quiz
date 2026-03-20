@@ -1,17 +1,13 @@
 import { useReducer, useCallback, useEffect, useRef } from 'react';
 import { useAuth } from '@/hooks/useAuth';
-import {
-  fetchPackPlayQuestions,
-  createQuizSession,
-  updateSessionMetadata,
-  completeQuizSession,
-} from '@qwizzeria/supabase-client';
+import { fetchPackPlayQuestions } from '@qwizzeria/supabase-client';
 import { reducer, initialState, ACTIONS } from './doublesReducer';
 import {
   saveDoublesSession,
   loadDoublesSession,
   clearDoublesSession,
 } from '@/utils/doublesSessionPersistence';
+import useDoublesDbSync from '@/hooks/useDoublesDbSync';
 import DoublesEventSelect from './DoublesEventSelect';
 import DoublesPlayerSetup from './DoublesPlayerSetup';
 import DoublesRules from './DoublesRules';
@@ -24,8 +20,8 @@ export default function DoublesQuiz() {
   const { user } = useAuth();
   const [state, dispatch] = useReducer(reducer, initialState);
   const saveTimerRef = useRef(null);
-  const dbSyncRef = useRef(null);
   const restoredRef = useRef(false);
+  const { createPartSession, savePartToDb } = useDoublesDbSync(state, dispatch, user?.id);
 
   // Restore session on mount
   useEffect(() => {
@@ -34,7 +30,6 @@ export default function DoublesQuiz() {
 
     const saved = loadDoublesSession();
     if (saved && saved.phase && saved.phase !== 'select' && saved.phase !== 'results') {
-      // Remove savedAt before restoring
       const rest = { ...saved };
       delete rest.savedAt;
       dispatch({ type: ACTIONS.RESTORE_SESSION, payload: rest });
@@ -51,83 +46,6 @@ export default function DoublesQuiz() {
     }, 300);
 
     return () => clearTimeout(saveTimerRef.current);
-  }, [state]);
-
-  // Periodic DB sync every 30s during active parts
-  useEffect(() => {
-    const isActive = state.phase === 'part1' || state.phase === 'part2';
-    if (!isActive) return;
-
-    dbSyncRef.current = setInterval(() => {
-      const sessionId = state.phase === 'part1' ? state.part1SessionId : state.part2SessionId;
-      if (sessionId) {
-        updateSessionMetadata(sessionId, {
-          format: 'doubles',
-          part: state.phase === 'part1' ? 1 : 2,
-          player_name: state.playerName,
-          responses: state.responses,
-          timer_started_at: state.timerStartedAt,
-          timer_duration_seconds: state.timerMinutes * 60,
-        }).catch(() => {});
-      }
-    }, 30000);
-
-    return () => clearInterval(dbSyncRef.current);
-  }, [state.phase, state.part1SessionId, state.part2SessionId, state.playerName, state.responses, state.timerStartedAt, state.timerMinutes]);
-
-  // Create DB session for a part
-  const createPartSession = useCallback(async (partNumber) => {
-    if (!user?.id) return;
-
-    try {
-      const questions = partNumber === 1 ? state.part1Questions : state.part2Questions;
-      const session = await createQuizSession({
-        userId: user.id,
-        isFreeQuiz: false,
-        totalQuestions: questions.length,
-        quizPackId: state.pack.id,
-      });
-
-      dispatch({
-        type: ACTIONS.SET_SESSION_ID,
-        payload: { part: partNumber, sessionId: session.id },
-      });
-
-      await updateSessionMetadata(session.id, {
-        format: 'doubles',
-        part: partNumber,
-        player_name: state.playerName,
-        responses: {},
-        timer_started_at: new Date().toISOString(),
-        timer_duration_seconds: state.timerMinutes * 60,
-      });
-    } catch {
-      // Non-blocking — local state is the source of truth
-    }
-  }, [user, state.pack, state.part1Questions, state.part2Questions, state.playerName, state.timerMinutes]);
-
-  // Save responses to DB on part submit
-  const savePartToDb = useCallback(async (partNumber) => {
-    const sessionId = partNumber === 1 ? state.part1SessionId : state.part2SessionId;
-    if (!sessionId) return;
-
-    try {
-      const questions = partNumber === 1 ? state.part1Questions : state.part2Questions;
-      const answeredCount = questions.filter(q => state.responses[q.id]?.trim()).length;
-
-      await updateSessionMetadata(sessionId, {
-        format: 'doubles',
-        part: partNumber,
-        player_name: state.playerName,
-        responses: state.responses,
-        timer_started_at: state.timerStartedAt,
-        timer_duration_seconds: state.timerMinutes * 60,
-      });
-
-      await completeQuizSession(sessionId, answeredCount);
-    } catch {
-      // Non-blocking
-    }
   }, [state]);
 
   // Handlers
