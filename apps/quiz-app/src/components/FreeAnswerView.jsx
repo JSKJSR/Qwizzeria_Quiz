@@ -5,10 +5,13 @@ export default function FreeAnswerView({ question, onSelfAssess, onReturn }) {
   useEffect(() => {
     function handleKey(e) {
       if (e.key === 'Escape') onReturn();
+      if (e.key === '1') onSelfAssess(true);
+      if (e.key === '2') onSelfAssess(false);
+      if (e.key === '3') onSelfAssess(false, true);
     }
     window.addEventListener('keydown', handleKey);
     return () => window.removeEventListener('keydown', handleKey);
-  }, [onReturn]);
+  }, [onReturn, onSelfAssess]);
 
   const hasMedia = question.mediaType !== 'none';
   const isVideo = question.mediaType === 'video';
@@ -59,17 +62,17 @@ export default function FreeAnswerView({ question, onSelfAssess, onReturn }) {
               style={{ borderColor: 'var(--accent-success, #4caf50)' }}
               onClick={() => onSelfAssess(true)}
             >
-              I Knew It
+              I Knew It <span className="answer-view__shortcut">1</span>
             </button>
             <button
               className="answer-view__team-btn"
               onClick={() => onSelfAssess(false)}
             >
-              Didn&apos;t Know
+              Didn&apos;t Know <span className="answer-view__shortcut">2</span>
             </button>
           </div>
           <button className="answer-view__no-points-btn" onClick={() => onSelfAssess(false, true)}>
-            Skip
+            Skip <span className="answer-view__shortcut">3</span>
           </button>
         </div>
       </div>

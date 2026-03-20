@@ -126,6 +126,21 @@
   color: var(--text-primary);
 }
 
+/* Keyboard shortcut hints */
+.answer-view__shortcut {
+  display: inline-block;
+  font-size: 0.65rem;
+  font-weight: 600;
+  color: var(--text-muted, #888);
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 3px;
+  padding: 0.1rem 0.35rem;
+  margin-left: 0.5rem;
+  vertical-align: middle;
+  line-height: 1;
+}
+
 /* Answer view watermark — now using CSS background, hide the img element */
 .av-watermark {
   display: none;
