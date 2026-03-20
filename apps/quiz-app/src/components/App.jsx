@@ -35,6 +35,7 @@ import PackForm from '../pages/admin/PackForm';
 import PackQuestionsManager from '../pages/admin/PackQuestionsManager';
 import UserList from '../pages/admin/UserList';
 import RolesAndTiersGuide from '../pages/admin/RolesAndTiersGuide';
+import AdminOpsManual from '../pages/admin/AdminOpsManual';
 
 export default function App() {
   return (
@@ -101,6 +102,7 @@ export default function App() {
               <Route path="packs/:id/questions" element={<PackQuestionsManager />} />
               <Route path="users" element={<UserList />} />
               <Route path="guide" element={<RolesAndTiersGuide />} />
+              <Route path="ops" element={<AdminOpsManual />} />
             </Route>
           </Route>
         </Route>

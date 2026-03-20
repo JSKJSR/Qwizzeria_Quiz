@@ -67,6 +67,16 @@ export default function AdminLayout() {
           >
             Roles & Tiers Overview
           </NavLink>
+          {isFullAdmin && (
+            <NavLink
+              to="/admin/ops"
+              className={({ isActive }) =>
+                `admin-sidebar__link${isActive ? ' admin-sidebar__link--active' : ''}`
+              }
+            >
+              Ops Manual
+            </NavLink>
+          )}
           <NavLink
             to="/dashboard"
             className="admin-sidebar__link admin-sidebar__link--back"
