@@ -56,7 +56,7 @@ export default function AdminLayout() {
                 `admin-sidebar__link${isActive ? ' admin-sidebar__link--active' : ''}`
               }
             >
-              Users
+              Users Management
             </NavLink>
           )}
           <NavLink
@@ -74,7 +74,7 @@ export default function AdminLayout() {
                 `admin-sidebar__link${isActive ? ' admin-sidebar__link--active' : ''}`
               }
             >
-              Ops Manual
+              Admin Ops Manual
             </NavLink>
           )}
           <NavLink
