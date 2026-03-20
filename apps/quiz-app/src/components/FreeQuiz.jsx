@@ -256,8 +256,8 @@ export default function FreeQuiz({ resumeData } = {}) {
   // Complete session when results are shown
   useEffect(() => {
     if (state.phase === 'results') {
-      const newBest = saveBestScore(state.score, maxScore);
-      setIsNewBest(newBest);
+      const max = state.allQuestions.reduce((sum, q) => sum + q.points, 0);
+      setIsNewBest(saveBestScore(state.score, max));
       incrementPlayCount();
 
       if (sessionIdRef.current) {
@@ -265,8 +265,7 @@ export default function FreeQuiz({ resumeData } = {}) {
           .catch(err => console.error('FreeQuiz: Failed to complete session:', err));
       }
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [state.phase]);
+  }, [state.phase, state.score, state.allQuestions]);
 
   const handleQuit = useCallback(() => {
     if (sessionIdRef.current) {
@@ -277,7 +276,7 @@ export default function FreeQuiz({ resumeData } = {}) {
   }, [navigate]);
 
   const handleShareScore = useCallback(() => {
-    const max = allQuestions.reduce((sum, q) => sum + q.points, 0);
+    const max = state.allQuestions.reduce((sum, q) => sum + q.points, 0);
     const pct = max > 0 ? Math.round((state.score / max) * 100) : 0;
     const text = `I scored ${state.score}/${max} (${pct}%) on Qwizzeria! Can you beat me?`;
     if (navigator.share) {
@@ -288,7 +287,7 @@ export default function FreeQuiz({ resumeData } = {}) {
         setTimeout(() => setShareConfirm(false), 2000);
       }).catch(() => {});
     }
-  }, [state.score, allQuestions]);
+  }, [state.score, state.allQuestions]);
 
   const handleQuestionCountChange = useCallback((qc) => {
     setQuestionCount(qc);
