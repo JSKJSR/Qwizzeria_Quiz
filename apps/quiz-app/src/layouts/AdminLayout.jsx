@@ -12,6 +12,7 @@ export default function AdminLayout() {
       <aside className="admin-sidebar">
         <div className="admin-sidebar__logo">Qwizzeria Admin</div>
         <nav className="admin-sidebar__nav">
+          {/* Content Management */}
           {isFullAdmin && (
             <NavLink
               to="/admin"
@@ -31,6 +32,14 @@ export default function AdminLayout() {
           >
             Questions
           </NavLink>
+          <NavLink
+            to="/admin/packs"
+            className={({ isActive }) =>
+              `admin-sidebar__link${isActive ? ' admin-sidebar__link--active' : ''}`
+            }
+          >
+            Quiz Packs
+          </NavLink>
           {isFullAdmin && (
             <NavLink
               to="/admin/import"
@@ -41,14 +50,8 @@ export default function AdminLayout() {
               Bulk Import
             </NavLink>
           )}
-          <NavLink
-            to="/admin/packs"
-            className={({ isActive }) =>
-              `admin-sidebar__link${isActive ? ' admin-sidebar__link--active' : ''}`
-            }
-          >
-            Quiz Packs
-          </NavLink>
+
+          {/* Administration */}
           {isSuperadmin && (
             <NavLink
               to="/admin/users"
@@ -59,6 +62,8 @@ export default function AdminLayout() {
               Users Management
             </NavLink>
           )}
+
+          {/* Reference */}
           <NavLink
             to="/admin/guide"
             className={({ isActive }) =>
