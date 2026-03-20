@@ -27,6 +27,7 @@ Every user in Qwizzeria belongs to one of three pricing tiers. The tier determin
 | Quiz History | - | Yes | Yes |
 | Global Leaderboard | - | Yes | Yes |
 | Resume Saved Sessions | - | Yes | Yes |
+| Doubles | - | - | Yes |
 | Host Quiz (multiplayer, 2-8 players) | - | - | Yes |
 | Tournaments (elimination brackets) | - | - | Yes |
 | AI Quiz Generation (any topic) | - | - | Yes |
@@ -175,6 +176,7 @@ Each subscription is per-user. For team or classroom pricing, contact us for bul
 | Play a quick quiz | Nothing (Free Quiz is public) |
 | Play curated quiz packs | Basic ($9.99/mo) |
 | Track my scores and compete | Basic ($9.99/mo) |
+| Play Doubles quiz | Pro ($99.99/mo) |
 | Host a live quiz for my team | Pro ($99.99/mo) |
 | Generate quizzes with AI | Pro ($99.99/mo) |
 | Run a tournament bracket | Pro ($99.99/mo) |

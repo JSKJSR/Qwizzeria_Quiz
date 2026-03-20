@@ -92,6 +92,7 @@ export const DISPLAY_FEATURES = [
   { key: 'packs', label: 'Quiz Packs (browse + play)' },
   { key: 'history', label: 'Quiz History' },
   { key: 'leaderboard', label: 'Global Leaderboard' },
+  { key: 'doubles', label: 'Doubles' },
   { key: 'host_quiz', label: 'Host Quiz (multiplayer)' },
   { key: 'tournaments', label: 'Tournaments' },
 ];

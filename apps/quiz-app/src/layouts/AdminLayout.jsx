@@ -65,7 +65,7 @@ export default function AdminLayout() {
               `admin-sidebar__link${isActive ? ' admin-sidebar__link--active' : ''}`
             }
           >
-            Roles & Tiers
+            Roles & Tiers Overview
           </NavLink>
           <NavLink
             to="/dashboard"

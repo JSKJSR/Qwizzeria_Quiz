@@ -38,7 +38,7 @@ const NAV_ITEMS = [
   { to: '/dashboard', icon: NAV_ICONS.home, label: 'Home' },
   { to: '/play/free', icon: NAV_ICONS.play, label: 'Surprise Me!' },
   { to: '/host', icon: NAV_ICONS.host, label: 'Host Quiz', requiredTier: 'pro' },
-  { to: '/doubles', icon: NAV_ICONS.doubles, label: 'Doubles' },
+  { to: '/doubles', icon: NAV_ICONS.doubles, label: 'Doubles',requiredTier: 'pro' },
   { to: '/packs', icon: NAV_ICONS.packs, label: 'Browse Packs', requiredTier: 'basic' },
   { to: '/history', icon: NAV_ICONS.history, label: 'History', requiredTier: 'basic' },
   { to: '/leaderboard', icon: NAV_ICONS.trophy, label: 'Leaderboard', requiredTier: 'basic' },

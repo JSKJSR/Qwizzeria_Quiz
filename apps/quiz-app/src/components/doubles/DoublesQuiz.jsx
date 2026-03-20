@@ -175,7 +175,7 @@ export default function DoublesQuiz() {
             Part 2 has {state.part2Questions.length} questions with a {state.timerMinutes}-minute timer.
           </p>
           <div className="doubles-rules__warning">
-            <strong>Important:</strong> Once you start Part 2, you cannot go back to Part 1 or reset the quiz. The timer begins immediately.
+            <strong>Important:</strong> Once you start Part 2, you cannot go back or reset the quiz. The timer begins immediately.
           </div>
           <button
             type="button"
