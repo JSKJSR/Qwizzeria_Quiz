@@ -53,7 +53,6 @@ describe('doublesReducer', () => {
     const state = reducer(prev, { type: ACTIONS.ACCEPT_RULES });
 
     expect(state.phase).toBe('part1');
-    expect(state.currentIndex).toBe(0);
     expect(state.timerStartedAt).toBeTruthy();
   });
 
@@ -77,20 +76,12 @@ describe('doublesReducer', () => {
     expect(state.responses['q-0']).toBe('Paris');
   });
 
-  it('NAVIGATE_QUESTION changes currentIndex', () => {
-    const prev = { ...initialState, currentIndex: 0 };
-    const state = reducer(prev, { type: ACTIONS.NAVIGATE_QUESTION, payload: 3 });
-
-    expect(state.currentIndex).toBe(3);
-  });
-
   it('SUBMIT_PART locks part1 and goes to part1Review', () => {
-    const prev = { ...initialState, phase: 'part1', currentIndex: 5 };
+    const prev = { ...initialState, phase: 'part1' };
     const state = reducer(prev, { type: ACTIONS.SUBMIT_PART });
 
     expect(state.phase).toBe('part1Review');
     expect(state.part1Locked).toBe(true);
-    expect(state.currentIndex).toBe(0);
   });
 
   it('TIMER_EXPIRED locks part1 and goes to part1Review', () => {
@@ -109,11 +100,10 @@ describe('doublesReducer', () => {
   });
 
   it('START_PART2 transitions to part2 with new timerStartedAt', () => {
-    const prev = { ...initialState, phase: 'break', currentIndex: 5 };
+    const prev = { ...initialState, phase: 'break' };
     const state = reducer(prev, { type: ACTIONS.START_PART2 });
 
     expect(state.phase).toBe('part2');
-    expect(state.currentIndex).toBe(0);
     expect(state.timerStartedAt).toBeTruthy();
   });
 

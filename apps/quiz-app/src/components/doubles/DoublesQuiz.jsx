@@ -156,10 +156,6 @@ export default function DoublesQuiz() {
     dispatch({ type: ACTIONS.UPDATE_RESPONSE, payload: { questionId, text } });
   }, []);
 
-  const handleNavigate = useCallback((index) => {
-    dispatch({ type: ACTIONS.NAVIGATE_QUESTION, payload: index });
-  }, []);
-
   const handleSubmitPart1 = useCallback(() => {
     dispatch({ type: ACTIONS.SUBMIT_PART });
     savePartToDb(1);
@@ -232,11 +228,9 @@ export default function DoublesQuiz() {
             partNumber={1}
             questions={state.part1Questions}
             responses={state.responses}
-            currentIndex={state.currentIndex}
             timerMinutes={state.timerMinutes}
             timerStartedAt={state.timerStartedAt}
             onResponseChange={handleResponseChange}
-            onNavigate={handleNavigate}
             onSubmit={handleSubmitPart1}
             onTimerExpired={handleTimerExpiredPart1}
           />
@@ -279,11 +273,9 @@ export default function DoublesQuiz() {
             partNumber={2}
             questions={state.part2Questions}
             responses={state.responses}
-            currentIndex={state.currentIndex}
             timerMinutes={state.timerMinutes}
             timerStartedAt={state.timerStartedAt}
             onResponseChange={handleResponseChange}
-            onNavigate={handleNavigate}
             onSubmit={handleSubmitPart2}
             onTimerExpired={handleTimerExpiredPart2}
           />

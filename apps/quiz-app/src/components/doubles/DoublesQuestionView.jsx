@@ -1,18 +1,8 @@
-import { useRef, useEffect } from 'react';
-
-export default function DoublesQuestionView({ question, questionNumber, totalQuestions, response, onResponseChange }) {
-  const inputRef = useRef(null);
-
-  useEffect(() => {
-    inputRef.current?.focus();
-  }, [question.id]);
-
+export default function DoublesQuestionView({ question, questionNumber, response, onResponseChange }) {
   return (
     <div className="doubles-question">
       <div className="doubles-question__header">
-        <span className="doubles-question__number">
-          Question {questionNumber} of {totalQuestions}
-        </span>
+        <span className="doubles-question__number">Q{questionNumber}</span>
         {question.category && (
           <span className="doubles-question__category">{question.category}</span>
         )}
@@ -28,7 +18,6 @@ export default function DoublesQuestionView({ question, questionNumber, totalQue
 
       <div className="doubles-question__input-wrapper">
         <input
-          ref={inputRef}
           type="text"
           className="doubles-question__input"
           value={response || ''}

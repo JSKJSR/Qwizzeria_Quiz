@@ -3,7 +3,6 @@ export const ACTIONS = {
   SET_PLAYER: 'SET_PLAYER',
   ACCEPT_RULES: 'ACCEPT_RULES',
   UPDATE_RESPONSE: 'UPDATE_RESPONSE',
-  NAVIGATE_QUESTION: 'NAVIGATE_QUESTION',
   SUBMIT_PART: 'SUBMIT_PART',
   TIMER_EXPIRED: 'TIMER_EXPIRED',
   START_PART2: 'START_PART2',
@@ -23,7 +22,6 @@ export const initialState = {
   part1Questions: [],
   part2Questions: [],
   responses: {},
-  currentIndex: 0,
   part1Locked: false,
   part2Locked: false,
   timerMinutes: 60,
@@ -72,7 +70,6 @@ export function reducer(state, action) {
       return {
         ...state,
         phase: 'part1',
-        currentIndex: 0,
         timerStartedAt: new Date().toISOString(),
       };
 
@@ -85,18 +82,11 @@ export function reducer(state, action) {
         },
       };
 
-    case ACTIONS.NAVIGATE_QUESTION:
-      return {
-        ...state,
-        currentIndex: action.payload,
-      };
-
     case ACTIONS.SUBMIT_PART:
       return {
         ...state,
         phase: 'part1Review',
         part1Locked: true,
-        currentIndex: 0,
       };
 
     case ACTIONS.TIMER_EXPIRED:
@@ -104,7 +94,6 @@ export function reducer(state, action) {
         ...state,
         phase: 'part1Review',
         part1Locked: true,
-        currentIndex: 0,
       };
 
     case ACTIONS.GO_TO_BREAK:
@@ -117,7 +106,6 @@ export function reducer(state, action) {
       return {
         ...state,
         phase: 'part2',
-        currentIndex: 0,
         timerStartedAt: new Date().toISOString(),
       };
 
@@ -126,7 +114,6 @@ export function reducer(state, action) {
         ...state,
         phase: 'part2Review',
         part2Locked: true,
-        currentIndex: 0,
       };
 
     case ACTIONS.TIMER_EXPIRED_PART2:
@@ -134,7 +121,6 @@ export function reducer(state, action) {
         ...state,
         phase: 'part2Review',
         part2Locked: true,
-        currentIndex: 0,
       };
 
     case ACTIONS.FINISH_QUIZ:

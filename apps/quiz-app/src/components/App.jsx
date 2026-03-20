@@ -3,6 +3,7 @@ import AuthProvider from './AuthProvider';
 import AuthRedirect from './AuthRedirect';
 import ProtectedRoute from './ProtectedRoute';
 import AdminRoute from './AdminRoute';
+import DoublesRoute from './DoublesRoute';
 import { TierRoute } from './SubscriptionGate';
 import DashboardLayout from '../layouts/DashboardLayout';
 import AdminLayout from '../layouts/AdminLayout';
@@ -68,6 +69,10 @@ export default function App() {
             {/* Pro tier routes */}
             <Route element={<TierRoute requiredTier="pro" />}>
               <Route path="/host" element={<HostQuizPage />} />
+            </Route>
+
+            {/* Doubles: role-gated (premium+) */}
+            <Route element={<DoublesRoute />}>
               <Route path="/doubles" element={<DoublesPage />} />
             </Route>
           </Route>
