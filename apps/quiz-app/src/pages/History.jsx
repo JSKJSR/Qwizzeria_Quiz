@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import { fetchUserHistory, fetchSessionDetail } from '@qwizzeria/supabase-client';
+import DoublesHistoryDetail from '../components/DoublesHistoryDetail';
 import SEO from '../components/SEO';
 import '../styles/History.css';
 
@@ -72,9 +73,9 @@ export default function History() {
 
     setExpandedId(sessionId);
 
-    // Host sessions have all detail in metadata — no need to fetch
+    // Host and doubles sessions have all detail in metadata — no need to fetch
     const session = sessions.find(s => s.id === sessionId);
-    if (session?.metadata?.is_host_quiz) return;
+    if (session?.metadata?.is_host_quiz || session?.metadata?.format === 'doubles') return;
 
     if (!detailCache[sessionId]) {
       setDetailLoading(sessionId);
@@ -125,6 +126,7 @@ export default function History() {
           <option value="free">Free Quiz</option>
           <option value="pack">Quiz Packs</option>
           <option value="host">Host Quiz</option>
+          <option value="doubles">Doubles</option>
         </select>
         <select className="history__filter-select" value={statusFilter} onChange={handleStatusChange} aria-label="Filter by status">
           <option value="all">All Statuses</option>
@@ -148,6 +150,7 @@ export default function History() {
               const detail = detailCache[session.id];
               const isLoadingDetail = detailLoading === session.id;
               const isHostQuiz = session.metadata?.is_host_quiz;
+              const isDoubles = session.metadata?.format === 'doubles';
               const hostParticipants = isHostQuiz ? session.metadata?.participants || [] : [];
 
               return (
@@ -161,12 +164,18 @@ export default function History() {
                         {isHostQuiz && (
                           <span className="history__type-badge history__type-badge--host">HOST</span>
                         )}
+                        {isDoubles && (
+                          <span className="history__type-badge history__type-badge--doubles">
+                            DOUBLES P{session.metadata?.part || '?'}
+                          </span>
+                        )}
                         {session.is_free_quiz ? 'Free Quiz' : session.quiz_packs?.title || 'Quiz Pack'}
                       </div>
                       <div className="history__item-date">
                         {new Date(session.started_at).toLocaleDateString()} &middot;{' '}
                         {session.total_questions} questions
                         {isHostQuiz && ` · ${hostParticipants.length} participants`}
+                        {isDoubles && session.metadata?.player_name && ` · ${session.metadata.player_name}`}
                       </div>
                     </div>
                     <span className="history__item-score">
@@ -211,6 +220,8 @@ export default function History() {
                             </tbody>
                           </table>
                         </>
+                      ) : isDoubles ? (
+                        <DoublesHistoryDetail metadata={session.metadata} />
                       ) : isLoadingDetail ? (
                         <p style={{ color: '#999', fontSize: '0.85rem', padding: '0.5rem' }}>Loading details...</p>
                       ) : detail?.attempts?.length > 0 ? (

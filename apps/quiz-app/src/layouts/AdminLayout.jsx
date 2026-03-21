@@ -50,6 +50,16 @@ export default function AdminLayout() {
               Bulk Import
             </NavLink>
           )}
+          {isFullAdmin && (
+            <NavLink
+              to="/admin/doubles"
+              className={({ isActive }) =>
+                `admin-sidebar__link${isActive ? ' admin-sidebar__link--active' : ''}`
+              }
+            >
+              Doubles Sessions
+            </NavLink>
+          )}
 
           {/* Administration */}
           {isSuperadmin && (

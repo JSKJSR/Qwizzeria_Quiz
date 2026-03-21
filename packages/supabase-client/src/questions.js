@@ -448,6 +448,23 @@ export async function fetchCategories() {
 }
 
 /**
+ * Fetch multiple questions by their IDs.
+ * Used by DoublesHistoryDetail and DoublesGradeModal.
+ */
+export async function fetchQuestionsByIds(ids) {
+  if (!ids || ids.length === 0) return [];
+  const supabase = getSupabase();
+
+  const { data, error } = await supabase
+    .from('questions_master')
+    .select('id, question_text, answer_text, category')
+    .in('id', ids);
+
+  if (error) throw new Error(`Failed to fetch questions: ${error.message}`);
+  return data || [];
+}
+
+/**
  * Fetch distinct tags for filter dropdowns.
  */
 export async function fetchTags() {

@@ -155,6 +155,11 @@
   color: #ce93d8;
 }
 
+.history__type-badge--doubles {
+  background: rgba(33, 150, 243, 0.2);
+  color: #64b5f6;
+}
+
 .history__host-info {
   font-size: 0.85rem;
   font-weight: 600;

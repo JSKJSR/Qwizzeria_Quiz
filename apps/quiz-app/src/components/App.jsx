@@ -36,6 +36,7 @@ import PackQuestionsManager from '../pages/admin/PackQuestionsManager';
 import UserList from '../pages/admin/UserList';
 import RolesAndTiersGuide from '../pages/admin/RolesAndTiersGuide';
 import AdminOpsManual from '../pages/admin/AdminOpsManual';
+import DoublesSessions from '../pages/admin/DoublesSessions';
 
 export default function App() {
   return (
@@ -100,6 +101,7 @@ export default function App() {
               <Route path="packs/new" element={<PackForm />} />
               <Route path="packs/:id/edit" element={<PackForm />} />
               <Route path="packs/:id/questions" element={<PackQuestionsManager />} />
+              <Route path="doubles" element={<DoublesSessions />} />
               <Route path="users" element={<UserList />} />
               <Route path="guide" element={<RolesAndTiersGuide />} />
               <Route path="ops" element={<AdminOpsManual />} />

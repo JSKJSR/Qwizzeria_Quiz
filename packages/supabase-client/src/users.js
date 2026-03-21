@@ -55,10 +55,15 @@ export async function fetchUserHistory({ userId, type = 'all', status = 'all', p
 
   if (type === 'free') query = query.eq('is_free_quiz', true);
   if (type === 'pack') {
-    query = query.eq('is_free_quiz', false).neq('metadata->>is_host_quiz', 'true');
+    query = query.eq('is_free_quiz', false)
+      .neq('metadata->>is_host_quiz', 'true')
+      .neq('metadata->>format', 'doubles');
   }
   if (type === 'host') {
     query = query.eq('is_free_quiz', false).eq('metadata->>is_host_quiz', 'true');
+  }
+  if (type === 'doubles') {
+    query = query.eq('is_free_quiz', false).eq('metadata->>format', 'doubles');
   }
   if (status !== 'all') query = query.eq('status', status);
 
@@ -209,6 +214,65 @@ export async function fetchAllUsersWithEmail({ search, role, page = 1, pageSize 
 
   if (error) throw new Error(`Failed to fetch users: ${error.message}`);
   return data || { users: [], total: 0 };
+}
+
+// ============================================================
+// Admin Doubles Functions
+// ============================================================
+
+/**
+ * Fetch all doubles sessions for admin review (admin-only via RLS).
+ */
+export async function fetchDoublesSessionsAdmin({ userId, packId, status, dateFrom, dateTo, page = 1, pageSize = 20 } = {}) {
+  const supabase = getSupabase();
+
+  let query = supabase
+    .from('quiz_sessions')
+    .select('id, user_id, quiz_pack_id, started_at, completed_at, score, total_questions, status, metadata, quiz_packs(title), user_profiles(display_name)', { count: 'exact' })
+    .eq('metadata->>format', 'doubles');
+
+  if (userId) query = query.eq('user_id', userId);
+  if (packId) query = query.eq('quiz_pack_id', packId);
+  if (status && status !== 'all') query = query.eq('status', status);
+  if (dateFrom) query = query.gte('started_at', dateFrom);
+  if (dateTo) query = query.lte('started_at', dateTo);
+
+  const from = (page - 1) * pageSize;
+  const to = from + pageSize - 1;
+  query = query.order('started_at', { ascending: false }).range(from, to);
+
+  const { data, error, count } = await query;
+  if (error) throw new Error(`Failed to fetch doubles sessions: ${error.message}`);
+  return { data: data || [], count: count || 0, page, pageSize };
+}
+
+/**
+ * Grade all doubles responses for a session (admin-only via RLS).
+ * @param {string} sessionId
+ * @param {Object} grades - { [questionId]: true/false }
+ */
+export async function gradeAllDoublesResponses(sessionId, grades) {
+  const supabase = getSupabase();
+
+  // Read current metadata
+  const { data: session, error: readErr } = await supabase
+    .from('quiz_sessions')
+    .select('metadata')
+    .eq('id', sessionId)
+    .single();
+
+  if (readErr) throw new Error(`Failed to read session: ${readErr.message}`);
+
+  const updatedMetadata = { ...session.metadata, grades };
+
+  const { error: writeErr } = await supabase
+    .from('quiz_sessions')
+    .update({ metadata: updatedMetadata })
+    .eq('id', sessionId);
+
+  if (writeErr) throw new Error(`Failed to grade session: ${writeErr.message}`);
+
+  logAdminAction({ action: 'grade_doubles_session', tableName: 'quiz_sessions', recordId: sessionId, payload: { gradeCount: Object.keys(grades).length } });
 }
 
 /**

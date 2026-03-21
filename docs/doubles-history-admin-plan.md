@@ -9,113 +9,100 @@ Doubles sessions are stored in `quiz_sessions` with `metadata.format = 'doubles'
 - Doubles creates **2 session rows** per quiz (Part 1 + Part 2), each with metadata: `{ format: 'doubles', part: 1|2, player_name, responses: {qId: text}, timer_started_at, timer_duration_seconds }`
 - Score = answered count (not correctness) — responses are free-text, intended for manual review
 - Doubles does **NOT** create `question_attempts` rows — all data is in metadata JSONB
-- History type detection uses `is_free_quiz` + `metadata.is_host_quiz` — no `doubles` case exists
-- No admin page exists for viewing individual quiz sessions of any type
+- History type detection uses `is_free_quiz` + `metadata.is_host_quiz` — no `doubles` case existed
+- No admin page existed for viewing individual quiz sessions of any type
 
 ---
 
 ## Part 1: Participant Doubles History
 
-### 1A. Update `fetchUserHistory()` type filters
-**File:** `packages/supabase-client/src/users.js`
-- Add `doubles` type filter: `.eq('is_free_quiz', false).eq('metadata->>format', 'doubles')`
-- Update `pack` filter to **exclude** doubles: add `.neq('metadata->>format', 'doubles')`
-
-### 1B. Add "Doubles" filter option to History page
-**File:** `apps/quiz-app/src/pages/History.jsx`
-- Add `<option value="doubles">Doubles</option>` to the type filter dropdown
-
-### 1C. Add DOUBLES badge + part number to History rows
-**File:** `apps/quiz-app/src/pages/History.jsx`
-- Detect: `const isDoubles = session.metadata?.format === 'doubles'`
-- Render badge: `DOUBLES P1` / `DOUBLES P2` (similar to existing HOST badge)
-- Show `metadata.player_name` as subtitle
-
-### 1D. Render doubles-specific expanded detail
-**File:** `apps/quiz-app/src/pages/History.jsx`
-- Skip `fetchSessionDetail()` for doubles sessions (no question_attempts exist)
-- Add a `DoublesHistoryDetail` branch in the expanded section
-
-### 1E. Create DoublesHistoryDetail component
-**New file:** `apps/quiz-app/src/components/DoublesHistoryDetail.jsx`
-- On mount, fetch questions via `fetchQuestionsByIds(Object.keys(responses))`
-- Render table: #, Question, Category, Correct Answer, Your Response
-- Show player name, part number, timer duration as header info
-
-### 1F. Create shared `fetchQuestionsByIds()` utility
+### 1A. `fetchQuestionsByIds()` shared utility
 **File:** `packages/supabase-client/src/questions.js`
 - Query `questions_master` with `.in('id', ids)` for `id, question_text, answer_text, category`
-- Re-export from barrel `packages/supabase-client/src/index.js`
+- Auto-exported via barrel `packages/supabase-client/src/index.js`
 
-### 1G. CSS for doubles badge
+### 1B. Update `fetchUserHistory()` type filters
+**File:** `packages/supabase-client/src/users.js`
+- Added `doubles` type filter: `.eq('is_free_quiz', false).eq('metadata->>format', 'doubles')`
+- Updated `pack` filter to **exclude** doubles: added `.neq('metadata->>format', 'doubles')`
+
+### 1C. History page updates
+**File:** `apps/quiz-app/src/pages/History.jsx`
+- Added `<option value="doubles">Doubles</option>` to type filter dropdown
+- Detect doubles: `const isDoubles = session.metadata?.format === 'doubles'`
+- Render badge: `DOUBLES P1` / `DOUBLES P2` (blue, distinct from HOST purple)
+- Show `metadata.player_name` in date line
+- Skip `fetchSessionDetail()` for doubles sessions (no question_attempts exist)
+- Added `DoublesHistoryDetail` branch in expanded section
+
+### 1D. DoublesHistoryDetail component
+**File:** `apps/quiz-app/src/components/DoublesHistoryDetail.jsx`
+- On mount, fetches questions via `fetchQuestionsByIds(Object.keys(responses))`
+- Renders table: #, Question, Category, Correct Answer, Your Response
+- Shows grades column if responses have been graded
+- Header info: player name, part number, timer duration
+
+### 1E. CSS for doubles badge
 **File:** `apps/quiz-app/src/styles/History.css`
-- `.history__type-badge--doubles` — blue color scheme to distinguish from HOST (purple)
+- `.history__type-badge--doubles` — blue color scheme (`rgba(33, 150, 243, 0.2)` / `#64b5f6`)
 
 ---
 
 ## Part 2: Admin Doubles Management
 
-### 2A. Create `fetchDoublesSessionsAdmin()`
+### 2A. `fetchDoublesSessionsAdmin()` + `gradeAllDoublesResponses()`
 **File:** `packages/supabase-client/src/users.js`
-- Fetch all doubles sessions with joins: `quiz_packs(title)`, `user_profiles(display_name)`
-- Filters: userId, packId, status, dateFrom, dateTo
-- Pagination (20/page), ordered by `started_at DESC`
+- `fetchDoublesSessionsAdmin()`: Fetches all doubles sessions with joins (`quiz_packs(title)`, `user_profiles(display_name)`), filters (userId, packId, status, dateFrom, dateTo), pagination (20/page), ordered by `started_at DESC`
+- `gradeAllDoublesResponses(sessionId, grades)`: Reads session metadata, merges grades object, writes back. Logs admin action.
 
-### 2B. Create `gradeDoublesResponse()`
-**File:** `packages/supabase-client/src/questions.js`
-- Read session metadata, update `metadata.grades[questionId] = true/false`
-- Single-field update on `quiz_sessions` row
-- Also add `gradeAllDoublesResponses(sessionId, grades)` for bulk grading
+### 2B. RLS migration
+**File:** `packages/supabase-client/migrations/027_admin_session_access.sql`
+- `admin_read_all_sessions` — SELECT policy on quiz_sessions using `is_admin()`
+- `admin_update_all_sessions` — UPDATE policy on quiz_sessions using `is_admin()`
+- Both use `DO $$ ... IF NOT EXISTS` guard to skip if already present
 
-### 2C. RLS policy for admin session reads
-**New file:** `packages/supabase-client/migrations/026_admin_read_sessions.sql`
-- Add `CREATE POLICY "admin_read_all_sessions" ON quiz_sessions FOR SELECT USING (is_admin())`
-- Also add UPDATE policy for grading: `CREATE POLICY "admin_update_sessions" ON quiz_sessions FOR UPDATE USING (is_admin())`
-- Check if these already exist first — skip if admin bypass is already in place
-
-### 2D. Create admin DoublesSessions page
-**New file:** `apps/quiz-app/src/pages/admin/DoublesSessions.jsx`
-- Follow UserList pattern (orchestrator with inline sub-components or decomposed)
-- **Filters bar:** User search (debounced text), Pack dropdown, Status, Date range
-- **Table:** User, Pack, Part, Player Name, Answered, Status, Date, Actions (Grade)
+### 2C. Admin DoublesSessions page
+**File:** `apps/quiz-app/src/pages/admin/DoublesSessions.jsx`
+- Follows UserList pattern (orchestrator)
+- **Filters bar:** Debounced text search (user/player/pack name), status dropdown
+- **Table:** User, Pack, Part, Player Name, Answered, Graded, Status, Date, Actions (Grade button)
 - **Pagination:** 20/page
+- Reuses existing AdminCms.css classes (no separate CSS file needed)
 
-### 2E. Create DoublesGradeModal component
-**New file:** `apps/quiz-app/src/components/admin/doubles/DoublesGradeModal.jsx`
-- Fetch questions via `fetchQuestionsByIds`
-- Table: Question Text, Category, Correct Answer, Player Response, Grade toggle (✓/✗)
+### 2D. DoublesGradeModal component
+**File:** `apps/quiz-app/src/components/admin/doubles/DoublesGradeModal.jsx`
+- Fetches questions via `fetchQuestionsByIds`
+- Table: #, Question Text, Correct Answer, Player Response, Grade toggle button
+- Three-state grade toggle: ungraded (—) → correct (✓) → wrong (✗) → ungraded
 - Summary: X/Y graded, Z correct
-- Calls `gradeDoublesResponse` per toggle or `gradeAllDoublesResponses` for bulk
+- Calls `gradeAllDoublesResponses` on save
+- Uses existing `confirm-overlay` / `confirm-dialog` / `data-table` CSS classes
 
-### 2F. Add route + sidebar nav
+### 2E. Route + sidebar nav
 **File:** `apps/quiz-app/src/components/App.jsx`
-- Add `<Route path="doubles" element={<DoublesSessions />} />` under admin routes
+- Added `<Route path="doubles" element={<DoublesSessions />} />` under admin routes
 **File:** `apps/quiz-app/src/layouts/AdminLayout.jsx`
-- Add "Doubles Sessions" NavLink (admin+ only), after "Quiz Packs"
-
-### 2G. CSS
-**New file:** `apps/quiz-app/src/styles/DoublesSessions.css`
-- Follow existing admin page patterns (table, filters, modal)
+- Added "Doubles Sessions" NavLink (admin+ only), after "Bulk Import"
 
 ---
 
 ## Implementation Order
 
-1. `fetchQuestionsByIds()` — shared dependency (questions.js + barrel export)
+1. `fetchQuestionsByIds()` — shared dependency (questions.js, auto-exported via barrel)
 2. `fetchUserHistory()` updates — add doubles filter, exclude from pack
-3. History.jsx — badge, filter, expanded detail branch
-4. `DoublesHistoryDetail` component + CSS
-5. RLS migration (if needed)
-6. `fetchDoublesSessionsAdmin()` + `gradeDoublesResponse()`
+3. `fetchDoublesSessionsAdmin()` + `gradeAllDoublesResponses()` — admin data layer
+4. History.jsx — badge, filter, expanded detail branch
+5. `DoublesHistoryDetail` component
+6. Doubles badge CSS
 7. Admin DoublesSessions page + DoublesGradeModal
 8. Route + sidebar nav updates
+9. RLS migration
 
 ## Files Modified (Existing)
-- `packages/supabase-client/src/questions.js` — add `fetchQuestionsByIds`, `gradeDoublesResponse`
-- `packages/supabase-client/src/users.js` — update `fetchUserHistory`, add `fetchDoublesSessionsAdmin`
-- `packages/supabase-client/src/index.js` — re-export new functions
+- `packages/supabase-client/src/questions.js` — added `fetchQuestionsByIds`
+- `packages/supabase-client/src/users.js` — updated `fetchUserHistory`, added `fetchDoublesSessionsAdmin`, `gradeAllDoublesResponses`
 - `apps/quiz-app/src/pages/History.jsx` — doubles filter, badge, expanded detail
-- `apps/quiz-app/src/components/App.jsx` — admin doubles route
+- `apps/quiz-app/src/components/App.jsx` — admin doubles route + import
 - `apps/quiz-app/src/layouts/AdminLayout.jsx` — sidebar nav item
 - `apps/quiz-app/src/styles/History.css` — doubles badge style
 
@@ -123,8 +110,7 @@ Doubles sessions are stored in `quiz_sessions` with `metadata.format = 'doubles'
 - `apps/quiz-app/src/components/DoublesHistoryDetail.jsx`
 - `apps/quiz-app/src/pages/admin/DoublesSessions.jsx`
 - `apps/quiz-app/src/components/admin/doubles/DoublesGradeModal.jsx`
-- `apps/quiz-app/src/styles/DoublesSessions.css`
-- `packages/supabase-client/migrations/026_admin_read_sessions.sql` (if needed)
+- `packages/supabase-client/migrations/027_admin_session_access.sql`
 
 ## Verification
 - `npm run build` — no build errors
