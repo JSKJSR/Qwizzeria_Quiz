@@ -43,23 +43,27 @@ export default function QuestionView({ question, onRevealAnswer, onSubmitAnswer,
   const [mediaVisible, setMediaVisible] = useState(question.mediaType === 'image');
   const [countdown, setCountdown] = useState(timerSeconds || 0);
   const [answerText, setAnswerText] = useState('');
+  const [prevQuestionId, setPrevQuestionId] = useState(question.id);
   const intervalRef = useRef(null);
   const inputRef = useRef(null);
   const submittedRef = useRef(false);
 
-  useEffect(() => {
+  // Reset state when question changes (render-time adjustment, avoids extra effect cycle)
+  if (prevQuestionId !== question.id) {
+    setPrevQuestionId(question.id);
     setMediaVisible(question.mediaType === 'image');
     setAnswerText('');
-    submittedRef.current = false;
-  }, [question]);
+    setCountdown(timerSeconds || 0);
+  }
 
+  // Reset refs and focus in effect (refs can't be updated during render)
   useEffect(() => {
+    submittedRef.current = false;
     if (showAnswerInput && inputRef.current) inputRef.current.focus();
   }, [showAnswerInput, question.id]);
 
   useEffect(() => {
     if (!timerSeconds) return;
-    setCountdown(timerSeconds);
     intervalRef.current = setInterval(() => {
       setCountdown(prev => {
         if (prev <= 1) { clearInterval(intervalRef.current); return 0; }

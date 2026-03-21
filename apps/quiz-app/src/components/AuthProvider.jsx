@@ -17,13 +17,10 @@ export default function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [role, setRole] = useState('user');
   const [subscription, setSubscription] = useState(DEFAULT_SUBSCRIPTION);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(() => isSupabaseConfigured());
 
   useEffect(() => {
-    if (!isSupabaseConfigured()) {
-      setLoading(false);
-      return;
-    }
+    if (!isSupabaseConfigured()) return;
 
     let mounted = true;
 

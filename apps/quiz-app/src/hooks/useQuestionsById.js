@@ -7,16 +7,21 @@ import { fetchQuestionsByIds } from '@qwizzeria/supabase-client';
  */
 export default function useQuestionsById(questionIds) {
   const [questions, setQuestions] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(() => questionIds.length > 0);
+  const [prevIds, setPrevIds] = useState(questionIds);
+
+  // Reset loading during render when IDs change (avoids synchronous setState in effect)
+  if (prevIds !== questionIds) {
+    setPrevIds(questionIds);
+    if (questionIds.length > 0) {
+      setLoading(true);
+    }
+  }
 
   useEffect(() => {
-    if (questionIds.length === 0) {
-      setLoading(false);
-      return;
-    }
+    if (questionIds.length === 0) return;
 
     let cancelled = false;
-    setLoading(true);
 
     fetchQuestionsByIds(questionIds)
       .then((data) => {

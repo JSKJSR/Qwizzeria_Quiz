@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import ResponsesModal from './ResponsesModal';
 import { getHostHint } from '@/utils/hostHintText';
 import '@/styles/BuzzerOverlay.css';
@@ -50,15 +50,18 @@ export default function BuzzerOverlay({
     catch { /* ignore */ return true; }
   });
   const [guideOpen, setGuideOpen] = useState(false);
+  const [prevAutoShow, setPrevAutoShow] = useState(false);
 
   // Auto-expand panel and open responses modal when timer expires and collection is locked
-  useEffect(() => {
-    if (autoShowResponses) {
-      setExpanded(true);
-      setShowResponsesModal(true);
-      onAutoShowResponsesHandled?.();
-    }
-  }, [autoShowResponses, onAutoShowResponsesHandled]);
+  // (render-time state adjustment — avoids synchronous setState in effect)
+  if (autoShowResponses && !prevAutoShow) {
+    setPrevAutoShow(true);
+    setExpanded(true);
+    setShowResponsesModal(true);
+    onAutoShowResponsesHandled?.();
+  } else if (!autoShowResponses && prevAutoShow) {
+    setPrevAutoShow(false);
+  }
 
   if (isCreating || !roomCode) return null;
 

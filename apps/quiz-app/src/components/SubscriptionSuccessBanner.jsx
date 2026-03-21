@@ -1,26 +1,36 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { useAuth } from '../hooks/useAuth';
+
+function checkSubscriptionSuccess() {
+  const params = new URLSearchParams(window.location.search);
+  if (params.get('subscription') !== 'success') return false;
+
+  // Clean URL immediately
+  params.delete('subscription');
+  const newUrl = params.toString()
+    ? `${window.location.pathname}?${params}`
+    : window.location.pathname;
+  window.history.replaceState(null, '', newUrl);
+  return true;
+}
 
 export default function SubscriptionSuccessBanner() {
   const { refreshSubscription, subscription } = useAuth();
-  const [visible, setVisible] = useState(false);
-  const [tierName, setTierName] = useState(null);
+  const [visible, setVisible] = useState(checkSubscriptionSuccess);
   const pollRef = useRef(0);
 
+  // Derive tier name from subscription — no stored state needed
+  const tierName = useMemo(() => {
+    if (subscription.status === 'active' && subscription.tier) {
+      return subscription.tier === 'pro' ? 'Pro' : 'Basic';
+    }
+    return null;
+  }, [subscription.status, subscription.tier]);
+
+  // Poll for subscription refresh (webhook may take 1-5s)
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    if (params.get('subscription') !== 'success') return;
+    if (!visible) return;
 
-    // Clean URL
-    params.delete('subscription');
-    const newUrl = params.toString()
-      ? `${window.location.pathname}?${params}`
-      : window.location.pathname;
-    window.history.replaceState(null, '', newUrl);
-
-    setVisible(true);
-
-    // Poll for subscription refresh (webhook may take 1-5s)
     const maxAttempts = 5;
     const interval = setInterval(() => {
       pollRef.current += 1;
@@ -29,14 +39,7 @@ export default function SubscriptionSuccessBanner() {
     }, 2000);
 
     return () => clearInterval(interval);
-  }, [refreshSubscription]);
-
-  // Update tier name when subscription changes during polling
-  useEffect(() => {
-    if (visible && subscription.status === 'active' && subscription.tier) {
-      setTierName(subscription.tier === 'pro' ? 'Pro' : 'Basic');
-    }
-  }, [visible, subscription.status, subscription.tier]);
+  }, [visible, refreshSubscription]);
 
   // Auto-dismiss after 10s
   useEffect(() => {
