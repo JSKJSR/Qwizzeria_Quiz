@@ -401,9 +401,9 @@ export default function TournamentMatchPage() {
   // --- Loading ---
   if (phase === 'loading') {
     return (
-      <div className="host-quiz host-quiz--fullscreen" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <div className="host-quiz host-quiz--fullscreen tournament-match__center">
         <SEO title="Tournament Match" noIndex />
-        <div style={{ textAlign: 'center', color: 'var(--text-secondary, #b0a0a5)' }}>
+        <div className="tournament-match__loading">
           <div className="host-pack-select__spinner" />
           <p>Loading match...</p>
         </div>
@@ -414,10 +414,10 @@ export default function TournamentMatchPage() {
   // --- Error ---
   if (phase === 'error') {
     return (
-      <div className="host-quiz host-quiz--fullscreen" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <div className="host-quiz host-quiz--fullscreen tournament-match__center">
         <SEO title="Tournament Match" noIndex />
-        <div style={{ textAlign: 'center', maxWidth: 400 }}>
-          <p style={{ color: '#ff6b6b', marginBottom: '1rem' }}>{errorMessage}</p>
+        <div className="tournament-match__error">
+          <p className="tournament-match__error-msg">{errorMessage}</p>
           <button
             className="host-results__btn host-results__btn--secondary"
             onClick={() => navigate(`/host/tournament/${tournamentId}`)}
@@ -436,17 +436,17 @@ export default function TournamentMatchPage() {
       : null;
 
     return (
-      <div className="host-quiz host-quiz--fullscreen" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <div className="host-quiz host-quiz--fullscreen tournament-match__center">
         <SEO title="Match Complete" noIndex />
-        <div style={{ textAlign: 'center', maxWidth: 500 }}>
-          <h2 style={{ fontSize: '1.5rem', marginBottom: '0.5rem' }}>Match Complete</h2>
-          {matchLabel && <p style={{ color: 'var(--accent-primary, #e85c1a)', fontSize: '0.85rem', marginBottom: '1rem' }}>{matchLabel}</p>}
+        <div className="tournament-match__completed">
+          <h2 className="tournament-match__completed-title">Match Complete</h2>
+          {matchLabel && <p className="tournament-match__completed-label">{matchLabel}</p>}
           {winner && (
-            <div style={{ marginBottom: '1.5rem' }}>
-              <div style={{ fontSize: '2.5rem' }}>&#127942;</div>
-              <div style={{ fontSize: '1.5rem', fontWeight: 700, color: '#ffd700' }}>{winner.name}</div>
+            <div className="tournament-match__winner">
+              <div className="tournament-match__trophy">&#127942;</div>
+              <div className="tournament-match__winner-name">{winner.name}</div>
               {participants.length === 2 && (
-                <p style={{ color: 'var(--text-secondary)', marginTop: '0.5rem' }}>
+                <p className="tournament-match__final-score">
                   {participants[0].name} {participants[0].score} - {participants[1].score} {participants[1].name}
                 </p>
               )}

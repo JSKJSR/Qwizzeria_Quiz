@@ -1,7 +1,8 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
-import { fetchUserHistory, fetchUserStats, fetchGlobalLeaderboard, abandonQuizSession } from '@qwizzeria/supabase-client';
+import { fetchUserHistory, fetchUserStats, fetchGlobalLeaderboard, abandonQuizSession, fetchGamificationStats } from '@qwizzeria/supabase-client';
+import { getLevel, getLevelTitle, getLevelProgress, BADGES } from '../utils/gamification';
 import SEO from '../components/SEO';
 import '../styles/DashboardHome.css';
 
@@ -20,6 +21,7 @@ export default function DashboardHome() {
     try { return localStorage.getItem(COLLAPSE_KEY) === 'true'; } catch { return false; }
   });
   const [dismissing, setDismissing] = useState(null);
+  const [gamification, setGamification] = useState(null);
 
   useEffect(() => {
     if (!user) return;
@@ -29,10 +31,12 @@ export default function DashboardHome() {
       fetchUserHistory({ userId: user.id, status: 'in_progress', pageSize: 5 }),
       fetchUserStats(user.id).catch(() => null),
       fetchGlobalLeaderboard('this_week', 50).catch(() => []),
-    ]).then(([historyResult, statsResult, leaderboard]) => {
+      fetchGamificationStats(user.id).catch(() => null),
+    ]).then(([historyResult, statsResult, leaderboard, gamData]) => {
       if (cancelled) return;
       setResumable(historyResult.data || []);
       setStats(statsResult);
+      setGamification(gamData);
 
       if (Array.isArray(leaderboard)) {
         const idx = leaderboard.findIndex(e => e.user_id === user.id);
@@ -94,6 +98,37 @@ export default function DashboardHome() {
         <h1 className="dash-home__greeting">Welcome back, {displayName}</h1>
         <p className="dash-home__subtitle">Ready for your next quiz challenge?</p>
       </div>
+
+      {gamification && gamification.xp_total > 0 && (() => {
+        const level = getLevel(gamification.xp_total);
+        const title = getLevelTitle(level);
+        const progress = getLevelProgress(gamification.xp_total);
+        const earnedBadges = BADGES.filter(b => (gamification.badges || []).includes(b.key));
+        return (
+          <div className="dash-home__gamification">
+            <div className="dash-home__level-row">
+              <div className="dash-home__level-badge">Lv. {level}</div>
+              <div className="dash-home__level-info">
+                <span className="dash-home__level-title">{title}</span>
+                <span className="dash-home__xp-text">{gamification.xp_total} XP</span>
+              </div>
+              {gamification.daily_streak_count > 0 && (
+                <div className="dash-home__streak-pill">{gamification.daily_streak_count} day streak</div>
+              )}
+            </div>
+            <div className="dash-home__xp-bar">
+              <div className="dash-home__xp-fill" style={{ width: `${progress.pct}%` }} />
+            </div>
+            {earnedBadges.length > 0 && (
+              <div className="dash-home__badges">
+                {earnedBadges.map(b => (
+                  <span key={b.key} className="dash-home__badge" title={b.label}>{b.icon}</span>
+                ))}
+              </div>
+            )}
+          </div>
+        );
+      })()}
 
       {error && (
         <div className="dash-home__error">

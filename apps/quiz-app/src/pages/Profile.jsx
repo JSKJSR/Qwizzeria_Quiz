@@ -196,7 +196,7 @@ export default function Profile() {
             </div>
 
             <div className="profile__xp-bar">
-              <div className="profile__xp-fill" style={{ width: `${Math.round(progress * 100)}%` }} />
+              <div className="profile__xp-fill" style={{ width: `${progress.pct}%` }} />
             </div>
 
             <div className="profile__gamification-stats">
@@ -308,7 +308,7 @@ export default function Profile() {
                     : `Next billing: ${new Date(subscription.currentPeriodEnd).toLocaleDateString()}`}
                 </p>
               )}
-              <button className="profile__action-link" onClick={handleManageSubscription} disabled={portalLoading} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, fontFamily: 'inherit' }}>
+              <button className="profile__action-link" onClick={handleManageSubscription} disabled={portalLoading}>
                 {portalLoading ? 'Loading...' : 'Manage Subscription'}
               </button>
             </div>
@@ -335,7 +335,7 @@ export default function Profile() {
             <div className="profile__sub-info">
               <p className="profile__sub-status profile__sub-status--warning">Payment Failed</p>
               <p className="profile__sub-date">Please update your payment method to avoid losing access.</p>
-              <button className="profile__action-link" onClick={handleManageSubscription} disabled={portalLoading} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, fontFamily: 'inherit' }}>
+              <button className="profile__action-link" onClick={handleManageSubscription} disabled={portalLoading}>
                 {portalLoading ? 'Loading...' : 'Update Payment Method'}
               </button>
             </div>

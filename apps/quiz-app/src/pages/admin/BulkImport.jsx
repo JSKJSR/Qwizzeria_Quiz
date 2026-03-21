@@ -109,6 +109,25 @@ export default function BulkImport() {
     URL.revokeObjectURL(url);
   };
 
+  const handleAssignToPack = async () => {
+    setPackAssigning(true);
+    setPackResult(null);
+    try {
+      let packId = selectedPackId;
+      if (packMode === 'new') {
+        const pack = await createPack({ title: newPackTitle.trim(), status: 'draft', is_public: false });
+        packId = pack.id;
+      }
+      await bulkAddQuestionsToPack(packId, importedIds);
+      setPackResult({ success: true, packId });
+      setImportedIds([]);
+    } catch (err) {
+      setPackResult({ success: false, error: err.message });
+    } finally {
+      setPackAssigning(false);
+    }
+  };
+
   return (
     <div>
       <div className="page-header">
@@ -125,7 +144,7 @@ export default function BulkImport() {
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
       >
-        <p style={{ fontSize: 'var(--font-size-md)', color: 'var(--text-primary)' }}>
+        <p className="import-zone__hint">
           Drop Excel file here or click to browse
         </p>
         <p>Supported formats: .xlsx, .xls</p>
@@ -134,12 +153,12 @@ export default function BulkImport() {
           type="file"
           accept=".xlsx,.xls"
           onChange={handleFileChange}
-          style={{ display: 'none' }}
+          hidden
         />
       </div>
 
       {errors.length > 0 && (
-        <div className="alert alert--error" style={{ marginTop: '1rem' }}>
+        <div className="alert alert--error bulk-import__alert-mt">
           {errors.map((e, i) => (
             <div key={i}>{e}</div>
           ))}
@@ -147,7 +166,7 @@ export default function BulkImport() {
       )}
 
       {warnings.length > 0 && (
-        <div className="alert alert--warning" style={{ marginTop: '1rem', background: 'rgba(232, 168, 37, 0.1)', border: '1px solid rgba(232, 168, 37, 0.3)', color: '#e8a825', borderRadius: '8px', padding: '0.75rem 1rem', fontSize: '0.85rem' }}>
+        <div className="bulk-import__warning">
           <strong>Category warnings ({warnings.length}):</strong>
           {warnings.map((w, i) => (
             <div key={i}>{w}</div>
@@ -156,10 +175,7 @@ export default function BulkImport() {
       )}
 
       {result && (
-        <div
-          className={`alert ${result.error ? 'alert--error' : 'alert--success'}`}
-          style={{ marginTop: '1rem' }}
-        >
+        <div className={`alert ${result.error ? 'alert--error' : 'alert--success'} bulk-import__alert-mt`}>
           {result.error
             ? `Import failed: ${result.error}`
             : `Successfully imported ${result.success} question${result.success !== 1 ? 's' : ''}.`}
@@ -167,21 +183,21 @@ export default function BulkImport() {
       )}
 
       {importedIds.length > 0 && !packResult && (
-        <div style={{ marginTop: '1.5rem', padding: '1.25rem', background: 'rgba(99, 102, 241, 0.08)', border: '1px solid rgba(99, 102, 241, 0.25)', borderRadius: '8px' }}>
-          <h3 style={{ fontSize: 'var(--font-size-md)', marginBottom: '0.75rem' }}>
+        <div className="bulk-import__pack-section">
+          <h3 className="bulk-import__pack-title">
             Add {importedIds.length} questions to a Quiz Pack
           </h3>
 
-          <div style={{ display: 'flex', gap: '0.75rem', marginBottom: '1rem' }}>
-            <label style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', cursor: 'pointer' }}>
+          <div className="bulk-import__pack-modes">
+            <label className="bulk-import__pack-mode-label">
               <input type="radio" name="packMode" value="new" checked={packMode === 'new'} onChange={() => setPackMode('new')} />
               Create new pack
             </label>
-            <label style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', cursor: 'pointer' }}>
+            <label className="bulk-import__pack-mode-label">
               <input type="radio" name="packMode" value="existing" checked={packMode === 'existing'} onChange={() => setPackMode('existing')} />
               Add to existing pack
             </label>
-            <label style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', cursor: 'pointer' }}>
+            <label className="bulk-import__pack-mode-label">
               <input type="radio" name="packMode" value="none" checked={packMode === 'none'} onChange={() => setPackMode('none')} />
               Skip
             </label>
@@ -190,18 +206,18 @@ export default function BulkImport() {
           {packMode === 'new' && (
             <input
               type="text"
+              className="bulk-import__pack-input"
               placeholder="Pack title (e.g. January 2024 Qwizzeria Challenge)"
               value={newPackTitle}
               onChange={(e) => setNewPackTitle(e.target.value)}
-              style={{ width: '100%', padding: '0.5rem 0.75rem', borderRadius: '6px', border: '1px solid var(--border-color)', background: 'var(--bg-secondary)', color: 'var(--text-primary)', fontSize: '0.9rem' }}
             />
           )}
 
           {packMode === 'existing' && (
             <select
+              className="bulk-import__pack-input"
               value={selectedPackId}
               onChange={(e) => setSelectedPackId(e.target.value)}
-              style={{ width: '100%', padding: '0.5rem 0.75rem', borderRadius: '6px', border: '1px solid var(--border-color)', background: 'var(--bg-secondary)', color: 'var(--text-primary)', fontSize: '0.9rem' }}
             >
               <option value="">Select a pack...</option>
               {existingPacks.map(p => (
@@ -212,27 +228,9 @@ export default function BulkImport() {
 
           {packMode !== 'none' && (
             <button
-              className="btn btn-primary"
-              style={{ marginTop: '0.75rem' }}
+              className="btn btn-primary bulk-import__pack-btn"
               disabled={packAssigning || (packMode === 'new' && !newPackTitle.trim()) || (packMode === 'existing' && !selectedPackId)}
-              onClick={async () => {
-                setPackAssigning(true);
-                setPackResult(null);
-                try {
-                  let packId = selectedPackId;
-                  if (packMode === 'new') {
-                    const pack = await createPack({ title: newPackTitle.trim(), status: 'draft', is_public: false });
-                    packId = pack.id;
-                  }
-                  await bulkAddQuestionsToPack(packId, importedIds);
-                  setPackResult({ success: true, packId });
-                  setImportedIds([]);
-                } catch (err) {
-                  setPackResult({ success: false, error: err.message });
-                } finally {
-                  setPackAssigning(false);
-                }
-              }}
+              onClick={handleAssignToPack}
             >
               {packAssigning ? 'Assigning...' : `Add ${importedIds.length} Questions to Pack`}
             </button>
@@ -241,7 +239,7 @@ export default function BulkImport() {
       )}
 
       {packResult && (
-        <div className={`alert ${packResult.success ? 'alert--success' : 'alert--error'}`} style={{ marginTop: '1rem' }}>
+        <div className={`alert ${packResult.success ? 'alert--success' : 'alert--error'} bulk-import__alert-mt`}>
           {packResult.success
             ? `Successfully added all questions to the pack! You can manage it in Admin → Packs.`
             : `Failed to assign to pack: ${packResult.error}`}
@@ -249,9 +247,9 @@ export default function BulkImport() {
       )}
 
       {parsed && parsed.length > 0 && (
-        <div style={{ marginTop: '1.5rem' }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
-            <h2 style={{ fontSize: 'var(--font-size-md)' }}>
+        <div className="bulk-import__preview">
+          <div className="bulk-import__preview-header">
+            <h2 className="bulk-import__preview-title">
               Preview ({parsed.length} question{parsed.length !== 1 ? 's' : ''})
             </h2>
             <button
@@ -263,7 +261,7 @@ export default function BulkImport() {
             </button>
           </div>
 
-          <div style={{ overflowX: 'auto' }}>
+          <div className="bulk-import__table-wrap">
             <table className="data-table">
               <thead>
                 <tr>
@@ -285,17 +283,13 @@ export default function BulkImport() {
                     <td>
                       {q.category || '—'}
                       {q._categoryWarning && (
-                        <span style={{ color: '#e8a825', marginLeft: '0.35rem', fontSize: '0.75rem', fontWeight: 600 }} title="Non-standard category">
-                          !!
-                        </span>
+                        <span className="bulk-import__category-warn" title="Non-standard category">!!</span>
                       )}
                     </td>
                     <td>
                       {q.sub_category || '—'}
                       {q._subCategoryWarning && (
-                        <span style={{ color: '#e8a825', marginLeft: '0.35rem', fontSize: '0.75rem', fontWeight: 600 }} title="Non-standard sub-category">
-                          !!
-                        </span>
+                        <span className="bulk-import__category-warn" title="Non-standard sub-category">!!</span>
                       )}
                     </td>
                     <td>{q.display_title || '—'}</td>

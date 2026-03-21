@@ -1,4 +1,5 @@
 import { Component } from 'react';
+import '../styles/ErrorBoundary.css';
 
 export default class ErrorBoundary extends Component {
   constructor(props) {
@@ -20,50 +21,20 @@ export default class ErrorBoundary extends Component {
 
   render() {
     if (this.state.hasError) {
+      if (this.props.fallback) {
+        return this.props.fallback({ error: this.state.error, reset: this.handleReset });
+      }
       return (
-        <div style={{
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
-          minHeight: '100vh',
-          padding: '2rem',
-          textAlign: 'center',
-          fontFamily: 'system-ui, sans-serif',
-          backgroundColor: '#000',
-          color: '#fff',
-        }}>
-          <h1 style={{ fontSize: '1.5rem', marginBottom: '1rem' }}>Something went wrong</h1>
-          <p style={{ color: '#999', marginBottom: '1.5rem', maxWidth: '400px' }}>
+        <div className="error-boundary">
+          <h1 className="error-boundary__title">Something went wrong</h1>
+          <p className="error-boundary__message">
             An unexpected error occurred. You can try refreshing the page or resetting the app.
           </p>
-          <div style={{ display: 'flex', gap: '1rem' }}>
-            <button
-              onClick={this.handleReset}
-              style={{
-                padding: '0.75rem 1.5rem',
-                backgroundColor: '#e85c1a',
-                color: '#fff',
-                border: 'none',
-                borderRadius: '8px',
-                cursor: 'pointer',
-                fontSize: '1rem',
-              }}
-            >
+          <div className="error-boundary__actions">
+            <button className="error-boundary__btn error-boundary__btn--primary" onClick={this.handleReset}>
               Try Again
             </button>
-            <button
-              onClick={() => window.location.reload()}
-              style={{
-                padding: '0.75rem 1.5rem',
-                backgroundColor: '#333',
-                color: '#fff',
-                border: 'none',
-                borderRadius: '8px',
-                cursor: 'pointer',
-                fontSize: '1rem',
-              }}
-            >
+            <button className="error-boundary__btn error-boundary__btn--secondary" onClick={() => window.location.reload()}>
               Reload Page
             </button>
           </div>

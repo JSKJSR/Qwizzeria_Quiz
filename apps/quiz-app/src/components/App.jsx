@@ -24,6 +24,7 @@ import TournamentMatchPage from '../pages/TournamentMatchPage';
 import BuzzerPage from '../pages/BuzzerPage';
 import ResetPassword from '../pages/ResetPassword';
 import NotFound from '../pages/NotFound';
+import ErrorBoundary from './ErrorBoundary';
 
 // Admin pages
 import AdminDashboard from '../pages/admin/Dashboard';
@@ -46,7 +47,7 @@ export default function App() {
         <Route path="/" element={<AuthRedirect />} />
 
         {/* Public routes: accessible without login */}
-        <Route path="/play/free" element={<FreeQuizPage />} />
+        <Route path="/play/free" element={<ErrorBoundary><FreeQuizPage /></ErrorBoundary>} />
         <Route path="/reset-password" element={<ResetPassword />} />
 
         {/* All protected routes */}
@@ -63,15 +64,15 @@ export default function App() {
             <Route element={<TierRoute requiredTier="basic" />}>
               <Route path="/packs" element={<PackBrowse />} />
               <Route path="/packs/:id" element={<PackDetail />} />
-              <Route path="/packs/:id/play" element={<PackPlay />} />
+              <Route path="/packs/:id/play" element={<ErrorBoundary><PackPlay /></ErrorBoundary>} />
               <Route path="/leaderboard" element={<Leaderboard />} />
               <Route path="/history" element={<History />} />
-              <Route path="/play/resume/:sessionId" element={<ResumePlay />} />
+              <Route path="/play/resume/:sessionId" element={<ErrorBoundary><ResumePlay /></ErrorBoundary>} />
             </Route>
 
             {/* Pro tier routes */}
             <Route element={<TierRoute requiredTier="pro" />}>
-              <Route path="/host" element={<HostQuizPage />} />
+              <Route path="/host" element={<ErrorBoundary><HostQuizPage /></ErrorBoundary>} />
             </Route>
 
             {/* Doubles: pro tier */}
@@ -83,7 +84,7 @@ export default function App() {
           {/* Tournament routes (full-screen, no sidebar) — pro tier */}
           <Route element={<TierRoute requiredTier="pro" />}>
             <Route path="/host/tournament/:tournamentId" element={<TournamentBracketPage />} />
-            <Route path="/host/tournament/:tournamentId/match/:matchId" element={<TournamentMatchPage />} />
+            <Route path="/host/tournament/:tournamentId/match/:matchId" element={<ErrorBoundary><TournamentMatchPage /></ErrorBoundary>} />
           </Route>
 
           {/* Buzzer page (full-screen, no sidebar, any logged-in user) */}

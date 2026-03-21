@@ -29,6 +29,85 @@
   font-size: 0.95rem;
 }
 
+/* Gamification */
+.dash-home__gamification {
+  background: var(--bg-card, #1a1015);
+  border: 1px solid var(--border-color, #2a1520);
+  border-radius: var(--radius, 12px);
+  padding: 1.25rem 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.dash-home__level-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.dash-home__level-badge {
+  background: var(--accent-primary, #e85c1a);
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.85rem;
+  padding: 0.3rem 0.6rem;
+  border-radius: 6px;
+  white-space: nowrap;
+}
+
+.dash-home__level-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  flex: 1;
+}
+
+.dash-home__level-title {
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.dash-home__xp-text {
+  font-size: 0.8rem;
+  color: var(--text-secondary, #b0a0a5);
+}
+
+.dash-home__streak-pill {
+  background: rgba(255, 193, 7, 0.15);
+  color: #ffc107;
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 0.25rem 0.6rem;
+  border-radius: 20px;
+  white-space: nowrap;
+}
+
+.dash-home__xp-bar {
+  height: 6px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 3px;
+  overflow: hidden;
+  margin-bottom: 0.5rem;
+}
+
+.dash-home__xp-fill {
+  height: 100%;
+  background: var(--accent-primary, #e85c1a);
+  border-radius: 3px;
+  transition: width 0.4s ease;
+}
+
+.dash-home__badges {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.dash-home__badge {
+  font-size: 1.25rem;
+  cursor: default;
+}
+
 /* Quick action cards */
 .dash-home__actions {
   display: grid;

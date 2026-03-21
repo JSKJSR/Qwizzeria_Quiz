@@ -5,6 +5,7 @@ import { fetchResumableSession, fetchPackPlayQuestions } from '@qwizzeria/supaba
 import PackPlayJeopardy from '../components/PackPlayJeopardy';
 import PackPlaySequential from '../components/PackPlaySequential';
 import FreeQuiz from '../components/FreeQuiz';
+import '../styles/HostQuiz.css';
 
 export default function ResumePlay() {
   const { sessionId } = useParams();
@@ -77,8 +78,8 @@ export default function ResumePlay() {
 
   if (authLoading || loading) {
     return (
-      <div style={{ minHeight: '100vh', background: '#000', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', gap: '1rem' }}>
-        <div style={{ width: 40, height: 40, border: '3px solid rgba(255,255,255,0.1)', borderTopColor: '#e85c1a', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} />
+      <div className="resume-play__center">
+        <div className="resume-play__spinner" />
         <p>Resuming quiz...</p>
       </div>
     );
@@ -86,13 +87,10 @@ export default function ResumePlay() {
 
   if (error || !resumeData) {
     return (
-      <div style={{ minHeight: '100vh', background: '#000', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', gap: '1rem', padding: '2rem' }}>
+      <div className="resume-play__center">
         <h2>Cannot Resume</h2>
-        <p style={{ color: '#999' }}>{error || 'Session not found or already completed.'}</p>
-        <button
-          onClick={() => navigate('/profile')}
-          style={{ padding: '0.6rem 1.25rem', background: '#e85c1a', color: '#fff', border: 'none', borderRadius: '8px', cursor: 'pointer' }}
-        >
+        <p className="resume-play__error-msg">{error || 'Session not found or already completed.'}</p>
+        <button className="resume-play__btn" onClick={() => navigate('/profile')}>
           Back to Profile
         </button>
       </div>
