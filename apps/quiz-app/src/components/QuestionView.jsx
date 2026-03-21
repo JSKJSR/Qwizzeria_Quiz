@@ -54,14 +54,26 @@ function CountdownRing({ seconds, total, onExpired }) {
   );
 }
 
-export default function QuestionView({ question, onRevealAnswer, onBack, onSkip, timerSeconds }) {
+export default function QuestionView({ question, onRevealAnswer, onSubmitAnswer, onBack, onSkip, timerSeconds, showAnswerInput = false }) {
   const [mediaVisible, setMediaVisible] = useState(question.mediaType === 'image');
   const [countdown, setCountdown] = useState(timerSeconds || 0);
+  const [answerText, setAnswerText] = useState('');
   const intervalRef = useRef(null);
+  const inputRef = useRef(null);
+  const submittedRef = useRef(false);
 
   useEffect(() => {
     setMediaVisible(question.mediaType === 'image');
+    setAnswerText('');
+    submittedRef.current = false;
   }, [question]);
+
+  // Auto-focus answer input
+  useEffect(() => {
+    if (showAnswerInput && inputRef.current) {
+      inputRef.current.focus();
+    }
+  }, [showAnswerInput, question.id]);
 
   // Countdown timer
   useEffect(() => {
@@ -78,6 +90,23 @@ export default function QuestionView({ question, onRevealAnswer, onBack, onSkip,
     }, 1000);
     return () => clearInterval(intervalRef.current);
   }, [timerSeconds, question.id]);
+
+  const handleTimerExpired = () => {
+    if (showAnswerInput && onSubmitAnswer && !submittedRef.current) {
+      submittedRef.current = true;
+      onSubmitAnswer(answerText);
+    } else if (onRevealAnswer) {
+      onRevealAnswer();
+    }
+  };
+
+  const handleSubmit = (e) => {
+    e?.preventDefault();
+    if (showAnswerInput && onSubmitAnswer && !submittedRef.current) {
+      submittedRef.current = true;
+      onSubmitAnswer(answerText);
+    }
+  };
 
   useEffect(() => {
     function handleKey(e) {
@@ -104,7 +133,7 @@ export default function QuestionView({ question, onRevealAnswer, onBack, onSkip,
 
         <div className="question-view__points-row">
           {timerSeconds > 0 && (
-            <CountdownRing seconds={countdown} total={timerSeconds} onExpired={onRevealAnswer} />
+            <CountdownRing seconds={countdown} total={timerSeconds} onExpired={handleTimerExpired} />
           )}
           <div className="question-view__points">{question.points} pts</div>
         </div>
@@ -139,19 +168,48 @@ export default function QuestionView({ question, onRevealAnswer, onBack, onSkip,
           </div>
         )}
 
-        <div className="question-view__actions">
-          <button className="question-view__back-btn" onClick={onBack}>
-            Back to Grid
-          </button>
-          {onSkip && (
-            <button className="question-view__skip-btn" onClick={onSkip}>
-              Next
+        {showAnswerInput ? (
+          <form className="question-view__answer-form" onSubmit={handleSubmit}>
+            <input
+              ref={inputRef}
+              type="text"
+              className="question-view__answer-input"
+              placeholder="Type your answer..."
+              value={answerText}
+              onChange={(e) => setAnswerText(e.target.value)}
+              maxLength={200}
+              autoComplete="off"
+              aria-label="Your answer"
+            />
+            <button type="submit" className="question-view__submit-btn" aria-label="Submit answer">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <line x1="5" y1="12" x2="19" y2="12" /><polyline points="12 5 19 12 12 19" />
+              </svg>
             </button>
-          )}
-          <button className="question-view__reveal-btn" onClick={onRevealAnswer}>
-            Reveal Answer
-          </button>
-        </div>
+          </form>
+        ) : (
+          <div className="question-view__actions">
+            <button className="question-view__back-btn" onClick={onBack}>
+              Back to Grid
+            </button>
+            {onSkip && (
+              <button className="question-view__skip-btn" onClick={onSkip}>
+                Next
+              </button>
+            )}
+            <button className="question-view__reveal-btn" onClick={onRevealAnswer}>
+              Reveal Answer
+            </button>
+          </div>
+        )}
+
+        {showAnswerInput && (
+          <div className="question-view__actions question-view__actions--secondary">
+            <button className="question-view__back-btn" onClick={onBack}>
+              Back to Grid
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );

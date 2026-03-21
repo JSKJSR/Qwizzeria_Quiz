@@ -1,7 +1,13 @@
 import { useTheme } from '@/hooks/useTheme';
+import { getXP, getStreak } from '@/utils/freeQuizStorage';
+import { getLevel } from '@/utils/gamification';
 
 export default function FreeQuizHeader({ score, streak, scoreBounce, children }) {
   const { theme, toggleTheme } = useTheme();
+  const totalXP = getXP();
+  const level = getLevel(totalXP);
+  const dailyStreak = getStreak();
+
   return (
     <div className="free-quiz__header">
       <img
@@ -10,12 +16,28 @@ export default function FreeQuizHeader({ score, streak, scoreBounce, children })
         className="free-quiz__logo"
         onError={(e) => { e.target.src = '/qwizzeria-logo.svg'; }}
       />
+
+      {level > 1 && (
+        <div className="free-quiz__level-badge" aria-label={`Level ${level}`}>
+          Lv.{level}
+        </div>
+      )}
+
       <div className={`free-quiz__score-bar ${scoreBounce ? 'free-quiz__score-bar--bounce' : ''}`}>
         Score: {score}
       </div>
+
       {streak >= 2 && (
         <div className="free-quiz__streak-badge">{streak} streak</div>
       )}
+
+      {dailyStreak && dailyStreak.count >= 2 && (
+        <div className="free-quiz__daily-streak" aria-label={`${dailyStreak.count} day streak`}>
+          <span className="free-quiz__fire-icon" aria-hidden="true">{'\u{1F525}'}</span>
+          {dailyStreak.count}
+        </div>
+      )}
+
       <button
         className="free-quiz__theme-btn"
         onClick={toggleTheme}

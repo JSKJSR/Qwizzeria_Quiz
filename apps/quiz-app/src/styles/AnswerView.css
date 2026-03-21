@@ -141,6 +141,106 @@
   line-height: 1;
 }
 
+/* Result badge (correct / wrong) */
+.answer-view__result-badge {
+  font-size: 1.5rem;
+  font-weight: 800;
+  padding: 0.5rem 1.5rem;
+  border-radius: 10px;
+  animation: resultAppear 0.3s ease;
+}
+
+@keyframes resultAppear {
+  0% { transform: scale(0.7); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.answer-view__result-badge--correct {
+  color: var(--accent-success, #4caf50);
+  background: rgba(76, 175, 80, 0.12);
+  border: 2px solid rgba(76, 175, 80, 0.3);
+}
+
+.answer-view__result-badge--wrong {
+  color: #f44336;
+  background: rgba(244, 67, 54, 0.12);
+  border: 2px solid rgba(244, 67, 54, 0.3);
+}
+
+/* XP earned animation */
+.answer-view__xp-earned {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--accent-primary, #e85c1a);
+  animation: xpFloat 0.6s ease;
+}
+
+@keyframes xpFloat {
+  0% { transform: translateY(10px); opacity: 0; }
+  100% { transform: translateY(0); opacity: 1; }
+}
+
+/* User answer display */
+.answer-view__user-answer {
+  font-size: 0.9rem;
+  padding: 0.5rem 1rem;
+  background: rgba(255, 255, 255, 0.04);
+  border-radius: 6px;
+  max-width: 500px;
+}
+
+.answer-view__user-answer--correct {
+  color: var(--accent-success, #4caf50);
+  border: 1px solid rgba(76, 175, 80, 0.25);
+}
+
+.answer-view__user-answer--wrong {
+  color: #f44336;
+  border: 1px solid rgba(244, 67, 54, 0.25);
+}
+
+/* Feedback action buttons */
+.answer-view__feedback-actions {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.answer-view__continue-btn {
+  padding: 0.75rem 2.5rem;
+  background: var(--accent-success, #4caf50);
+  color: #fff;
+  font-size: var(--font-size-md, 1rem);
+  font-weight: 700;
+  border: none;
+  border-radius: var(--radius, 12px);
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.answer-view__continue-btn:hover {
+  background: #43a047;
+}
+
+.answer-view__override-btn {
+  padding: 0.6rem 1.5rem;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: var(--radius, 12px);
+  color: var(--text-secondary, #aaa);
+  font-size: var(--font-size-sm, 0.85rem);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.answer-view__override-btn:hover {
+  border-color: var(--accent-primary, #e85c1a);
+  color: var(--text-primary, #fff);
+}
+
 /* Back to Grid link */
 .answer-view__back-link {
   background: none;

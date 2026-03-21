@@ -209,6 +209,57 @@
   50% { transform: scale(1.15); }
 }
 
+/* Answer input form */
+.question-view__answer-form {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  max-width: 500px;
+  margin-top: 0.5rem;
+}
+
+.question-view__answer-input {
+  flex: 1;
+  padding: 0.85rem 1rem;
+  background: rgba(255, 255, 255, 0.06);
+  border: 2px solid rgba(255, 255, 255, 0.15);
+  border-radius: var(--radius, 12px);
+  color: var(--text-primary, #fff);
+  font-size: var(--font-size-md, 1rem);
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.question-view__answer-input::placeholder {
+  color: var(--text-muted, #666);
+}
+
+.question-view__answer-input:focus {
+  border-color: var(--accent-primary, #e85c1a);
+}
+
+.question-view__submit-btn {
+  padding: 0.85rem;
+  background: var(--accent-success, #4caf50);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius, 12px);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+}
+
+.question-view__submit-btn:hover {
+  background: #43a047;
+}
+
+.question-view__actions--secondary {
+  margin-top: 0.5rem;
+}
+
 /* Question view watermark — now using CSS background, hide the img element */
 .qv-watermark {
   display: none;

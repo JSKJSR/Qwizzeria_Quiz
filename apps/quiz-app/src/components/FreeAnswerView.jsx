@@ -1,17 +1,15 @@
 import { useEffect } from 'react';
 import '../styles/AnswerView.css';
 
-export default function FreeAnswerView({ question, onSelfAssess, onReturn }) {
+export default function FreeAnswerView({ question, isCorrect, userAnswer, xpEarned, onContinue, onOverride, onReturn }) {
   useEffect(() => {
     function handleKey(e) {
       if (e.key === 'Escape') onReturn();
-      if (e.key === '1') onSelfAssess(true);
-      if (e.key === '2') onSelfAssess(false);
-      if (e.key === '3') onSelfAssess(false, true);
+      if (e.key === 'Enter') onContinue();
     }
     window.addEventListener('keydown', handleKey);
     return () => window.removeEventListener('keydown', handleKey);
-  }, [onReturn, onSelfAssess]);
+  }, [onReturn, onContinue]);
 
   const hasMedia = question.mediaType !== 'none';
   const isVideo = question.mediaType === 'video';
@@ -26,11 +24,27 @@ export default function FreeAnswerView({ question, onSelfAssess, onReturn }) {
         className="av-watermark"
       />
       <div className="answer-view__content">
+        <div className={`answer-view__result-badge ${isCorrect ? 'answer-view__result-badge--correct' : 'answer-view__result-badge--wrong'}`}>
+          {isCorrect ? 'Correct!' : 'Not quite'}
+        </div>
+
+        {xpEarned > 0 && (
+          <div className="answer-view__xp-earned" aria-live="polite">
+            +{xpEarned} XP
+          </div>
+        )}
+
         <div className="answer-view__label">Answer</div>
         <div className="answer-view__text">{question.answer}</div>
 
         {question.answerExplanation && (
           <p className="answer-view__explanation">{question.answerExplanation}</p>
+        )}
+
+        {userAnswer && (
+          <div className={`answer-view__user-answer ${isCorrect ? 'answer-view__user-answer--correct' : 'answer-view__user-answer--wrong'}`}>
+            Your answer: &ldquo;{userAnswer}&rdquo; {isCorrect ? '\u2713' : '\u2717'}
+          </div>
         )}
 
         {hasMedia && (
@@ -52,28 +66,15 @@ export default function FreeAnswerView({ question, onSelfAssess, onReturn }) {
           </div>
         )}
 
-        <div className="answer-view__award-section">
-          <div className="answer-view__award-label">
-            Did you know the answer? ({question.points} pts)
-          </div>
-          <div className="answer-view__team-buttons">
-            <button
-              className="answer-view__team-btn"
-              style={{ borderColor: 'var(--accent-success, #4caf50)' }}
-              onClick={() => onSelfAssess(true)}
-            >
-              I Knew It <span className="answer-view__shortcut">1</span>
-            </button>
-            <button
-              className="answer-view__team-btn"
-              onClick={() => onSelfAssess(false)}
-            >
-              Didn&apos;t Know <span className="answer-view__shortcut">2</span>
-            </button>
-          </div>
-          <button className="answer-view__no-points-btn" onClick={() => onSelfAssess(false, true)}>
-            Skip <span className="answer-view__shortcut">3</span>
+        <div className="answer-view__feedback-actions">
+          <button className="answer-view__continue-btn" onClick={onContinue}>
+            Continue <span className="answer-view__shortcut">Enter</span>
           </button>
+          {!isCorrect && onOverride && (
+            <button className="answer-view__override-btn" onClick={onOverride}>
+              I was close
+            </button>
+          )}
         </div>
 
         <button className="answer-view__back-link" onClick={onReturn}>

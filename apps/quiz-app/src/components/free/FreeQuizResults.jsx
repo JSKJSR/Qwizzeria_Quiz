@@ -1,14 +1,46 @@
+import { useNavigate } from 'react-router-dom';
 import { getScoreMessage, getBestScore } from '@/utils/freeQuizStorage';
+import { BADGES } from '@/utils/gamification';
+import SignupNudge from './SignupNudge';
+
+function getNudgeMessage({ gamification, isNewBest, user }) {
+  if (user) return null;
+  if (!gamification) return null;
+
+  const { newBadges, leveledUp, playCount } = gamification;
+
+  // Priority: badge > level-up > personal best > play count
+  if (newBadges?.length > 0) {
+    const badge = BADGES.find(b => b.key === newBadges[0]);
+    return `You earned ${badge?.label || 'a badge'}! Sign up to display it.`;
+  }
+  if (leveledUp) {
+    return `Level ${gamification.level}: ${gamification.levelTitle} — Sign up to keep your rank.`;
+  }
+  if (isNewBest) {
+    return 'New best! Create an account so you never lose it.';
+  }
+  if (playCount >= 3) {
+    return `You've played ${playCount} quizzes — sign up to track everything.`;
+  }
+  if (playCount === 1) {
+    return 'Nice! Sign up free to save your progress.';
+  }
+  return null;
+}
 
 export default function FreeQuizResults({
   score, maxScore, results, allQuestions, bestStreak,
   isNewBest, shareConfirm, user,
   onShareScore, onPlayAgain, onNavigateHome,
+  gamification,
 }) {
+  const navigate = useNavigate();
   const pct = maxScore > 0 ? Math.round((score / maxScore) * 100) : 0;
   const correctCount = results.filter(r => r.isCorrect).length;
   const bestScoreData = getBestScore();
-  const playCount = parseInt(localStorage.getItem('qwizzeria_free_play_count') || '0', 10);
+
+  const nudgeMessage = getNudgeMessage({ gamification, isNewBest, user });
 
   return (
     <div className="free-quiz">
@@ -36,6 +68,57 @@ export default function FreeQuizResults({
           {getScoreMessage(score, maxScore)}
         </p>
 
+        {/* Gamification: XP + Level */}
+        {gamification && (
+          <div className="free-quiz__gamification-section">
+            <div className="free-quiz__xp-earned">
+              +{gamification.sessionXP} XP
+            </div>
+
+            {gamification.leveledUp && (
+              <div className="free-quiz__level-up" aria-live="polite">
+                Level Up!
+              </div>
+            )}
+
+            <div className="free-quiz__level-display">
+              <span className="free-quiz__level-title">
+                Level {gamification.level}: {gamification.levelTitle}
+              </span>
+              <div className="free-quiz__xp-progress-bar">
+                <div
+                  className="free-quiz__xp-progress-fill"
+                  style={{ width: `${gamification.levelProgress.pct}%` }}
+                />
+              </div>
+              {gamification.levelProgress.needed > 0 && (
+                <span className="free-quiz__xp-progress-text">
+                  {gamification.levelProgress.current} / {gamification.levelProgress.needed} XP to next level
+                </span>
+              )}
+            </div>
+
+            {/* Badges earned */}
+            {gamification.newBadges?.length > 0 && (
+              <div className="free-quiz__badges-earned">
+                <div className="free-quiz__badges-title">Badges Earned!</div>
+                <div className="free-quiz__badge-tiles">
+                  {gamification.newBadges.map(key => {
+                    const badge = BADGES.find(b => b.key === key);
+                    if (!badge) return null;
+                    return (
+                      <div key={key} className="free-quiz__badge-tile">
+                        <span className="free-quiz__badge-icon">{badge.icon}</span>
+                        <span className="free-quiz__badge-label">{badge.label}</span>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
         <div className="free-quiz__stats-bar">
           <div className="free-quiz__stat">
             <span className="free-quiz__stat-value">{correctCount}/{allQuestions.length}</span>
@@ -61,20 +144,6 @@ export default function FreeQuizResults({
           {shareConfirm ? 'Copied!' : 'Share Score'}
         </button>
 
-        {!user && (
-          <div className="free-quiz__leaderboard-teaser">
-            <span className="free-quiz__teaser-text">
-              Sign up to see how you rank on the global leaderboard!
-            </span>
-          </div>
-        )}
-
-        {!user && playCount >= 3 && (
-          <div className="free-quiz__play-nudge">
-            You&apos;ve played {playCount} times! Sign up to track your progress.
-          </div>
-        )}
-
         <div className="free-quiz__review">
           {allQuestions.map((q) => {
             const r = results.find(res => res.questionId === q.id);
@@ -88,6 +157,11 @@ export default function FreeQuizResults({
                   </span>
                 </div>
                 <div className="free-quiz__review-question">{q.question}</div>
+                {r?.userAnswer && (
+                  <div className={`free-quiz__review-user-answer free-quiz__review-user-answer--${status}`}>
+                    Your answer: &ldquo;{r.userAnswer}&rdquo;
+                  </div>
+                )}
                 <div className="free-quiz__review-answer">{q.answer}</div>
                 {q.answerExplanation && (
                   <div className="free-quiz__review-explanation">{q.answerExplanation}</div>
@@ -113,6 +187,15 @@ export default function FreeQuizResults({
             </button>
           </div>
         </div>
+
+        {/* Signup nudge for anonymous users */}
+        {nudgeMessage && (
+          <SignupNudge
+            message={nudgeMessage}
+            onSignUp={() => navigate('/')}
+            onDismiss={() => {}}
+          />
+        )}
 
         <div className="results-watermark">
           <img src="/qwizzeria-logo.png" alt="" className="results-watermark__logo" onError={(e) => { e.target.src = '/qwizzeria-logo.svg'; }} />
