@@ -172,8 +172,6 @@ export default function Profile() {
   return (
     <div className="profile">
       <SEO title="Settings" path="/profile" noIndex />
-      <h1 className="profile__title">Settings</h1>
-
       {/* Level & Progress Section */}
       {gamification && gamification.xp_total > 0 && (() => {
         const level = getLevel(gamification.xp_total);
@@ -230,6 +228,8 @@ export default function Profile() {
           </section>
         );
       })()}
+
+      <h1 className="profile__title">Settings</h1>
 
       {/* Account Section */}
       <section className="profile__section">
