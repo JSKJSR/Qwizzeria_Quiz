@@ -141,6 +141,21 @@
   line-height: 1;
 }
 
+/* Back to Grid link */
+.answer-view__back-link {
+  background: none;
+  border: none;
+  color: var(--text-muted, #888);
+  font-size: var(--font-size-sm, 0.85rem);
+  cursor: pointer;
+  padding: 0.5rem 1rem;
+  transition: color 0.2s;
+}
+
+.answer-view__back-link:hover {
+  color: var(--text-primary, #fff);
+}
+
 /* Answer view watermark — now using CSS background, hide the img element */
 .av-watermark {
   display: none;

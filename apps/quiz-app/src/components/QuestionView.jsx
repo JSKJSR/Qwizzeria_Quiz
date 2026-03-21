@@ -1,12 +1,83 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import '../styles/QuestionView.css';
 
-export default function QuestionView({ question, onRevealAnswer, onBack, onSkip }) {
+function CountdownRing({ seconds, total, onExpired }) {
+  const radius = 20;
+  const circumference = 2 * Math.PI * radius;
+  const progress = total > 0 ? seconds / total : 0;
+  const offset = circumference * (1 - progress);
+  const isUrgent = seconds <= 5 && seconds > 0;
+  const isExpired = seconds <= 0;
+  const expiredRef = useRef(false);
+
+  useEffect(() => {
+    if (isExpired && !expiredRef.current) {
+      expiredRef.current = true;
+      onExpired();
+    }
+  }, [isExpired, onExpired]);
+
+  // Reset on new question
+  useEffect(() => {
+    expiredRef.current = false;
+  }, [total]);
+
+  let strokeColor = 'var(--accent-primary, #e85c1a)';
+  if (isExpired) strokeColor = '#f44336';
+  else if (isUrgent) strokeColor = '#f44336';
+
+  return (
+    <div className={`qv-timer ${isUrgent ? 'qv-timer--urgent' : ''} ${isExpired ? 'qv-timer--expired' : ''}`}>
+      <svg width="52" height="52" viewBox="0 0 52 52" aria-hidden="true">
+        <circle
+          cx="26" cy="26" r={radius}
+          fill="none"
+          stroke="rgba(255,255,255,0.08)"
+          strokeWidth="3"
+        />
+        <circle
+          cx="26" cy="26" r={radius}
+          fill="none"
+          stroke={strokeColor}
+          strokeWidth="3"
+          strokeLinecap="round"
+          strokeDasharray={circumference}
+          strokeDashoffset={offset}
+          transform="rotate(-90 26 26)"
+          style={{ transition: 'stroke-dashoffset 0.3s linear, stroke 0.3s' }}
+        />
+      </svg>
+      <span className="qv-timer__text" aria-label={`${seconds} seconds remaining`}>
+        {isExpired ? '0' : seconds}
+      </span>
+    </div>
+  );
+}
+
+export default function QuestionView({ question, onRevealAnswer, onBack, onSkip, timerSeconds }) {
   const [mediaVisible, setMediaVisible] = useState(question.mediaType === 'image');
+  const [countdown, setCountdown] = useState(timerSeconds || 0);
+  const intervalRef = useRef(null);
 
   useEffect(() => {
     setMediaVisible(question.mediaType === 'image');
   }, [question]);
+
+  // Countdown timer
+  useEffect(() => {
+    if (!timerSeconds) return;
+    setCountdown(timerSeconds);
+    intervalRef.current = setInterval(() => {
+      setCountdown(prev => {
+        if (prev <= 1) {
+          clearInterval(intervalRef.current);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+    return () => clearInterval(intervalRef.current);
+  }, [timerSeconds, question.id]);
 
   useEffect(() => {
     function handleKey(e) {
@@ -30,7 +101,14 @@ export default function QuestionView({ question, onRevealAnswer, onBack, onSkip 
       />
       <div className="question-view__content">
         <div className="question-view__topic">{question.topic}</div>
-        <div className="question-view__points">{question.points} pts</div>
+
+        <div className="question-view__points-row">
+          {timerSeconds > 0 && (
+            <CountdownRing seconds={countdown} total={timerSeconds} onExpired={onRevealAnswer} />
+          )}
+          <div className="question-view__points">{question.points} pts</div>
+        </div>
+
         <div className="question-view__text">{question.question}</div>
 
         {hasMedia && isVideo && (

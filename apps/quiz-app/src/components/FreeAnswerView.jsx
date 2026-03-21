@@ -75,6 +75,10 @@ export default function FreeAnswerView({ question, onSelfAssess, onReturn }) {
             Skip <span className="answer-view__shortcut">3</span>
           </button>
         </div>
+
+        <button className="answer-view__back-link" onClick={onReturn}>
+          Back to Grid
+        </button>
       </div>
     </div>
   );

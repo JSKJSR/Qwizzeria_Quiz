@@ -171,6 +171,44 @@
   }
 }
 
+/* Countdown timer ring */
+.question-view__points-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.qv-timer {
+  position: relative;
+  width: 52px;
+  height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.qv-timer__text {
+  position: absolute;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-primary, #fff);
+}
+
+.qv-timer--urgent .qv-timer__text {
+  color: #f44336;
+  animation: timerPulse 0.5s ease infinite;
+}
+
+.qv-timer--expired .qv-timer__text {
+  color: #f44336;
+}
+
+@keyframes timerPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.15); }
+}
+
 /* Question view watermark — now using CSS background, hide the img element */
 .qv-watermark {
   display: none;

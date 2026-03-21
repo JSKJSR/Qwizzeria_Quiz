@@ -8,6 +8,7 @@ import QuestionView from './QuestionView';
 import FreeAnswerView from './FreeAnswerView';
 import '../styles/FreeQuiz.css';
 
+const SECONDS_PER_QUESTION = 15;
 const BEST_SCORE_KEY = 'qwizzeria_free_best_score';
 const PLAY_COUNT_KEY = 'qwizzeria_free_play_count';
 
@@ -73,6 +74,7 @@ const ACTIONS = {
   BACK_TO_GRID: 'BACK_TO_GRID',
   REVEAL_ANSWER: 'REVEAL_ANSWER',
   ANSWER_QUESTION: 'ANSWER_QUESTION',
+  ANSWER_AND_NEXT: 'ANSWER_AND_NEXT',
   RESET: 'RESET',
 };
 
@@ -131,6 +133,34 @@ function reducer(state, action) {
         ...state,
         phase: allDone ? 'results' : 'grid',
         currentQuestion: null,
+        completedQuestionIds: newCompleted,
+        results: newResults,
+        score: newScore,
+        streak: newStreak,
+        bestStreak: newBestStreak,
+      };
+    }
+
+    case ACTIONS.ANSWER_AND_NEXT: {
+      const { isCorrect, skipped, nextQuestion } = action;
+      const q = state.currentQuestion;
+      const earnedPoints = isCorrect ? q.points : 0;
+      const newStreak = isCorrect ? state.streak + 1 : 0;
+      const newBestStreak = Math.max(state.bestStreak, newStreak);
+      const newResults = [...state.results, {
+        questionId: q.id,
+        isCorrect,
+        skipped,
+        points: earnedPoints,
+      }];
+      const newCompleted = [...state.completedQuestionIds, q.id];
+      const newScore = state.score + earnedPoints;
+      const allDone = newCompleted.length >= state.allQuestions.length;
+
+      return {
+        ...state,
+        phase: allDone ? 'results' : 'question',
+        currentQuestion: allDone ? null : nextQuestion,
         completedQuestionIds: newCompleted,
         results: newResults,
         score: newScore,
@@ -225,9 +255,16 @@ export default function FreeQuiz({ resumeData } = {}) {
     dispatch({ type: ACTIONS.REVEAL_ANSWER });
   }, []);
 
-  const handleSelfAssess = useCallback((isCorrect, skipped = false) => {
+  const getNextUnanswered = useCallback(() => {
+    const completedSet = new Set(state.completedQuestionIds);
+    if (state.currentQuestion) completedSet.add(state.currentQuestion.id);
+    return state.allQuestions.find(q => !completedSet.has(q.id)) || null;
+  }, [state.allQuestions, state.completedQuestionIds, state.currentQuestion]);
+
+  const handleSelfAssessAndNext = useCallback((isCorrect, skipped = false) => {
     const q = state.currentQuestion;
     const timeSpentMs = questionStartRef.current ? Date.now() - questionStartRef.current : 0;
+    const nextQ = getNextUnanswered();
 
     if (isCorrect) {
       setScoreBounce(true);
@@ -239,9 +276,9 @@ export default function FreeQuiz({ resumeData } = {}) {
       }
     }
 
-    dispatch({ type: ACTIONS.ANSWER_QUESTION, isCorrect, skipped });
+    questionStartRef.current = Date.now();
+    dispatch({ type: ACTIONS.ANSWER_AND_NEXT, isCorrect, skipped, nextQuestion: nextQ });
 
-    // Record attempt (non-blocking)
     if (sessionIdRef.current) {
       recordAttempt({
         sessionId: sessionIdRef.current,
@@ -251,7 +288,7 @@ export default function FreeQuiz({ resumeData } = {}) {
         skipped,
       }).catch(err => console.warn('FreeQuiz: Failed to record attempt:', err));
     }
-  }, [state.currentQuestion, state.streak]);
+  }, [state.currentQuestion, state.streak, getNextUnanswered]);
 
   // Complete session when results are shown
   useEffect(() => {
@@ -490,6 +527,7 @@ export default function FreeQuiz({ resumeData } = {}) {
           question={currentQuestion}
           onRevealAnswer={handleRevealAnswer}
           onBack={handleBackToGrid}
+          timerSeconds={SECONDS_PER_QUESTION}
         />
       </div>
     );
@@ -515,7 +553,7 @@ export default function FreeQuiz({ resumeData } = {}) {
         </div>
         <FreeAnswerView
           question={currentQuestion}
-          onSelfAssess={handleSelfAssess}
+          onSelfAssess={handleSelfAssessAndNext}
           onReturn={handleBackToGrid}
         />
       </div>
