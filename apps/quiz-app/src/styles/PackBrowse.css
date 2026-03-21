@@ -45,16 +45,16 @@
 
 .pack-browse__filter-select {
   padding: 0.5rem 1rem;
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: var(--bg-card, #1a1015);
+  border: 1px solid var(--border-color, #2a1520);
   border-radius: 8px;
-  color: #fff;
+  color: var(--text-primary, #fff);
   font-size: 0.9rem;
 }
 
 .pack-browse__filter-select option {
-  background: #1a1015;
-  color: #fff;
+  background: var(--bg-card, #1a1015);
+  color: var(--text-primary, #fff);
 }
 
 .pack-browse__grid {

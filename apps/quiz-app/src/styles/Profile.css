@@ -57,10 +57,10 @@
 .profile__input {
   width: 100%;
   padding: 0.6rem 1rem;
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: var(--bg-input, rgba(255, 255, 255, 0.06));
+  border: 1px solid var(--border-input, rgba(255, 255, 255, 0.12));
   border-radius: 8px;
-  color: #fff;
+  color: var(--text-primary, #fff);
   font-size: 1rem;
   box-sizing: border-box;
 }

@@ -1,16 +1,8 @@
-import { useState, useRef, useEffect, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import '@/styles/HostScoreboard.css';
 import TimerControl from './TimerControl';
 import BuzzerQRCode from './BuzzerQRCode';
-
-function useHostTheme() {
-  const [light, setLight] = useState(false);
-  useEffect(() => {
-    document.documentElement.classList.toggle('host-light-theme', light);
-    return () => document.documentElement.classList.remove('host-light-theme');
-  }, [light]);
-  return [light, setLight];
-}
+import { useTheme } from '@/hooks/useTheme';
 
 const ADJUST_OPTIONS = [
   { label: '-5', delta: -5 },
@@ -42,7 +34,8 @@ export default function HostScoreboard({
   const hasScores = maxScore > 0;
   const [openPopover, setOpenPopover] = useState(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const [lightMode, setLightMode] = useHostTheme();
+  const { theme, toggleTheme } = useTheme();
+  const lightMode = theme === 'light';
   const [published, setPublished] = useState(false);
   const popoverRef = useRef(null);
 
@@ -180,12 +173,17 @@ export default function HostScoreboard({
               {published ? 'Published!' : 'Publish Scores'}
             </button>
           )}
-          <label className="scoreboard__theme-toggle">
-            <span className="scoreboard__theme-label">Light Mode</span>
-            <div className={`scoreboard__toggle ${lightMode ? 'scoreboard__toggle--on' : ''}`} onClick={() => setLightMode(l => !l)}>
-              <div className="scoreboard__toggle-knob" />
-            </div>
-          </label>
+          <button
+            className="scoreboard__theme-btn"
+            onClick={toggleTheme}
+            aria-label={lightMode ? 'Switch to dark mode' : 'Switch to light mode'}
+          >
+            {lightMode ? (
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" /></svg>
+            ) : (
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="5" /><line x1="12" y1="1" x2="12" y2="3" /><line x1="12" y1="21" x2="12" y2="23" /><line x1="4.22" y1="4.22" x2="5.64" y2="5.64" /><line x1="18.36" y1="18.36" x2="19.78" y2="19.78" /><line x1="1" y1="12" x2="3" y2="12" /><line x1="21" y1="12" x2="23" y2="12" /><line x1="4.22" y1="19.78" x2="5.64" y2="18.36" /><line x1="18.36" y1="5.64" x2="19.78" y2="4.22" /></svg>
+            )}
+          </button>
           {showEndQuiz && (
             <button className="scoreboard__end-btn" onClick={onEndQuiz}>
               {endButtonLabel}

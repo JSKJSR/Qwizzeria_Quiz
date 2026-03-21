@@ -34,6 +34,44 @@
   --radius-sm: 8px;
 
   --sidebar-width: 260px;
+
+  --bg-sidebar: #000000;
+  --bg-overlay-dim: rgba(0, 0, 0, 0.6);
+  --bg-subtle: rgba(255, 255, 255, 0.06);
+  --bg-subtle-hover: rgba(255, 255, 255, 0.12);
+  --bg-input: rgba(255, 255, 255, 0.06);
+  --border-input: rgba(255, 255, 255, 0.12);
+}
+
+/* ---- Light theme ---- */
+.light-theme {
+  --bg-primary: #f5f0eb;
+  --bg-secondary: #e8e0d8;
+  --bg-card: #ffffff;
+  --bg-card-hover: #f0e8e0;
+  --bg-completed: #e0d8d0;
+  --bg-overlay: rgba(0, 0, 0, 0.5);
+
+  --text-primary: #1a1015;
+  --text-secondary: #5a5055;
+  --text-muted: #8a8085;
+
+  --accent-primary: #d4521a;
+  --accent-primary-hover: #b84515;
+  --accent-secondary: #a0102a;
+  --accent-success: #2e8b32;
+  --accent-warning: #c08920;
+  --accent-danger: #c52e2e;
+
+  --border-color: #d0c8c0;
+  --border-active: #d4521a;
+
+  --bg-sidebar: #ffffff;
+  --bg-overlay-dim: rgba(0, 0, 0, 0.3);
+  --bg-subtle: rgba(0, 0, 0, 0.04);
+  --bg-subtle-hover: rgba(0, 0, 0, 0.08);
+  --bg-input: #ffffff;
+  --border-input: #d0c8c0;
 }
 
 *, *::before, *::after {
@@ -167,6 +205,16 @@ a:focus-visible {
   font-size: 0.8rem;
   font-style: italic;
   color: var(--text-muted, #998888);
+}
+
+/* Light theme component overrides */
+.light-theme .results-watermark__logo {
+  filter: brightness(1) saturate(1);
+}
+
+.light-theme .branded-empty__logo {
+  filter: none;
+  opacity: 0.4;
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -5,6 +5,7 @@ import { HelmetProvider } from 'react-helmet-async';
 import { initSupabase } from '@qwizzeria/supabase-client';
 import { Analytics } from '@vercel/analytics/react';
 import ErrorBoundary from './components/ErrorBoundary';
+import { ThemeProvider } from './hooks/useTheme';
 import App from './components/App';
 import './styles/global.css';
 
@@ -20,10 +21,12 @@ createRoot(document.getElementById('root')).render(
   <StrictMode>
     <HelmetProvider>
       <ErrorBoundary>
-        <BrowserRouter>
-          <App />
-          <Analytics />
-        </BrowserRouter>
+        <ThemeProvider>
+          <BrowserRouter>
+            <App />
+            <Analytics />
+          </BrowserRouter>
+        </ThemeProvider>
       </ErrorBoundary>
     </HelmetProvider>
   </StrictMode>
