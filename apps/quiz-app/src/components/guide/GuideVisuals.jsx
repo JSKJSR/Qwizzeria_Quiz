@@ -89,19 +89,15 @@ export function FreeQuizGridVisual() {
   );
 }
 
-export function SelfAssessVisual() {
+export function FreeQuizInputVisual() {
   return (
     <svg viewBox="0 0 200 120" aria-hidden="true" className="guide__svg">
-      <rect x="20" y="10" width="160" height="40" rx="6" fill="#1a1015" stroke="#2a1520" strokeWidth="1.5" />
-      <text x="100" y="25" textAnchor="middle" fill="#b0a0a5" fontSize="7">Answer:</text>
-      <text x="100" y="42" textAnchor="middle" fill="#f0f0f0" fontSize="9" fontWeight="bold">Mount Everest</text>
-      <rect x="15" y="62" width="55" height="30" rx="6" fill="rgba(46, 204, 113, 0.15)" stroke="#2ecc71" strokeWidth="1.5" />
-      <text x="42" y="81" textAnchor="middle" fill="#2ecc71" fontSize="8" fontWeight="bold">I Knew It</text>
-      <rect x="78" y="62" width="55" height="30" rx="6" fill="rgba(231, 76, 60, 0.15)" stroke="#e74c3c" strokeWidth="1.5" />
-      <text x="105" y="81" textAnchor="middle" fill="#e74c3c" fontSize="7" fontWeight="bold">Didn't Know</text>
-      <rect x="140" y="62" width="45" height="30" rx="6" fill="rgba(255,255,255,0.05)" stroke="#2a1520" strokeWidth="1.5" />
-      <text x="162" y="81" textAnchor="middle" fill="#b0a0a5" fontSize="8">Skip</text>
-      <text x="100" y="110" textAnchor="middle" fill="#b0a0a5" fontSize="7">Honest self-assessment</text>
+      <rect x="20" y="15" width="160" height="25" rx="4" fill="#1a1015" stroke="#2a1520" strokeWidth="1.5" />
+      <text x="100" y="31" textAnchor="middle" fill="#b0a0a5" fontSize="8">Mount Everst|</text>
+      <rect x="35" y="55" width="130" height="28" rx="6" fill="rgba(231, 76, 60, 0.15)" stroke="#e74c3c" strokeWidth="1.5" />
+      <text x="100" y="73" textAnchor="middle" fill="#e74c3c" fontSize="8" fontWeight="bold">Incorrect (Mount Everest)</text>
+      <rect x="65" y="90" width="70" height="20" rx="4" fill="#2a1520" />
+      <text x="100" y="103" textAnchor="middle" fill="#f0f0f0" fontSize="7">I was close!</text>
     </svg>
   );
 }

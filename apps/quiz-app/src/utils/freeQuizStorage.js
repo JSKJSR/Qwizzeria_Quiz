@@ -99,6 +99,25 @@ export function addTotalCorrect(count) {
   } catch { return 0; }
 }
 
+// --- Bulk read/write for DB sync ---
+export function loadGamificationState() {
+  return {
+    xp: getXP(),
+    streak: getStreak(),
+    badges: getBadges(),
+    totalCorrect: getTotalCorrect(),
+  };
+}
+
+export function applyGamificationState({ xp, streak, badges, totalCorrect }) {
+  try {
+    localStorage.setItem(XP_KEY, String(xp || 0));
+    if (streak) localStorage.setItem(STREAK_KEY, JSON.stringify(streak));
+    if (badges) localStorage.setItem(BADGES_KEY, JSON.stringify(badges));
+    localStorage.setItem(TOTAL_CORRECT_KEY, String(totalCorrect || 0));
+  } catch { /* ignore */ }
+}
+
 export function getScoreMessage(score, maxScore) {
   const pct = (score / maxScore) * 100;
   if (pct === 100) return 'Perfect score! You are a quiz master!';

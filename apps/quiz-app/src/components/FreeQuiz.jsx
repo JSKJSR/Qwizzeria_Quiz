@@ -1,10 +1,10 @@
 import { useReducer, useEffect, useCallback, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
-import { fetchGridQuestions, createQuizSession, recordAttempt, completeQuizSession, abandonQuizSession, updateSessionMetadata } from '@qwizzeria/supabase-client';
-import { saveBestScore, incrementPlayCount, getXP, addXP, getStreak, saveStreak, getBadges, addBadges, addTotalCorrect } from '@/utils/freeQuizStorage';
+import { fetchGridQuestions, createQuizSession, recordAttempt, updateAttempt, completeQuizSession, abandonQuizSession, updateSessionMetadata, fetchGamificationStats, saveGamificationStats } from '@qwizzeria/supabase-client';
+import { saveBestScore, incrementPlayCount, getXP, addXP, getStreak, saveStreak, getBadges, addBadges, addTotalCorrect, getTotalCorrect, applyGamificationState } from '@/utils/freeQuizStorage';
 import { matchAnswer } from '@/utils/answerMatcher';
-import { calculateXP, getLevel, getLevelTitle, getLevelProgress, checkNewBadges, checkDedicatedBadge, updateStreak, SESSION_COMPLETE_XP } from '@/utils/gamification';
+import { calculateXP, getLevel, getLevelTitle, getLevelProgress, checkNewBadges, updateStreak, SESSION_COMPLETE_XP } from '@/utils/gamification';
 import { reducer, initialState, ACTIONS, enrichWithMedia, QUESTION_COUNTS, SECONDS_PER_QUESTION } from './free/freeQuizReducer';
 import FreeQuizHeader from './free/FreeQuizHeader';
 import FreeQuizResults from './free/FreeQuizResults';
@@ -12,6 +12,46 @@ import TopicGrid from './TopicGrid';
 import QuestionView from './QuestionView';
 import FreeAnswerView from './FreeAnswerView';
 import '@/styles/FreeQuiz.css';
+
+function computeGamification(state) {
+  const correctCount = state.results.filter(r => r.isCorrect).length;
+  const totalSessionXP = state.sessionXP + SESSION_COMPLETE_XP;
+  const prevXP = getXP();
+  const newTotalXP = addXP(totalSessionXP);
+  const prevLevel = getLevel(prevXP);
+  const newLevel = getLevel(newTotalXP);
+
+  addTotalCorrect(correctCount);
+
+  const currentStreak = getStreak();
+  const updatedStreak = updateStreak(currentStreak);
+  saveStreak(updatedStreak);
+
+  const existingBadges = getBadges();
+  const playCount = incrementPlayCount();
+  const newBadges = checkNewBadges({
+    correctCount,
+    totalCount: state.allQuestions.length,
+    bestStreak: state.bestStreak,
+    playCount,
+    level: newLevel,
+    dailyStreakCount: updatedStreak.count,
+    existingBadges,
+  });
+  if (newBadges.length > 0) addBadges(newBadges);
+
+  return {
+    sessionXP: totalSessionXP,
+    totalXP: newTotalXP,
+    level: newLevel,
+    levelTitle: getLevelTitle(newLevel),
+    levelProgress: getLevelProgress(newTotalXP),
+    leveledUp: newLevel > prevLevel,
+    newBadges,
+    dailyStreak: updatedStreak,
+    playCount,
+  };
+}
 
 export default function FreeQuiz({ resumeData } = {}) {
   const navigate = useNavigate();
@@ -24,8 +64,26 @@ export default function FreeQuiz({ resumeData } = {}) {
   const [isNewBest, setIsNewBest] = useState(false);
   const [shareConfirm, setShareConfirm] = useState(false);
   const [questionCount, setQuestionCount] = useState(QUESTION_COUNTS[0]);
-  // Gamification results state
   const [gamificationData, setGamificationData] = useState(null);
+
+  // Read once for header props (not on every render like before)
+  const headerLevel = getLevel(getXP());
+  const headerDailyStreak = getStreak()?.count || 0;
+
+  const triggerCorrectAnimation = useCallback((nextStreak) => {
+    setScoreBounce(true);
+    setTimeout(() => setScoreBounce(false), 400);
+    if (nextStreak >= 2) {
+      setStreakFlash(nextStreak);
+      setTimeout(() => setStreakFlash(0), 1200);
+    }
+  }, []);
+
+  const trackAttempt = useCallback((questionId, isCorrect, timeSpentMs) => {
+    if (!sessionIdRef.current) return;
+    recordAttempt({ sessionId: sessionIdRef.current, questionId, isCorrect, timeSpentMs, skipped: false })
+      .catch(err => console.warn('FreeQuiz: Failed to record attempt:', err));
+  }, []);
 
   // --- Data loading ---
 
@@ -39,30 +97,40 @@ export default function FreeQuiz({ resumeData } = {}) {
         perCategory: config.perCategory,
       });
 
-      const enrichedTopics = topics.map(t => ({
-        ...t,
-        questions: t.questions.map(enrichWithMedia),
-      }));
+      const enrichedTopics = topics.map(t => ({ ...t, questions: t.questions.map(enrichWithMedia) }));
       const enrichedAll = allQuestions.map(enrichWithMedia);
-
       dispatch({ type: ACTIONS.LOAD_SUCCESS, topics: enrichedTopics, allQuestions: enrichedAll });
 
       if (user?.id) {
         try {
-          const session = await createQuizSession({
-            userId: user.id,
-            isFreeQuiz: true,
-            totalQuestions: enrichedAll.length,
-          });
+          const session = await createQuizSession({ userId: user.id, isFreeQuiz: true, totalQuestions: enrichedAll.length });
           sessionIdRef.current = session.id;
-          updateSessionMetadata(session.id, {
-            question_ids: enrichedAll.map(q => q.id),
-            format: 'jeopardy',
-          }).catch(err => console.warn('FreeQuiz: Failed to save metadata:', err));
+          updateSessionMetadata(session.id, { question_ids: enrichedAll.map(q => q.id), format: 'jeopardy' })
+            .catch(err => console.warn('FreeQuiz: Failed to save metadata:', err));
         } catch (err) {
           console.error('FreeQuiz: Failed to create session:', err);
           sessionIdRef.current = null;
         }
+        // Hydrate localStorage from DB (cross-device sync — merge, don't overwrite)
+        fetchGamificationStats(user.id).then(db => {
+          if (!db) return;
+          const localXP = getXP();
+          const localBadges = getBadges();
+          const localCorrect = getTotalCorrect();
+          const localStreak = getStreak();
+          // Take max of each numeric field; union badges
+          const mergedXP = Math.max(db.xp_total || 0, localXP);
+          const mergedCorrect = Math.max(db.total_correct || 0, localCorrect);
+          const mergedBadges = [...new Set([...localBadges, ...(db.badges || [])])];
+          const dbStreakCount = db.daily_streak_count || 0;
+          const localStreakCount = localStreak?.count || 0;
+          const mergedStreak = dbStreakCount >= localStreakCount
+            ? { count: dbStreakCount, lastPlayDate: db.daily_streak_last_play }
+            : localStreak || { count: 0, lastPlayDate: null };
+          if (mergedXP > localXP || mergedBadges.length > localBadges.length || mergedCorrect > localCorrect || dbStreakCount > localStreakCount) {
+            applyGamificationState({ xp: mergedXP, streak: mergedStreak, badges: mergedBadges, totalCorrect: mergedCorrect });
+          }
+        }).catch(() => {});
       }
     } catch (err) {
       dispatch({ type: ACTIONS.LOAD_ERROR, error: err.message });
@@ -70,9 +138,7 @@ export default function FreeQuiz({ resumeData } = {}) {
   }, [user, questionCount]);
 
   useEffect(() => {
-    if (resumeData?.sessionId) {
-      sessionIdRef.current = resumeData.sessionId;
-    }
+    if (resumeData?.sessionId) sessionIdRef.current = resumeData.sessionId;
     loadQuiz();
   }, [loadQuiz, resumeData]);
 
@@ -97,77 +163,35 @@ export default function FreeQuiz({ resumeData } = {}) {
     const q = state.currentQuestion;
     const timeSpentMs = questionStartRef.current ? Date.now() - questionStartRef.current : 0;
     const { isMatch } = matchAnswer(text, q.answer);
-    const xpEarned = calculateXP({
-      isCorrect: isMatch,
-      points: q.points,
-      timeSpentMs,
-      streak: isMatch ? state.streak : 0,
-    });
+    const xpEarned = calculateXP({ isCorrect: isMatch, points: q.points, timeSpentMs, streak: isMatch ? state.streak : 0 });
 
-    if (isMatch) {
-      setScoreBounce(true);
-      setTimeout(() => setScoreBounce(false), 400);
-      const nextStreak = state.streak + 1;
-      if (nextStreak >= 2) {
-        setStreakFlash(nextStreak);
-        setTimeout(() => setStreakFlash(0), 1200);
-      }
-    }
+    if (isMatch) triggerCorrectAnimation(state.streak + 1);
 
     dispatch({ type: ACTIONS.SUBMIT_ANSWER, userAnswer: text, isCorrect: isMatch, xpEarned });
-
-    if (sessionIdRef.current) {
-      recordAttempt({
-        sessionId: sessionIdRef.current,
-        questionId: q.id,
-        isCorrect: isMatch,
-        timeSpentMs,
-        skipped: false,
-      }).catch(err => console.warn('FreeQuiz: Failed to record attempt:', err));
-    }
-  }, [state.currentQuestion, state.streak]);
+    trackAttempt(q.id, isMatch, timeSpentMs);
+  }, [state.currentQuestion, state.streak, triggerCorrectAnimation, trackAttempt]);
 
   const handleContinue = useCallback(() => {
-    const nextQ = getNextUnanswered();
     questionStartRef.current = Date.now();
-    dispatch({ type: ACTIONS.CONTINUE, nextQuestion: nextQ });
+    dispatch({ type: ACTIONS.CONTINUE, nextQuestion: getNextUnanswered() });
   }, [getNextUnanswered]);
 
   const handleOverrideCorrect = useCallback(() => {
     const q = state.currentQuestion;
     const timeSpentMs = questionStartRef.current ? Date.now() - questionStartRef.current : 0;
-    const xpEarned = calculateXP({
-      isCorrect: true,
-      points: q.points,
-      timeSpentMs,
-      streak: state.streak,
-    });
+    const xpEarned = calculateXP({ isCorrect: true, points: q.points, timeSpentMs, streak: state.streak });
 
-    setScoreBounce(true);
-    setTimeout(() => setScoreBounce(false), 400);
-    const nextStreak = state.streak + 1;
-    if (nextStreak >= 2) {
-      setStreakFlash(nextStreak);
-      setTimeout(() => setStreakFlash(0), 1200);
-    }
-
+    triggerCorrectAnimation(state.streak + 1);
     dispatch({ type: ACTIONS.OVERRIDE_CORRECT, xpEarned });
-
     if (sessionIdRef.current) {
-      recordAttempt({
-        sessionId: sessionIdRef.current,
-        questionId: q.id,
-        isCorrect: true,
-        timeSpentMs,
-        skipped: false,
-      }).catch(err => console.warn('FreeQuiz: Failed to re-record attempt:', err));
+      updateAttempt(sessionIdRef.current, q.id, { isCorrect: true })
+        .catch(err => console.warn('FreeQuiz: Failed to update attempt:', err));
     }
-  }, [state.currentQuestion, state.streak]);
+  }, [state.currentQuestion, state.streak, triggerCorrectAnimation]);
 
   const handleQuit = useCallback(() => {
     if (sessionIdRef.current) {
-      abandonQuizSession(sessionIdRef.current)
-        .catch(err => console.warn('FreeQuiz: Failed to abandon session:', err));
+      abandonQuizSession(sessionIdRef.current).catch(err => console.warn('FreeQuiz: Failed to abandon session:', err));
     }
     navigate('/');
   }, [navigate]);
@@ -191,68 +215,40 @@ export default function FreeQuiz({ resumeData } = {}) {
     loadQuiz(qc);
   }, [loadQuiz]);
 
-  // Complete session + gamification when results are shown
+  // Complete session + gamification on results
   useEffect(() => {
-    if (state.phase === 'results') {
-      const max = state.allQuestions.reduce((sum, q) => sum + q.points, 0);
-      setIsNewBest(saveBestScore(state.score, max));
-      const playCount = incrementPlayCount();
+    if (state.phase !== 'results') return;
+    const max = state.allQuestions.reduce((sum, q) => sum + q.points, 0);
+    setIsNewBest(saveBestScore(state.score, max));
+    const gamData = computeGamification(state);
+    setGamificationData(gamData);
 
-      // Gamification updates
-      const correctCount = state.results.filter(r => r.isCorrect).length;
-      const totalSessionXP = state.sessionXP + SESSION_COMPLETE_XP;
-      const prevXP = getXP();
-      const newTotalXP = addXP(totalSessionXP);
-      const prevLevel = getLevel(prevXP);
-      const newLevel = getLevel(newTotalXP);
-      const leveledUp = newLevel > prevLevel;
-
-      addTotalCorrect(correctCount);
-
-      // Streak
-      const currentStreak = getStreak();
-      const updatedStreak = updateStreak(currentStreak);
-      saveStreak(updatedStreak);
-
-      // Badges
-      const existingBadges = getBadges();
-      const newBadges = checkNewBadges({
-        correctCount,
-        totalCount: state.allQuestions.length,
-        bestStreak: state.bestStreak,
-        playCount,
-        level: newLevel,
-        existingBadges,
-      });
-      if (checkDedicatedBadge(updatedStreak.count, existingBadges)) {
-        newBadges.push('dedicated');
-      }
-      if (newBadges.length > 0) addBadges(newBadges);
-
-      setGamificationData({
-        sessionXP: totalSessionXP,
-        totalXP: newTotalXP,
-        level: newLevel,
-        levelTitle: getLevelTitle(newLevel),
-        levelProgress: getLevelProgress(newTotalXP),
-        leveledUp,
-        newBadges,
-        dailyStreak: updatedStreak,
-        playCount,
-      });
-
-      if (sessionIdRef.current) {
-        completeQuizSession(sessionIdRef.current, state.score)
-          .catch(err => console.error('FreeQuiz: Failed to complete session:', err));
-      }
+    if (sessionIdRef.current) {
+      completeQuizSession(sessionIdRef.current, state.score)
+        .catch(err => console.error('FreeQuiz: Failed to complete session:', err));
     }
-  }, [state.phase, state.score, state.allQuestions, state.sessionXP, state.bestStreak, state.results]);
+
+    // Sync gamification to DB for logged-in users
+    if (user?.id) {
+      saveGamificationStats(user.id, {
+        xp_total: gamData.totalXP,
+        daily_streak_count: gamData.dailyStreak.count,
+        daily_streak_last_play: gamData.dailyStreak.lastPlayDate,
+        badges: getBadges(),
+        total_correct: getTotalCorrect(),
+      }).catch(err => console.warn('FreeQuiz: Failed to sync gamification:', err));
+    }
+  }, [state.phase, state.score, state.allQuestions, state.sessionXP, state.bestStreak, state.results, user]);
 
   // --- Render ---
 
   const { phase, topics, allQuestions, currentQuestion, completedQuestionIds, score, streak, bestStreak, results, error, userAnswer, isCorrect, questionXP } = state;
   const totalQuestions = allQuestions.length;
   const maxScore = allQuestions.reduce((sum, q) => sum + q.points, 0);
+
+  const streakFlashEl = streakFlash > 0 && (
+    <div className="free-quiz__streak-flash" aria-live="polite">{streakFlash} in a row!</div>
+  );
 
   if (phase === 'loading') {
     return (
@@ -300,12 +296,8 @@ export default function FreeQuiz({ resumeData } = {}) {
   if (phase === 'question' && currentQuestion) {
     return (
       <div className="free-quiz">
-        {streakFlash > 0 && (
-          <div className="free-quiz__streak-flash" aria-live="polite">
-            {streakFlash} in a row!
-          </div>
-        )}
-        <FreeQuizHeader score={score} streak={streak} scoreBounce={scoreBounce}>
+        {streakFlashEl}
+        <FreeQuizHeader score={score} streak={streak} scoreBounce={scoreBounce} level={headerLevel} dailyStreak={headerDailyStreak}>
           <button className="free-quiz__back-btn" onClick={handleBackToGrid}>Back to Grid</button>
         </FreeQuizHeader>
         <QuestionView
@@ -322,12 +314,8 @@ export default function FreeQuiz({ resumeData } = {}) {
   if (phase === 'feedback' && currentQuestion) {
     return (
       <div className="free-quiz">
-        {streakFlash > 0 && (
-          <div className="free-quiz__streak-flash" aria-live="polite">
-            {streakFlash} in a row!
-          </div>
-        )}
-        <FreeQuizHeader score={score} streak={streak} scoreBounce={scoreBounce} />
+        {streakFlashEl}
+        <FreeQuizHeader score={score} streak={streak} scoreBounce={scoreBounce} level={headerLevel} dailyStreak={headerDailyStreak} />
         <FreeAnswerView
           question={currentQuestion}
           isCorrect={isCorrect}
@@ -353,10 +341,8 @@ export default function FreeQuiz({ resumeData } = {}) {
         </div>
       )}
 
-      <FreeQuizHeader score={score} streak={streak} scoreBounce={scoreBounce}>
-        <span className="free-quiz__progress-text">
-          {completedQuestionIds.length} / {totalQuestions}
-        </span>
+      <FreeQuizHeader score={score} streak={streak} scoreBounce={scoreBounce} level={headerLevel} dailyStreak={headerDailyStreak}>
+        <span className="free-quiz__progress-text">{completedQuestionIds.length} / {totalQuestions}</span>
         <div className="free-quiz__header-right">
           {user && <span className="free-quiz__user-email">{user.email}</span>}
           <button className="free-quiz__back-btn" onClick={handleQuit}>Quit</button>
@@ -382,11 +368,7 @@ export default function FreeQuiz({ resumeData } = {}) {
         </div>
       )}
 
-      {streakFlash > 0 && (
-        <div className="free-quiz__streak-flash" aria-live="polite">
-          {streakFlash} in a row!
-        </div>
-      )}
+      {streakFlashEl}
 
       <TopicGrid
         topics={topics}

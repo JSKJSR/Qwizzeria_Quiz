@@ -210,3 +210,37 @@ export async function fetchAllUsersWithEmail({ search, role, page = 1, pageSize 
   if (error) throw new Error(`Failed to fetch users: ${error.message}`);
   return data || { users: [], total: 0 };
 }
+
+/**
+ * Fetch gamification stats for a user.
+ */
+export async function fetchGamificationStats(userId) {
+  const supabase = getSupabase();
+  const { data, error } = await supabase
+    .from('user_profiles')
+    .select('xp_total, daily_streak_count, daily_streak_last_play, badges, total_correct')
+    .eq('id', userId)
+    .maybeSingle();
+
+  if (error) throw new Error(`Failed to fetch gamification stats: ${error.message}`);
+  return data;
+}
+
+/**
+ * Save gamification stats for a user (fire-and-forget from caller).
+ */
+export async function saveGamificationStats(userId, stats) {
+  const supabase = getSupabase();
+  const { error } = await supabase
+    .from('user_profiles')
+    .update({
+      xp_total: stats.xp_total,
+      daily_streak_count: stats.daily_streak_count,
+      daily_streak_last_play: stats.daily_streak_last_play,
+      badges: stats.badges,
+      total_correct: stats.total_correct,
+    })
+    .eq('id', userId);
+
+  if (error) throw new Error(`Failed to save gamification stats: ${error.message}`);
+}

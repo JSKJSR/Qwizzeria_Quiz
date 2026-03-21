@@ -1,5 +1,5 @@
 import { GuideSection, GuideStep, GuideTip } from '../GuideBase';
-import { FreeQuizGridVisual, SelfAssessVisual } from '../GuideVisuals';
+import { FreeQuizGridVisual, FreeQuizInputVisual } from '../GuideVisuals';
 
 export default function FreeQuizSection() {
   return (
@@ -18,9 +18,9 @@ export default function FreeQuizSection() {
       />
       <GuideStep
         number={3}
-        title="Self-Assess"
-        description="After the answer is revealed, honestly rate yourself: 'I Knew It' earns the points, 'Didn't Know' scores zero, or 'Skip' to move on."
-        visual={<SelfAssessVisual />}
+        title="Answer & Progress"
+        description="Type your answer. The quiz uses fuzzy matching — close answers count! If you're marked wrong but were close, tap 'I was close' to override."
+        visual={<FreeQuizInputVisual />}
       />
       <GuideTip>
         The free quiz pulls random questions each time, so every session is different. Your score is tracked for the session — try to beat your personal best!

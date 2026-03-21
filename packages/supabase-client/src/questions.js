@@ -141,6 +141,22 @@ export async function recordAttempt({ sessionId, questionId, isCorrect, timeSpen
 }
 
 /**
+ * Update an existing question attempt (e.g., when user overrides to "I was close").
+ */
+export async function updateAttempt(sessionId, questionId, { isCorrect }) {
+  const supabase = getSupabase();
+
+  const { error } = await supabase
+    .from('question_attempts')
+    .update({ is_correct: isCorrect })
+    .match({ session_id: sessionId, question_id: questionId });
+
+  if (error) {
+    throw new Error(`Failed to update attempt: ${error.message}`);
+  }
+}
+
+/**
  * Complete a quiz session with the final score.
  */
 export async function completeQuizSession(sessionId, score) {

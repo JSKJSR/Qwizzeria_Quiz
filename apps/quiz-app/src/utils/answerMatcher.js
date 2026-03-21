@@ -3,6 +3,10 @@
  * Deliberately generous — the goal is engagement, not exam-level strictness.
  */
 
+const MIN_SUBSTRING_LEN = 3;
+const MAX_EDIT_DIST_SHORT = 2; // answers ≤ 10 chars
+const MAX_EDIT_DIST_LONG = 3;  // answers > 10 chars
+
 function levenshtein(a, b) {
   const m = a.length, n = b.length;
   const dp = Array.from({ length: m + 1 }, () => Array(n + 1).fill(0));
@@ -28,35 +32,24 @@ function normalize(str) {
     .trim();
 }
 
-/**
- * @param {string} userInput - What the user typed
- * @param {string} correctAnswer - The correct answer from the database
- * @returns {{ isMatch: boolean, normalizedInput: string, normalizedAnswer: string }}
- */
 export function matchAnswer(userInput, correctAnswer) {
   const normalizedInput = normalize(userInput || '');
   const normalizedAnswer = normalize(correctAnswer || '');
 
-  // Empty input is always wrong
   if (!normalizedInput) {
     return { isMatch: false, normalizedInput, normalizedAnswer };
   }
 
-  // Exact match after normalization
   if (normalizedInput === normalizedAnswer) {
     return { isMatch: true, normalizedInput, normalizedAnswer };
   }
 
-  // Substring containment (bidirectional)
-  if (normalizedAnswer.includes(normalizedInput) || normalizedInput.includes(normalizedAnswer)) {
-    // Only match if the substring is meaningful (at least 3 chars)
-    if (normalizedInput.length >= 3) {
-      return { isMatch: true, normalizedInput, normalizedAnswer };
-    }
+  if (normalizedInput.length >= MIN_SUBSTRING_LEN &&
+      (normalizedAnswer.includes(normalizedInput) || normalizedInput.includes(normalizedAnswer))) {
+    return { isMatch: true, normalizedInput, normalizedAnswer };
   }
 
-  // Levenshtein distance for typo tolerance
-  const maxDist = normalizedAnswer.length <= 10 ? 2 : 3;
+  const maxDist = normalizedAnswer.length <= 10 ? MAX_EDIT_DIST_SHORT : MAX_EDIT_DIST_LONG;
   if (levenshtein(normalizedInput, normalizedAnswer) <= maxDist) {
     return { isMatch: true, normalizedInput, normalizedAnswer };
   }

@@ -16,16 +16,18 @@ export const LEVELS = [
 ];
 
 export const BADGES = [
-  { key: 'first_steps', label: 'First Steps', icon: '\u{1F31F}' },
-  { key: 'sharp_shooter', label: 'Sharp Shooter', icon: '\u{1F3AF}' },
-  { key: 'on_fire', label: 'On Fire', icon: '\u{1F525}' },
-  { key: 'big_brain', label: 'Big Brain', icon: '\u{1F9E0}' },
-  { key: 'dedicated', label: 'Dedicated', icon: '\u{1F4C5}' },
-  { key: 'legend', label: 'Legend', icon: '\u{1F451}' },
+  { key: 'first_steps', label: 'First Steps', icon: '\u{1F31F}', check: (o) => o.playCount >= 1 },
+  { key: 'sharp_shooter', label: 'Sharp Shooter', icon: '\u{1F3AF}', check: (o) => o.totalCount > 0 && o.correctCount === o.totalCount },
+  { key: 'on_fire', label: 'On Fire', icon: '\u{1F525}', check: (o) => o.bestStreak >= 5 },
+  { key: 'big_brain', label: 'Big Brain', icon: '\u{1F9E0}', check: (o) => o.totalCount >= 27 && o.correctCount / o.totalCount >= 0.9 },
+  { key: 'dedicated', label: 'Dedicated', icon: '\u{1F4C5}', check: (o) => o.dailyStreakCount >= 7 },
+  { key: 'legend', label: 'Legend', icon: '\u{1F451}', check: (o) => o.level >= 10 },
 ];
 
-const SPEED_BONUS_THRESHOLD_MS = 5000;
+const SPEED_BONUS_MS = 5000;
 const SPEED_BONUS_XP = 5;
+const STREAK_XP_MULTIPLIER = 3;
+export const SESSION_COMPLETE_XP = 25;
 
 /**
  * Calculate XP earned for a single question answer.
@@ -33,16 +35,10 @@ const SPEED_BONUS_XP = 5;
 export function calculateXP({ isCorrect, points, timeSpentMs, streak }) {
   if (!isCorrect) return 0;
   let xp = points;
-  if (timeSpentMs > 0 && timeSpentMs < SPEED_BONUS_THRESHOLD_MS) {
-    xp += SPEED_BONUS_XP;
-  }
-  if (streak >= 1) {
-    xp += streak * 3;
-  }
+  if (timeSpentMs > 0 && timeSpentMs < SPEED_BONUS_MS) xp += SPEED_BONUS_XP;
+  if (streak >= 1) xp += streak * STREAK_XP_MULTIPLIER;
   return xp;
 }
-
-export const SESSION_COMPLETE_XP = 25;
 
 /**
  * Get level number (1-10) from total XP.
@@ -58,13 +54,11 @@ export function getLevel(totalXP) {
  * Get level title string.
  */
 export function getLevelTitle(level) {
-  const entry = LEVELS.find(l => l.level === level);
-  return entry ? entry.title : LEVELS[0].title;
+  return LEVELS.find(l => l.level === level)?.title || LEVELS[0].title;
 }
 
 /**
- * Get XP progress within current level (for progress bar).
- * Returns { current, needed, pct }
+ * Get XP progress within current level for progress bar.
  */
 export function getLevelProgress(totalXP) {
   const level = getLevel(totalXP);
@@ -77,70 +71,30 @@ export function getLevelProgress(totalXP) {
 }
 
 /**
- * Check which new badges were earned this session.
- * Returns array of newly earned badge keys.
+ * Check which new badges were earned. Returns array of newly earned badge keys.
  */
-export function checkNewBadges({ correctCount, totalCount, bestStreak, playCount, level, existingBadges }) {
-  const earned = [];
-  const has = (key) => existingBadges.includes(key);
-
-  if (!has('first_steps') && playCount >= 1) {
-    earned.push('first_steps');
-  }
-  if (!has('sharp_shooter') && totalCount > 0 && correctCount === totalCount) {
-    earned.push('sharp_shooter');
-  }
-  if (!has('on_fire') && bestStreak >= 5) {
-    earned.push('on_fire');
-  }
-  if (!has('big_brain') && totalCount >= 27 && correctCount / totalCount >= 0.9) {
-    earned.push('big_brain');
-  }
-  if (!has('dedicated') && playCount >= 7) {
-    // Note: this checks play count as a proxy — daily streak check is in storage
-    // The caller should pass the actual streak count as playCount for this badge
-  }
-  if (!has('legend') && level >= 10) {
-    earned.push('legend');
-  }
-
-  return earned;
-}
-
-/**
- * Check dedicated badge separately (needs daily streak count).
- */
-export function checkDedicatedBadge(dailyStreakCount, existingBadges) {
-  if (!existingBadges.includes('dedicated') && dailyStreakCount >= 7) {
-    return true;
-  }
-  return false;
+export function checkNewBadges(opts) {
+  return BADGES
+    .filter(b => !opts.existingBadges.includes(b.key) && b.check(opts))
+    .map(b => b.key);
 }
 
 /**
  * Update daily streak based on current date.
- * @param {{ count: number, lastPlayDate: string } | null} currentStreak
- * @returns {{ count: number, lastPlayDate: string }}
  */
 export function updateStreak(currentStreak) {
   const today = new Date().toISOString().split('T')[0];
 
-  if (!currentStreak || !currentStreak.lastPlayDate) {
+  if (!currentStreak?.lastPlayDate) {
     return { count: 1, lastPlayDate: today };
   }
-
   if (currentStreak.lastPlayDate === today) {
-    return currentStreak; // Already played today
+    return currentStreak;
   }
 
-  const lastDate = new Date(currentStreak.lastPlayDate);
-  const todayDate = new Date(today);
-  const diffDays = Math.floor((todayDate - lastDate) / (1000 * 60 * 60 * 24));
-
+  const diffDays = Math.floor((new Date(today) - new Date(currentStreak.lastPlayDate)) / 86400000);
   if (diffDays === 1) {
     return { count: currentStreak.count + 1, lastPlayDate: today };
   }
-
-  // Missed a day — reset
   return { count: 1, lastPlayDate: today };
 }

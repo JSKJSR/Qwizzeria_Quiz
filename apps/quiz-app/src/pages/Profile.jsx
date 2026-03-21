@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
-import { fetchUserProfile, upsertUserProfile, fetchUserStats, getSupabase, updatePassword, deleteOwnAccount } from '@qwizzeria/supabase-client';
+import { fetchUserProfile, upsertUserProfile, fetchUserStats, fetchGamificationStats, getSupabase, updatePassword, deleteOwnAccount } from '@qwizzeria/supabase-client';
+import { getLevel, getLevelTitle, getLevelProgress, BADGES } from '../utils/gamification';
 import SEO from '../components/SEO';
 import '../styles/Profile.css';
 
@@ -17,6 +18,7 @@ export default function Profile() {
 
   const [, setProfile] = useState(null);
   const [stats, setStats] = useState(null);
+  const [gamification, setGamification] = useState(null);
   const [displayName, setDisplayName] = useState('');
   const [saving, setSaving] = useState(false);
   const [saveMsg, setSaveMsg] = useState(null);
@@ -53,13 +55,15 @@ export default function Profile() {
     async function load() {
       setError(null);
       try {
-        const [profileData, statsData] = await Promise.all([
+        const [profileData, statsData, gamData] = await Promise.all([
           fetchUserProfile(user.id).catch(() => null),
           fetchUserStats(user.id).catch(() => null),
+          fetchGamificationStats(user.id).catch(() => null),
         ]);
         setProfile(profileData);
         setDisplayName(profileData?.display_name || '');
         setStats(statsData);
+        setGamification(gamData);
       } catch {
         setError('Failed to load profile. Please try again.');
       } finally {
@@ -321,6 +325,63 @@ export default function Profile() {
           </div>
         </section>
       )}
+
+      {/* Level & Progress Section */}
+      {gamification && gamification.xp_total > 0 && (() => {
+        const level = getLevel(gamification.xp_total);
+        const title = getLevelTitle(level);
+        const progress = getLevelProgress(gamification.xp_total);
+        const earnedBadges = BADGES.filter(b => (gamification.badges || []).includes(b.key));
+        return (
+          <section className="profile__section">
+            <div className="profile__section-header">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+              </svg>
+              <h2>Level & Progress</h2>
+            </div>
+
+            <div className="profile__level-info">
+              <div className="profile__level-badge">Lv. {level}</div>
+              <div className="profile__level-details">
+                <span className="profile__level-title">{title}</span>
+                <span className="profile__xp-text">{gamification.xp_total} XP</span>
+              </div>
+            </div>
+
+            <div className="profile__xp-bar">
+              <div className="profile__xp-fill" style={{ width: `${Math.round(progress * 100)}%` }} />
+            </div>
+
+            <div className="profile__gamification-stats">
+              {gamification.daily_streak_count > 0 && (
+                <div className="profile__stat-card">
+                  <div className="profile__stat-value">{gamification.daily_streak_count}</div>
+                  <div className="profile__stat-label">Day Streak</div>
+                </div>
+              )}
+              <div className="profile__stat-card">
+                <div className="profile__stat-value">{gamification.total_correct || 0}</div>
+                <div className="profile__stat-label">Total Correct</div>
+              </div>
+            </div>
+
+            {earnedBadges.length > 0 && (
+              <div className="profile__badges">
+                <p className="profile__badges-label">Badges Earned</p>
+                <div className="profile__badges-grid">
+                  {earnedBadges.map(b => (
+                    <div key={b.key} className="profile__badge">
+                      <span className="profile__badge-icon">{b.icon}</span>
+                      <span className="profile__badge-name">{b.label}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </section>
+        );
+      })()}
 
       {/* Password Section */}
       <section className="profile__section">

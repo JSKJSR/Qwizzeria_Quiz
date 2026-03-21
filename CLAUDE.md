@@ -72,7 +72,7 @@ Access restricted via role checks (editor, admin, superadmin).
 - **Dashboard layout**: Sidebar (260px) + content area, mobile hamburger at ≤768px
 - **Auth routing**: AuthRedirect (landing or /dashboard), ProtectedRoute (guards all authenticated routes)
 - **Quiz grid layout**: Flat CSS Grid card layout (`repeat(auto-fill, minmax(220px, 1fr))`) used by all quiz modes — each card shows category name + points in red. Shared `TopicGrid` component for Free Quiz and Pack Play; separate `HostTopicGrid` for Host Quiz (same visual design).
-- **Free quiz**: Local useReducer state machine in FreeQuiz.jsx (loading/grid/question/answer/results/error). Engagement features: streak counter (2+ consecutive correct), score bounce animation, question count selector (9/18/27), keyboard shortcuts (1/2/3 for self-assessment), personal best tracking (localStorage), share score button, play count nudge for anonymous users, stats bar on results (correct/accuracy/best streak).
+- **Free quiz**: Local useReducer state machine in FreeQuiz.jsx (loading/grid/question/feedback/results/error). Uses Duolingo-style answer input with fuzzy matching. Engagement features: lightweight gamification (XP, levels, daily streak, badges) synced to DB for logged-in users, score bounce animation, question count selector (9/18/27), personal best tracking (localStorage), share score button, context-aware signup nudge for anonymous users, and statistics/progression feedback on results.
 - **Pack play formats**:
   - **Jeopardy** (PackPlayJeopardy): Groups questions by category into flat card grid, 10/20/30 pts
   - **Sequential** (PackPlaySequential): Questions one-by-one in sort_order, 10 pts each

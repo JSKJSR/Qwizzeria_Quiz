@@ -305,3 +305,93 @@
   color: var(--text-secondary, #b0a0a5);
   margin: 0;
 }
+
+/* Level & Progress */
+.profile__level-info {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.profile__level-badge {
+  background: var(--accent-primary, #e85c1a);
+  color: #fff;
+  font-weight: 700;
+  font-size: 1.1rem;
+  padding: 0.4rem 0.8rem;
+  border-radius: 8px;
+  white-space: nowrap;
+}
+
+.profile__level-details {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.profile__level-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #fff;
+}
+
+.profile__xp-text {
+  font-size: 0.8rem;
+  color: #999;
+}
+
+.profile__xp-bar {
+  height: 8px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 1rem;
+}
+
+.profile__xp-fill {
+  height: 100%;
+  background: var(--accent-primary, #e85c1a);
+  border-radius: 4px;
+  transition: width 0.3s ease;
+}
+
+.profile__gamification-stats {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.profile__badges-label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #999;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 0.5rem;
+}
+
+.profile__badges-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.profile__badge {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  padding: 0.4rem 0.75rem;
+}
+
+.profile__badge-icon {
+  font-size: 1.2rem;
+}
+
+.profile__badge-name {
+  font-size: 0.8rem;
+  color: #ccc;
+}

@@ -1,12 +1,7 @@
 import { useTheme } from '@/hooks/useTheme';
-import { getXP, getStreak } from '@/utils/freeQuizStorage';
-import { getLevel } from '@/utils/gamification';
 
-export default function FreeQuizHeader({ score, streak, scoreBounce, children }) {
+export default function FreeQuizHeader({ score, streak, scoreBounce, level, dailyStreak, children }) {
   const { theme, toggleTheme } = useTheme();
-  const totalXP = getXP();
-  const level = getLevel(totalXP);
-  const dailyStreak = getStreak();
 
   return (
     <div className="free-quiz__header">
@@ -31,10 +26,10 @@ export default function FreeQuizHeader({ score, streak, scoreBounce, children })
         <div className="free-quiz__streak-badge">{streak} streak</div>
       )}
 
-      {dailyStreak && dailyStreak.count >= 2 && (
-        <div className="free-quiz__daily-streak" aria-label={`${dailyStreak.count} day streak`}>
+      {dailyStreak >= 2 && (
+        <div className="free-quiz__daily-streak" aria-label={`${dailyStreak} day streak`}>
           <span className="free-quiz__fire-icon" aria-hidden="true">{'\u{1F525}'}</span>
-          {dailyStreak.count}
+          {dailyStreak}
         </div>
       )}
 
