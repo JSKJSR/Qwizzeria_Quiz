@@ -1,8 +1,28 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { fetchDoublesSessionsAdmin } from '@qwizzeria/supabase-client';
 import DoublesGradeModal from '../../components/admin/doubles/DoublesGradeModal';
 
 const PAGE_SIZE = 20;
+
+function getGradeSummary(session) {
+  const grades = session.metadata?.grades;
+  if (!grades) return null;
+  const total = Object.keys(grades).length;
+  const correct = Object.values(grades).filter(Boolean).length;
+  return { total, correct };
+}
+
+function getAnsweredCount(session) {
+  const responses = session.metadata?.responses;
+  if (!responses) return 0;
+  return Object.values(responses).filter(Boolean).length;
+}
+
+const STATUS_BADGE_MAP = {
+  completed: 'active',
+  in_progress: 'draft',
+  abandoned: 'archived',
+};
 
 export default function DoublesSessions() {
   const [sessions, setSessions] = useState([]);
@@ -12,12 +32,10 @@ export default function DoublesSessions() {
   const [error, setError] = useState(null);
   const [gradingSession, setGradingSession] = useState(null);
 
-  // Filters
   const [searchInput, setSearchInput] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [debouncedSearch, setDebouncedSearch] = useState('');
 
-  // Debounced search
   useEffect(() => {
     const timer = setTimeout(() => {
       setDebouncedSearch(searchInput);
@@ -50,20 +68,23 @@ export default function DoublesSessions() {
     loadSessions();
   }, [loadSessions]);
 
-  const totalPages = Math.ceil(total / PAGE_SIZE);
+  // Client-side search filter (user display name, player name, or pack title)
+  const filtered = useMemo(() => {
+    if (!debouncedSearch) return sessions;
+    const term = debouncedSearch.toLowerCase();
+    return sessions.filter((s) => {
+      const displayName = (s.user_profiles?.display_name || '').toLowerCase();
+      const playerName = (s.metadata?.player_name || '').toLowerCase();
+      const packTitle = (s.quiz_packs?.title || '').toLowerCase();
+      return displayName.includes(term) || playerName.includes(term) || packTitle.includes(term);
+    });
+  }, [sessions, debouncedSearch]);
 
-  // Client-side search filter (user display name or player name)
-  const filtered = debouncedSearch
-    ? sessions.filter((s) => {
-        const term = debouncedSearch.toLowerCase();
-        const displayName = (s.user_profiles?.display_name || '').toLowerCase();
-        const playerName = (s.metadata?.player_name || '').toLowerCase();
-        const packTitle = (s.quiz_packs?.title || '').toLowerCase();
-        return displayName.includes(term) || playerName.includes(term) || packTitle.includes(term);
-      })
-    : sessions;
+  // Use filtered count for pagination when searching, server count otherwise
+  const effectiveTotal = debouncedSearch ? filtered.length : total;
+  const totalPages = Math.ceil(effectiveTotal / PAGE_SIZE);
 
-  const handleGraded = (sessionId, grades) => {
+  const handleGraded = useCallback((sessionId, grades) => {
     setSessions((prev) =>
       prev.map((s) =>
         s.id === sessionId
@@ -71,15 +92,12 @@ export default function DoublesSessions() {
           : s
       )
     );
-  };
+  }, []);
 
-  const gradedCount = (session) => {
-    const grades = session.metadata?.grades;
-    if (!grades) return null;
-    const total = Object.keys(grades).length;
-    const correct = Object.values(grades).filter(Boolean).length;
-    return { total, correct };
-  };
+  const handleStatusChange = useCallback((e) => {
+    setStatusFilter(e.target.value);
+    setPage(1);
+  }, []);
 
   return (
     <div>
@@ -92,11 +110,8 @@ export default function DoublesSessions() {
         </div>
       </div>
 
-      {error && (
-        <div className="alert alert--error">{error}</div>
-      )}
+      {error && <div className="alert alert--error">{error}</div>}
 
-      {/* Filters */}
       <div className="filters-bar">
         <input
           className="form-input"
@@ -104,11 +119,13 @@ export default function DoublesSessions() {
           placeholder="Search user, player, or pack..."
           value={searchInput}
           onChange={(e) => setSearchInput(e.target.value)}
+          aria-label="Search doubles sessions"
         />
         <select
           className="form-select"
           value={statusFilter}
-          onChange={(e) => { setStatusFilter(e.target.value); setPage(1); }}
+          onChange={handleStatusChange}
+          aria-label="Filter by status"
         >
           <option value="all">All Statuses</option>
           <option value="completed">Completed</option>
@@ -117,7 +134,6 @@ export default function DoublesSessions() {
         </select>
       </div>
 
-      {/* Table */}
       {loading ? (
         <p style={{ color: 'var(--text-secondary)' }}>Loading sessions...</p>
       ) : filtered.length === 0 ? (
@@ -140,18 +156,15 @@ export default function DoublesSessions() {
             </thead>
             <tbody>
               {filtered.map((session) => {
-                const gc = gradedCount(session);
-                const answeredCount = session.metadata?.responses
-                  ? Object.values(session.metadata.responses).filter(Boolean).length
-                  : 0;
-
+                const gc = getGradeSummary(session);
+                const answered = getAnsweredCount(session);
                 return (
                   <tr key={session.id}>
                     <td>{session.user_profiles?.display_name || '—'}</td>
                     <td className="truncate">{session.quiz_packs?.title || '—'}</td>
                     <td>P{session.metadata?.part || '?'}</td>
                     <td>{session.metadata?.player_name || '—'}</td>
-                    <td>{answeredCount}/{session.total_questions}</td>
+                    <td>{answered}/{session.total_questions}</td>
                     <td>
                       {gc ? (
                         <span className={`badge ${gc.correct === gc.total ? 'badge--active' : 'badge--draft'}`}>
@@ -162,7 +175,7 @@ export default function DoublesSessions() {
                       )}
                     </td>
                     <td>
-                      <span className={`badge badge--${session.status === 'completed' ? 'active' : session.status === 'in_progress' ? 'draft' : 'archived'}`}>
+                      <span className={`badge badge--${STATUS_BADGE_MAP[session.status] || 'archived'}`}>
                         {session.status}
                       </span>
                     </td>
@@ -187,6 +200,7 @@ export default function DoublesSessions() {
                 className="btn btn-secondary btn-sm"
                 disabled={page <= 1}
                 onClick={() => setPage((p) => p - 1)}
+                aria-label="Previous page"
               >
                 Previous
               </button>
@@ -195,6 +209,7 @@ export default function DoublesSessions() {
                 className="btn btn-secondary btn-sm"
                 disabled={page >= totalPages}
                 onClick={() => setPage((p) => p + 1)}
+                aria-label="Next page"
               >
                 Next
               </button>

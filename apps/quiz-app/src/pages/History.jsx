@@ -223,7 +223,7 @@ export default function History() {
                       ) : isDoubles ? (
                         <DoublesHistoryDetail metadata={session.metadata} />
                       ) : isLoadingDetail ? (
-                        <p style={{ color: '#999', fontSize: '0.85rem', padding: '0.5rem' }}>Loading details...</p>
+                        <p className="history__detail-message">Loading details...</p>
                       ) : detail?.attempts?.length > 0 ? (
                         <table className="history__detail-table">
                           <thead>
@@ -257,7 +257,7 @@ export default function History() {
                           </tbody>
                         </table>
                       ) : (
-                        <p style={{ color: '#999', fontSize: '0.85rem', padding: '0.5rem' }}>
+                        <p className="history__detail-message">
                           No attempt details available.
                         </p>
                       )}

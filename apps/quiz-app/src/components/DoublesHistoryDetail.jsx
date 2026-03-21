@@ -1,46 +1,20 @@
-import { useState, useEffect } from 'react';
-import { fetchQuestionsByIds } from '@qwizzeria/supabase-client';
+import { useMemo } from 'react';
+import useQuestionsById from '@/hooks/useQuestionsById';
 
 export default function DoublesHistoryDetail({ metadata }) {
-  const [questions, setQuestions] = useState([]);
-  const [loading, setLoading] = useState(true);
-
-  const responses = metadata?.responses || {};
+  const responses = useMemo(() => metadata?.responses || {}, [metadata]);
   const grades = metadata?.grades || {};
-  const questionIds = Object.keys(responses);
+  const questionIds = useMemo(() => Object.keys(responses), [responses]);
+  const hasGrades = Object.keys(grades).length > 0;
 
-  useEffect(() => {
-    const ids = Object.keys(metadata?.responses || {});
-    if (ids.length === 0) {
-      setLoading(false);
-      return;
-    }
-
-    let cancelled = false;
-    fetchQuestionsByIds(ids)
-      .then((data) => {
-        if (!cancelled) setQuestions(data);
-      })
-      .catch(() => {})
-      .finally(() => {
-        if (!cancelled) setLoading(false);
-      });
-
-    return () => { cancelled = true; };
-  }, [metadata]);
+  const { questionMap, loading } = useQuestionsById(questionIds);
 
   if (loading) {
-    return <p style={{ color: '#999', fontSize: '0.85rem', padding: '0.5rem' }}>Loading details...</p>;
+    return <p className="history__detail-message">Loading details...</p>;
   }
 
   if (questionIds.length === 0) {
-    return <p style={{ color: '#999', fontSize: '0.85rem', padding: '0.5rem' }}>No responses recorded.</p>;
-  }
-
-  // Build a lookup for quick access
-  const questionMap = {};
-  for (const q of questions) {
-    questionMap[q.id] = q;
+    return <p className="history__detail-message">No responses recorded.</p>;
   }
 
   const timerMinutes = metadata.timer_duration_seconds
@@ -49,10 +23,10 @@ export default function DoublesHistoryDetail({ metadata }) {
 
   return (
     <div>
-      <p style={{ color: '#64b5f6', fontSize: '0.85rem', fontWeight: 600, margin: '0.75rem 0 0.25rem' }}>
+      <p className="history__doubles-info">
         {metadata.player_name && <>{metadata.player_name} &middot; </>}
         Part {metadata.part}
-        {timerMinutes && <> &middot; {timerMinutes} min timer</>}
+        {timerMinutes != null && <> &middot; {timerMinutes} min timer</>}
       </p>
 
       <table className="history__detail-table">
@@ -63,7 +37,7 @@ export default function DoublesHistoryDetail({ metadata }) {
             <th>Category</th>
             <th>Correct Answer</th>
             <th>Your Response</th>
-            {Object.keys(grades).length > 0 && <th>Grade</th>}
+            {hasGrades && <th>Grade</th>}
           </tr>
         </thead>
         <tbody>
@@ -76,8 +50,8 @@ export default function DoublesHistoryDetail({ metadata }) {
                 <td>{q?.question_text || '—'}</td>
                 <td>{q?.category || '—'}</td>
                 <td>{q?.answer_text || '—'}</td>
-                <td>{responses[qId] || <span style={{ color: '#888' }}>No answer</span>}</td>
-                {Object.keys(grades).length > 0 && (
+                <td>{responses[qId] || <span className="history__detail-skipped">No answer</span>}</td>
+                {hasGrades && (
                   <td>
                     {grade === true && <span className="history__detail-correct">Correct</span>}
                     {grade === false && <span className="history__detail-wrong">Wrong</span>}

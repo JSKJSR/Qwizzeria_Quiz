@@ -677,6 +677,43 @@
   white-space: nowrap;
 }
 
+/* Doubles grade modal */
+.doubles-grade-modal {
+  max-width: 700px;
+  max-height: 80vh;
+  overflow: auto;
+}
+
+.doubles-grade-modal__subtitle {
+  color: var(--text-secondary);
+  font-size: var(--font-size-xs);
+  margin-bottom: 1rem;
+}
+
+.doubles-grade-modal__loading {
+  color: var(--text-secondary);
+}
+
+.doubles-grade-modal__table-wrap {
+  font-size: var(--font-size-xs);
+}
+
+.doubles-grade-modal__cell-text {
+  max-width: 180px;
+  word-break: break-word;
+}
+
+.doubles-grade-modal__col-grade {
+  text-align: center;
+  width: 60px;
+}
+
+.doubles-grade-modal__summary {
+  color: var(--text-secondary);
+  font-size: var(--font-size-xs);
+  margin: 1rem 0 0.5rem;
+}
+
 /* Responsive: hide columns on narrow screens */
 @media (max-width: 900px) {
   .data-table .col-tournaments,

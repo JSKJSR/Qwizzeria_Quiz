@@ -226,9 +226,10 @@ export async function fetchAllUsersWithEmail({ search, role, page = 1, pageSize 
 export async function fetchDoublesSessionsAdmin({ userId, packId, status, dateFrom, dateTo, page = 1, pageSize = 20 } = {}) {
   const supabase = getSupabase();
 
+  // quiz_sessions.user_id FKs to auth.users, not user_profiles — fetch sessions + packs, then batch-resolve display names
   let query = supabase
     .from('quiz_sessions')
-    .select('id, user_id, quiz_pack_id, started_at, completed_at, score, total_questions, status, metadata, quiz_packs(title), user_profiles(display_name)', { count: 'exact' })
+    .select('id, user_id, quiz_pack_id, started_at, completed_at, score, total_questions, status, metadata, quiz_packs(title)', { count: 'exact' })
     .eq('metadata->>format', 'doubles');
 
   if (userId) query = query.eq('user_id', userId);
@@ -243,7 +244,29 @@ export async function fetchDoublesSessionsAdmin({ userId, packId, status, dateFr
 
   const { data, error, count } = await query;
   if (error) throw new Error(`Failed to fetch doubles sessions: ${error.message}`);
-  return { data: data || [], count: count || 0, page, pageSize };
+
+  const sessions = data || [];
+
+  // Batch-fetch display names for unique user IDs
+  const userIds = [...new Set(sessions.map((s) => s.user_id).filter(Boolean))];
+  let profileMap = {};
+  if (userIds.length > 0) {
+    const { data: profiles } = await supabase
+      .from('user_profiles')
+      .select('id, display_name')
+      .in('id', userIds);
+    for (const p of (profiles || [])) {
+      profileMap[p.id] = p;
+    }
+  }
+
+  // Attach user_profiles to each session
+  const enriched = sessions.map((s) => ({
+    ...s,
+    user_profiles: profileMap[s.user_id] || null,
+  }));
+
+  return { data: enriched, count: count || 0, page, pageSize };
 }
 
 /**
