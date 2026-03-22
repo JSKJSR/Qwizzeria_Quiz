@@ -16,7 +16,7 @@ export default function DoublesEventSelect({ onSelect }) {
   if (loading) {
     return (
       <div className="doubles-select">
-        <h2 className="doubles-select__title">Quizzeria Doubles</h2>
+        <h2 className="doubles-select__title">Qwizzeria Doubles</h2>
         <p className="doubles-select__subtitle">Loading events...</p>
       </div>
     );
@@ -25,7 +25,7 @@ export default function DoublesEventSelect({ onSelect }) {
   if (error) {
     return (
       <div className="doubles-select">
-        <h2 className="doubles-select__title">Quizzeria Doubles</h2>
+        <h2 className="doubles-select__title">Qwizzeria Doubles</h2>
         <div className="doubles-error">{error}</div>
       </div>
     );
@@ -34,7 +34,7 @@ export default function DoublesEventSelect({ onSelect }) {
   if (packs.length === 0) {
     return (
       <div className="doubles-select">
-        <h2 className="doubles-select__title">Quizzeria Doubles</h2>
+        <h2 className="doubles-select__title">Qwizzeria Doubles</h2>
         <p className="doubles-select__empty">No doubles events available right now. Check back later!</p>
       </div>
     );
@@ -42,7 +42,7 @@ export default function DoublesEventSelect({ onSelect }) {
 
   return (
     <div className="doubles-select">
-      <h2 className="doubles-select__title">Quizzeria Doubles</h2>
+      <h2 className="doubles-select__title">Qwizzeria Doubles</h2>
       <p className="doubles-select__subtitle">Select an event to begin</p>
 
       <div className="doubles-select__grid">
