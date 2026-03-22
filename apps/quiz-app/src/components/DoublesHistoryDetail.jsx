@@ -24,7 +24,9 @@ export default function DoublesHistoryDetail({ metadata }) {
   return (
     <div>
       <p className="history__doubles-info">
-        {metadata.player_name && <>{metadata.player_name} &middot; </>}
+        {metadata.player_name && <>{metadata.player_name}</>}
+        {metadata.passive_player_name && <> + {metadata.passive_player_name}</>}
+        {metadata.player_name && <> &middot; </>}
         Part {metadata.part}
         {timerMinutes != null && <> &middot; {timerMinutes} min timer</>}
       </p>

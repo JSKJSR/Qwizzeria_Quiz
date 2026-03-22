@@ -50,20 +50,25 @@ export async function fetchUserHistory({ userId, type = 'all', status = 'all', p
 
   let query = supabase
     .from('quiz_sessions')
-    .select('id, is_free_quiz, quiz_pack_id, started_at, completed_at, score, total_questions, status, metadata, quiz_packs(title)', { count: 'exact' })
-    .eq('user_id', userId);
+    .select('id, is_free_quiz, quiz_pack_id, started_at, completed_at, score, total_questions, status, metadata, quiz_packs(title)', { count: 'exact' });
 
-  if (type === 'free') query = query.eq('is_free_quiz', true);
-  if (type === 'pack') {
-    query = query.eq('is_free_quiz', false)
-      .neq('metadata->>is_host_quiz', 'true')
-      .neq('metadata->>format', 'doubles');
-  }
-  if (type === 'host') {
-    query = query.eq('is_free_quiz', false).eq('metadata->>is_host_quiz', 'true');
-  }
+  // Doubles uses .or() to include sessions where user is passive participant
   if (type === 'doubles') {
-    query = query.eq('is_free_quiz', false).eq('metadata->>format', 'doubles');
+    query = query
+      .eq('is_free_quiz', false)
+      .eq('metadata->>format', 'doubles')
+      .or(`user_id.eq.${userId},metadata->>passive_user_id.eq.${userId}`);
+  } else {
+    query = query.eq('user_id', userId);
+    if (type === 'free') query = query.eq('is_free_quiz', true);
+    if (type === 'pack') {
+      query = query.eq('is_free_quiz', false)
+        .neq('metadata->>is_host_quiz', 'true')
+        .neq('metadata->>format', 'doubles');
+    }
+    if (type === 'host') {
+      query = query.eq('is_free_quiz', false).eq('metadata->>is_host_quiz', 'true');
+    }
   }
   if (status !== 'all') query = query.eq('status', status);
 

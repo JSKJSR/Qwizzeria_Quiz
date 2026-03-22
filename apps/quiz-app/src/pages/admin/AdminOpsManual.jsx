@@ -488,7 +488,7 @@ export default function AdminOpsManual() {
             <tr>
               <td><TierBadge tier="free" /></td>
               <td>{TIERS.free.price}</td>
-              <td>Free Quiz, Dashboard, Profile, Guide</td>
+              <td>Free Quiz (Gamified), Dashboard, Profile, Guide</td>
             </tr>
             <tr>
               <td><TierBadge tier="basic" /></td>
@@ -644,7 +644,7 @@ WHERE user_id = 'editor-user-uuid'
             <tr><td><code>pack_questions</code></td><td>Pack-question junction with sort_order</td></tr>
             <tr><td><code>quiz_sessions</code></td><td>Player quiz sessions</td></tr>
             <tr><td><code>question_attempts</code></td><td>Per-question results</td></tr>
-            <tr><td><code>user_profiles</code></td><td>Display names, avatars, roles</td></tr>
+            <tr><td><code>user_profiles</code></td><td>Display names, roles, avatars, XP/badges</td></tr>
             <tr><td><code>subscriptions</code></td><td>Stripe subscription state</td></tr>
             <tr><td><code>stripe_webhook_log</code></td><td>Webhook idempotency + audit</td></tr>
             <tr><td><code>content_permissions</code></td><td>Editor pack/category grants</td></tr>

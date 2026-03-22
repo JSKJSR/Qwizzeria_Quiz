@@ -61,8 +61,8 @@ export default function DoublesQuiz() {
     }
   }, []);
 
-  const handleSetPlayer = useCallback((name) => {
-    dispatch({ type: ACTIONS.SET_PLAYER, payload: name });
+  const handleSetPlayer = useCallback(({ playerName, passiveParticipant }) => {
+    dispatch({ type: ACTIONS.SET_PLAYER, payload: { playerName, passiveParticipant } });
   }, []);
 
   const handleAcceptRules = useCallback(() => {
@@ -134,6 +134,7 @@ export default function DoublesQuiz() {
           timerMinutes={state.timerMinutes}
           part1Count={state.part1Questions.length}
           part2Count={state.part2Questions.length}
+          partnerName={state.passiveParticipant?.displayName}
           onAccept={handleAcceptRules}
           onBack={handleBackToSelect}
         />
@@ -219,6 +220,7 @@ export default function DoublesQuiz() {
         <DoublesResultsView
           pack={state.pack}
           playerName={state.playerName}
+          passiveParticipant={state.passiveParticipant}
           part1Questions={state.part1Questions}
           part2Questions={state.part2Questions}
           responses={state.responses}

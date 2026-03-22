@@ -166,7 +166,7 @@ export default function History() {
                         )}
                         {isDoubles && (
                           <span className="history__type-badge history__type-badge--doubles">
-                            DOUBLES P{session.metadata?.part || '?'}
+                            {session.metadata?.passive_user_id === user?.id ? 'PARTNER' : 'DOUBLES'} P{session.metadata?.part || '?'}
                           </span>
                         )}
                         {session.is_free_quiz ? 'Free Quiz' : session.quiz_packs?.title || 'Quiz Pack'}
@@ -176,6 +176,7 @@ export default function History() {
                         {session.total_questions} questions
                         {isHostQuiz && ` · ${hostParticipants.length} participants`}
                         {isDoubles && session.metadata?.player_name && ` · ${session.metadata.player_name}`}
+                        {isDoubles && session.metadata?.passive_player_name && ` + ${session.metadata.passive_player_name}`}
                       </div>
                     </div>
                     <span className="history__item-score">

@@ -15,6 +15,7 @@ This document provides a comprehensive map of the user flow, product features, a
 - **Dashboard**: High-level stats, quick-play actions, resumable sessions.
 - **Browse Packs**: Filterable grid of curated content (Tier-gated).
 - **Play Quiz**:
+    - **Free Quiz**: Free-to-play random questions featuring Duolingo-style text input with fuzzy matching. Includes a full progression system (XP, Levels, Badges, Daily Streaks) that syncs to user profiles.
     - **Jeopardy Grid**: Non-linear topic selection with point values.
     - **Sequential**: Linear question-by-question flow.
 - **Results**: Score summary, accuracy percentage, and history persistence.
@@ -63,7 +64,7 @@ The Admin CMS is integrated into the application and accessible at `/admin` for 
 Qwizzeria implements a hybrid SaaS and One-Time Purchase model powered by Stripe.
 
 - **3-Day Free Trial**: Full access to all features (including AI generation) for 3 days.
-- **Free**: $0. Access to Daily Free Quiz and Profile/Dashboard.
+- **Free**: $0. Access to Free Quiz (with XP/Level/Badge progression), Dashboard, Profile, and Guide.
 - **Player Tier**: $3.99/mo. Unlocks the entire Quiz Pack library, History, and Global Leaderboards.
 - **Host Tier**: $12.99/mo. Unlocks local/party Game Hosting, AI Quiz Generation (Claude 3.5), Real-Time Buzzer, and Tournament brackets.
 - **Game Night Pass**: A $4.99 one-time purchase granting 48-hour access to the Host Tier features.

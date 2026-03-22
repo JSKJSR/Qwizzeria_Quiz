@@ -26,6 +26,8 @@ export default function useDoublesDbSync(state, dispatch, userId) {
           format: 'doubles',
           part: state.phase === 'part1' ? 1 : 2,
           player_name: state.playerName,
+          passive_user_id: state.passiveParticipant?.userId || null,
+          passive_player_name: state.passiveParticipant?.displayName || null,
           responses: state.responses,
           timer_started_at: state.timerStartedAt,
           timer_duration_seconds: state.timerMinutes * 60,
@@ -34,7 +36,7 @@ export default function useDoublesDbSync(state, dispatch, userId) {
     }, 30000);
 
     return () => clearInterval(dbSyncRef.current);
-  }, [state.phase, state.part1SessionId, state.part2SessionId, state.playerName, state.responses, state.timerStartedAt, state.timerMinutes]);
+  }, [state.phase, state.part1SessionId, state.part2SessionId, state.playerName, state.passiveParticipant?.userId, state.passiveParticipant?.displayName, state.responses, state.timerStartedAt, state.timerMinutes]);
 
   const createPartSession = useCallback(async (partNumber) => {
     if (!userId) return;
@@ -57,6 +59,8 @@ export default function useDoublesDbSync(state, dispatch, userId) {
         format: 'doubles',
         part: partNumber,
         player_name: state.playerName,
+        passive_user_id: state.passiveParticipant?.userId || null,
+        passive_player_name: state.passiveParticipant?.displayName || null,
         responses: {},
         timer_started_at: new Date().toISOString(),
         timer_duration_seconds: state.timerMinutes * 60,
@@ -64,7 +68,7 @@ export default function useDoublesDbSync(state, dispatch, userId) {
     } catch {
       // Non-blocking — local state is the source of truth
     }
-  }, [userId, state.pack, state.part1Questions, state.part2Questions, state.playerName, state.timerMinutes, dispatch]);
+  }, [userId, state.pack, state.part1Questions, state.part2Questions, state.playerName, state.passiveParticipant, state.timerMinutes, dispatch]);
 
   const savePartToDb = useCallback(async (partNumber) => {
     const sessionId = partNumber === 1 ? state.part1SessionId : state.part2SessionId;
@@ -78,6 +82,8 @@ export default function useDoublesDbSync(state, dispatch, userId) {
         format: 'doubles',
         part: partNumber,
         player_name: state.playerName,
+        passive_user_id: state.passiveParticipant?.userId || null,
+        passive_player_name: state.passiveParticipant?.displayName || null,
         responses: state.responses,
         timer_started_at: state.timerStartedAt,
         timer_duration_seconds: state.timerMinutes * 60,

@@ -1,12 +1,15 @@
 import { useState } from 'react';
 
-export default function DoublesRules({ packTitle, timerMinutes, part1Count, part2Count, onAccept, onBack }) {
+export default function DoublesRules({ packTitle, timerMinutes, part1Count, part2Count, partnerName, onAccept, onBack }) {
   const [accepted, setAccepted] = useState(false);
 
   return (
     <div className="doubles-rules">
       <h2 className="doubles-rules__title">Rules &amp; Instructions</h2>
-      <p className="doubles-rules__subtitle">{packTitle}</p>
+      <p className="doubles-rules__subtitle">
+        {packTitle}
+        {partnerName && <> &middot; Playing with <strong>{partnerName}</strong></>}
+      </p>
 
       <div className="doubles-rules__card">
         <ul className="doubles-rules__list">

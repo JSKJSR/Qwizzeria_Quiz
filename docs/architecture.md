@@ -83,7 +83,7 @@ Host Quiz supports a **Tournament Mode** for single-elimination bracket competit
 
 ## 🧪 Quality & Accessibility
 
-- **Test Coverage**: 168 tests across 15 files (Vitest + jsdom) — includes core state machines (reducers), AI generation logic, tournament brackets, session persistence, media detection, auth, and sub-millisecond buzzer resolution.
+- **Test Coverage**: 181 tests across 16 files (Vitest + jsdom) — includes gamification progression, core state machines (reducers), AI generation logic, tournament brackets, session persistence, media detection, auth, and sub-millisecond buzzer resolution.
 - **Error Handling**: All data-fetching pages display error UI with retry buttons (no silent failures).
 - **WCAG Compliance**: focus-visible states, WCAG-AA contrast ratios, 44px minimum touch targets, `prefers-reduced-motion` support, semantic ARIA labels on interactive elements.
 - **CI/CD**: GitHub Actions pipeline (lint → build → test) on every push/PR; Vercel deployment config.

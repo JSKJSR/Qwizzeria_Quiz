@@ -422,7 +422,7 @@ CSV export with columns: Name, Email, Role, Quizzes, Tournaments, Avg Score, Las
 
 | Tier | Price | Features |
 |---|---|---|
-| **Free** | $0 | Free Quiz, Dashboard, Profile, Guide |
+| **Free** | $0 | Free Quiz (Gamified), Dashboard, Profile, Guide |
 | **Basic** | $9.99/mo | + Packs, History, Leaderboard, Resume |
 | **Pro** | $99.99/mo | + Doubles, Host Quiz, Tournaments, AI Generate, Buzzer, Export, Certificates |
 
@@ -572,7 +572,7 @@ ORDER BY created_at DESC;
 | `pack_questions` | Junction: pack ↔ question with sort_order |
 | `quiz_sessions` | Player quiz sessions |
 | `question_attempts` | Per-question results |
-| `user_profiles` | Display names, avatars, roles |
+| `user_profiles` | Display names, roles, avatars, XP/badges |
 | `subscriptions` | Stripe subscription state |
 | `stripe_webhook_log` | Webhook idempotency + audit |
 | `content_permissions` | Editor pack/category grants |

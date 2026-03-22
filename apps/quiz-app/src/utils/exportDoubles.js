@@ -19,21 +19,24 @@ function escapeCSV(val) {
  * @param {Array} params.part2Questions - Array of { id, question_text, answer_text }
  * @param {object} params.responses - { [questionId]: string }
  */
-export function exportDoublesCSV({ playerName, packTitle, part1Questions, part2Questions, responses }) {
-  const rows = [
-    ['Part', 'Question #', 'Question Text', 'Correct Answer', 'Your Response'].map(escapeCSV).join(','),
-  ];
+export function exportDoublesCSV({ playerName, partnerName, packTitle, part1Questions, part2Questions, responses }) {
+  const header = ['Part', 'Question #', 'Question Text', 'Correct Answer', 'Your Response'];
+  if (partnerName) header.push('Partner');
+  const rows = [header.map(escapeCSV).join(',')];
+
+  // Add partner name to first data row only (for CSV context)
+  const partnerCol = partnerName ? escapeCSV(partnerName) : null;
 
   part1Questions.forEach((q, i) => {
-    rows.push(
-      ['Part 1', i + 1, q.question_text, q.answer_text, responses[q.id] || ''].map(escapeCSV).join(',')
-    );
+    const row = ['Part 1', i + 1, q.question_text, q.answer_text, responses[q.id] || ''].map(escapeCSV);
+    if (partnerCol) row.push(i === 0 ? partnerCol : '');
+    rows.push(row.join(','));
   });
 
   part2Questions.forEach((q, i) => {
-    rows.push(
-      ['Part 2', i + 1, q.question_text, q.answer_text, responses[q.id] || ''].map(escapeCSV).join(',')
-    );
+    const row = ['Part 2', i + 1, q.question_text, q.answer_text, responses[q.id] || ''].map(escapeCSV);
+    if (partnerCol) row.push('');
+    rows.push(row.join(','));
   });
 
   const csvContent = rows.join('\n');

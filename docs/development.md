@@ -79,7 +79,8 @@ npm run test
 cd apps/quiz-app && npx vitest run
 ```
 
-### Current Coverage (168 tests, 15 files)
+### Current Coverage (181 tests, 16 files)
+- `gamification.test.js` — Core XP, Streak, and Badge engine (21 tests)
 - `hostQuizReducer.test.js` — Core host state machine (39 tests)
 - `tournamentBracket.test.js` — Bracket generation, seeding, advancement (36 tests)
 - `doublesReducer.test.js` — Doubles/Match state machine (19 tests)
@@ -142,7 +143,7 @@ The project includes a GitHub Actions pipeline (`.github/workflows/ci.yml`) that
 1. `npm ci` — Install dependencies
 2. `npm run lint` — Lint all packages
 3. `npm run build` — Build all packages
-4. `npm run test` — Run test suite (168 tests)
+4. `npm run test` — Run test suite (181 tests)
 
 Production deployment is configured for **Vercel** via `vercel.json` (output: `apps/quiz-app/dist`). Set `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` as environment variables in the Vercel dashboard.
 

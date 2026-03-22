@@ -53,3 +53,4 @@ export * from './tournaments.js';
 export * from './realtime.js';
 export * from './aiGenerate.js';
 export * from './auditLog.js';
+export * from './doubles.js';

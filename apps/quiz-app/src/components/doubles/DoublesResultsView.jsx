@@ -1,12 +1,13 @@
 import { exportDoublesCSV } from '@/utils/exportDoubles';
 
-export default function DoublesResultsView({ pack, playerName, part1Questions, part2Questions, responses, onReset }) {
+export default function DoublesResultsView({ pack, playerName, passiveParticipant, part1Questions, part2Questions, responses, onReset }) {
   const totalQuestions = part1Questions.length + part2Questions.length;
   const answeredCount = [...part1Questions, ...part2Questions].filter(q => responses[q.id]?.trim()).length;
 
   const handleExport = () => {
     exportDoublesCSV({
       playerName,
+      partnerName: passiveParticipant?.displayName || null,
       packTitle: pack.title,
       part1Questions,
       part2Questions,
@@ -24,6 +25,12 @@ export default function DoublesResultsView({ pack, playerName, part1Questions, p
           <span className="doubles-results__stat-label">Player</span>
           <span className="doubles-results__stat-value">{playerName}</span>
         </div>
+        {passiveParticipant && (
+          <div className="doubles-results__stat">
+            <span className="doubles-results__stat-label">Partner</span>
+            <span className="doubles-results__stat-value">{passiveParticipant.displayName || 'Partner'}</span>
+          </div>
+        )}
         <div className="doubles-results__stat">
           <span className="doubles-results__stat-label">Questions Answered</span>
           <span className="doubles-results__stat-value">{answeredCount} / {totalQuestions}</span>

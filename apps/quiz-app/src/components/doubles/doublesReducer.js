@@ -19,6 +19,7 @@ export const initialState = {
   phase: 'select',
   pack: null,
   playerName: '',
+  passiveParticipant: null,
   part1Questions: [],
   part2Questions: [],
   responses: {},
@@ -59,12 +60,17 @@ export function reducer(state, action) {
       };
     }
 
-    case ACTIONS.SET_PLAYER:
+    case ACTIONS.SET_PLAYER: {
+      const payload = action.payload;
+      const playerName = typeof payload === 'string' ? payload.trim() : payload.playerName.trim();
+      const passiveParticipant = typeof payload === 'string' ? null : (payload.passiveParticipant || null);
       return {
         ...state,
         phase: 'rules',
-        playerName: action.payload.trim(),
+        playerName,
+        passiveParticipant,
       };
+    }
 
     case ACTIONS.ACCEPT_RULES:
       return {

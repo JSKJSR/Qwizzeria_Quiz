@@ -147,6 +147,7 @@ export default function DoublesSessions() {
                 <th>Pack</th>
                 <th>Part</th>
                 <th>Player Name</th>
+                <th>Partner</th>
                 <th>Answered</th>
                 <th>Graded</th>
                 <th>Status</th>
@@ -164,6 +165,7 @@ export default function DoublesSessions() {
                     <td className="truncate">{session.quiz_packs?.title || '—'}</td>
                     <td>P{session.metadata?.part || '?'}</td>
                     <td>{session.metadata?.player_name || '—'}</td>
+                    <td>{session.metadata?.passive_player_name || '—'}</td>
                     <td>{answered}/{session.total_questions}</td>
                     <td>
                       {gc ? (

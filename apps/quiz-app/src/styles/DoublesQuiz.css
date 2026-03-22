@@ -217,6 +217,72 @@
   justify-content: center;
 }
 
+/* ---- Player Setup: Partner Section ---- */
+.doubles-player-setup__section {
+  text-align: left;
+}
+
+.doubles-player-setup__label {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-secondary, #888);
+  margin-bottom: 0.4rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.doubles-player-setup__partner-toggle {
+  text-align: center;
+}
+
+.doubles-btn--link {
+  background: none;
+  border: none;
+  color: #e85c1a;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 600;
+  padding: 0.4rem 0;
+  text-decoration: underline;
+}
+.doubles-btn--link:hover {
+  color: #d04e12;
+}
+
+.doubles-player-setup__partner {
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+}
+
+.doubles-player-setup__input--valid {
+  border-color: #4caf50;
+}
+
+.doubles-player-setup__input--invalid {
+  border-color: #e85c1a;
+}
+
+.doubles-player-setup__status {
+  min-height: 1.4rem;
+  font-size: 0.85rem;
+  margin-top: 0.4rem;
+}
+
+.doubles-player-setup__status--checking {
+  color: var(--text-secondary, #888);
+}
+
+.doubles-player-setup__status--found {
+  color: #4caf50;
+}
+
+.doubles-player-setup__status--error {
+  color: #e85c1a;
+}
+
 /* ---- Rules ---- */
 .doubles-rules {
   max-width: 600px;

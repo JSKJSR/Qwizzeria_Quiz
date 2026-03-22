@@ -40,12 +40,38 @@ describe('doublesReducer', () => {
     expect(state.timerMinutes).toBe(60);
   });
 
-  it('SET_PLAYER transitions to rules', () => {
+  it('SET_PLAYER with string payload transitions to rules (backward compat)', () => {
     const prev = { ...initialState, phase: 'playerSetup', pack: mockPack };
     const state = reducer(prev, { type: ACTIONS.SET_PLAYER, payload: '  Alice  ' });
 
     expect(state.phase).toBe('rules');
     expect(state.playerName).toBe('Alice');
+    expect(state.passiveParticipant).toBeNull();
+  });
+
+  it('SET_PLAYER with object payload stores playerName and passiveParticipant', () => {
+    const prev = { ...initialState, phase: 'playerSetup', pack: mockPack };
+    const partner = { userId: 'u-123', displayName: 'Bob', email: 'bob@test.com' };
+    const state = reducer(prev, {
+      type: ACTIONS.SET_PLAYER,
+      payload: { playerName: '  Alice  ', passiveParticipant: partner },
+    });
+
+    expect(state.phase).toBe('rules');
+    expect(state.playerName).toBe('Alice');
+    expect(state.passiveParticipant).toEqual(partner);
+  });
+
+  it('SET_PLAYER with object payload and null passiveParticipant', () => {
+    const prev = { ...initialState, phase: 'playerSetup', pack: mockPack };
+    const state = reducer(prev, {
+      type: ACTIONS.SET_PLAYER,
+      payload: { playerName: 'Alice', passiveParticipant: null },
+    });
+
+    expect(state.phase).toBe('rules');
+    expect(state.playerName).toBe('Alice');
+    expect(state.passiveParticipant).toBeNull();
   });
 
   it('ACCEPT_RULES transitions to part1 with timerStartedAt', () => {
@@ -148,11 +174,13 @@ describe('doublesReducer', () => {
     expect(state.part2SessionId).toBe('session-xyz');
   });
 
-  it('RESTORE_SESSION replaces entire state', () => {
+  it('RESTORE_SESSION replaces entire state including passiveParticipant', () => {
+    const partner = { userId: 'u-5', displayName: 'Charlie', email: 'charlie@test.com' };
     const savedState = {
       ...initialState,
       phase: 'part1',
       playerName: 'Bob',
+      passiveParticipant: partner,
       responses: { 'q-0': 'test' },
     };
 
@@ -163,14 +191,16 @@ describe('doublesReducer', () => {
 
     expect(state.phase).toBe('part1');
     expect(state.playerName).toBe('Bob');
+    expect(state.passiveParticipant).toEqual(partner);
     expect(state.responses['q-0']).toBe('test');
   });
 
-  it('RESET returns to initialState', () => {
+  it('RESET returns to initialState and clears passiveParticipant', () => {
     const prev = {
       ...initialState,
       phase: 'results',
       playerName: 'Alice',
+      passiveParticipant: { userId: 'u-1', displayName: 'Bob', email: 'bob@test.com' },
       responses: { 'q-0': 'test' },
     };
 
@@ -178,6 +208,7 @@ describe('doublesReducer', () => {
 
     expect(state.phase).toBe('select');
     expect(state.playerName).toBe('');
+    expect(state.passiveParticipant).toBeNull();
     expect(state.responses).toEqual({});
   });
 
@@ -190,8 +221,13 @@ describe('doublesReducer', () => {
     });
     expect(state.phase).toBe('playerSetup');
 
-    state = reducer(state, { type: ACTIONS.SET_PLAYER, payload: 'Alice' });
+    const partner = { userId: 'u-99', displayName: 'Bob', email: 'bob@test.com' };
+    state = reducer(state, {
+      type: ACTIONS.SET_PLAYER,
+      payload: { playerName: 'Alice', passiveParticipant: partner },
+    });
     expect(state.phase).toBe('rules');
+    expect(state.passiveParticipant).toEqual(partner);
 
     state = reducer(state, { type: ACTIONS.ACCEPT_RULES });
     expect(state.phase).toBe('part1');
