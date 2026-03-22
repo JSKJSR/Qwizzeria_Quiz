@@ -5,6 +5,8 @@ import {
   fetchPackCategories,
   deletePack,
 } from '@qwizzeria/supabase-client';
+import ExpirationBadge from '@/components/ExpirationBadge';
+import { formatExpiration } from '@/utils/packExpiration';
 
 export default function PackList() {
   const navigate = useNavigate();
@@ -98,6 +100,7 @@ export default function PackList() {
           <option value="active">Active</option>
           <option value="draft">Draft</option>
           <option value="archived">Archived</option>
+          <option value="expired">Expired</option>
         </select>
       </div>
 
@@ -115,6 +118,7 @@ export default function PackList() {
                 <th>Questions</th>
                 <th>Type</th>
                 <th>Status</th>
+                <th>Expires</th>
                 <th>Plays</th>
                 <th>Updated</th>
                 <th></th>
@@ -144,6 +148,15 @@ export default function PackList() {
                     <span className={`badge badge--${p.status || 'draft'}`}>
                       {p.status || 'draft'}
                     </span>
+                  </td>
+                  <td style={{ fontSize: 'var(--font-size-xs)' }}>
+                    <ExpirationBadge expiresAt={p.expires_at} />
+                    {p.expires_at && (
+                      <span style={{ color: 'var(--text-muted)', marginLeft: '0.3rem' }}>
+                        {formatExpiration(p.expires_at)}
+                      </span>
+                    )}
+                    {!p.expires_at && <span style={{ color: 'var(--text-muted)' }}>—</span>}
                   </td>
                   <td>{p.play_count}</td>
                   <td style={{ fontSize: 'var(--font-size-xs)', color: 'var(--text-muted)' }}>

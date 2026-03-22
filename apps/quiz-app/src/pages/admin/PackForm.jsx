@@ -6,6 +6,7 @@ import {
   updatePack,
   fetchPackCategories,
 } from '@qwizzeria/supabase-client';
+import { toExpiresAtValue, toDatetimeLocalValue } from '@/utils/packExpiration';
 
 export default function PackForm() {
   const navigate = useNavigate();
@@ -21,6 +22,7 @@ export default function PackForm() {
     is_public: false,
     is_host: false,
     status: 'draft',
+    expires_at: '',
     config: {},
   });
   const [categories, setCategories] = useState([]);
@@ -46,6 +48,7 @@ export default function PackForm() {
           is_public: pack.is_public || false,
           is_host: pack.is_host || false,
           status: pack.status || 'draft',
+          expires_at: toDatetimeLocalValue(pack.expires_at),
           config: pack.config || {},
         });
       })
@@ -67,12 +70,14 @@ export default function PackForm() {
     setSaving(true);
     setError(null);
 
+    const payload = { ...form, expires_at: toExpiresAtValue(form.expires_at) };
+
     try {
       if (isEdit) {
-        await updatePack(id, form);
+        await updatePack(id, payload);
         navigate('/admin/packs');
       } else {
-        const created = await createPack(form);
+        const created = await createPack(payload);
         // Redirect to edit so admin can add questions
         navigate(`/admin/packs/${created.id}/edit`);
       }
@@ -160,6 +165,31 @@ export default function PackForm() {
             <option value="active">Active</option>
             <option value="archived">Archived</option>
           </select>
+        </div>
+
+        <div className="form-group">
+          <label className="form-label">Expiration Date (optional)</label>
+          <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+            <input
+              type="datetime-local"
+              className="form-input"
+              value={form.expires_at}
+              onChange={(e) => handleChange('expires_at', e.target.value)}
+              style={{ flex: 1 }}
+            />
+            {form.expires_at && (
+              <button
+                type="button"
+                className="btn btn-secondary btn-sm"
+                onClick={() => handleChange('expires_at', '')}
+              >
+                Clear
+              </button>
+            )}
+          </div>
+          <small style={{ color: 'var(--text-secondary)', fontSize: '0.78rem' }}>
+            Leave empty for no expiration. Pack will stop appearing to users after this date.
+          </small>
         </div>
 
         <div className="form-group" style={{ display: 'flex', gap: '2rem' }}>

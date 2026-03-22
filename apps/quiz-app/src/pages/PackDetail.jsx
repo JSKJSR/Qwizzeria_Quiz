@@ -48,7 +48,7 @@ export default function PackDetail() {
     return (
       <div className="pack-detail">
         <div className="pack-detail__error">
-          <p>{error || 'Pack not found.'}</p>
+          <p>This quiz pack is no longer available.</p>
           <button className="pack-detail__back-btn" onClick={() => navigate('/packs')}>
             Back to Packs
           </button>

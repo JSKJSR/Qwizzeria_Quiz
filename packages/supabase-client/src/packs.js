@@ -18,7 +18,9 @@ export async function fetchAllPacks({ category, status, search, page = 1, pageSi
   if (category) {
     query = query.eq('category', category);
   }
-  if (status) {
+  if (status === 'expired') {
+    query = query.eq('status', 'active').lt('expires_at', new Date().toISOString());
+  } else if (status) {
     query = query.eq('status', status);
   }
   if (search) {
