@@ -8,6 +8,16 @@ export default function DoublesReviewView({ partNumber, questions, responses, on
         You answered {answeredCount} of {questions.length} questions.
       </p>
 
+      <div className="doubles-review__actions">
+        <button
+          type="button"
+          className="doubles-btn doubles-btn--primary"
+          onClick={onContinue}
+        >
+          {continueLabel}
+        </button>
+      </div>
+
       <div className="doubles-review__list">
         {questions.map((q, i) => {
           const userResponse = responses[q.id] || '';
@@ -47,16 +57,6 @@ export default function DoublesReviewView({ partNumber, questions, responses, on
             </div>
           );
         })}
-      </div>
-
-      <div className="doubles-review__actions">
-        <button
-          type="button"
-          className="doubles-btn doubles-btn--primary"
-          onClick={onContinue}
-        >
-          {continueLabel}
-        </button>
       </div>
     </div>
   );
