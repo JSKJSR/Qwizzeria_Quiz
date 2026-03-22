@@ -134,7 +134,7 @@ export default function DoublesQuiz() {
           timerMinutes={state.timerMinutes}
           part1Count={state.part1Questions.length}
           part2Count={state.part2Questions.length}
-          partnerName={state.passiveParticipant?.displayName}
+          partnerName={state.passiveParticipant?.displayName || state.passiveParticipant?.email}
           onAccept={handleAcceptRules}
           onBack={handleBackToSelect}
         />

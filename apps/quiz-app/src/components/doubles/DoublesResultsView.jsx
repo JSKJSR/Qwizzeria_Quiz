@@ -28,7 +28,7 @@ export default function DoublesResultsView({ pack, playerName, passiveParticipan
         {passiveParticipant && (
           <div className="doubles-results__stat">
             <span className="doubles-results__stat-label">Partner</span>
-            <span className="doubles-results__stat-value">{passiveParticipant.displayName || 'Partner'}</span>
+            <span className="doubles-results__stat-value">{passiveParticipant.displayName || passiveParticipant.email || 'Partner'}</span>
           </div>
         )}
         <div className="doubles-results__stat">

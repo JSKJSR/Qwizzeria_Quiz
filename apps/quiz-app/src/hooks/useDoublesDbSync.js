@@ -27,7 +27,7 @@ export default function useDoublesDbSync(state, dispatch, userId) {
           part: state.phase === 'part1' ? 1 : 2,
           player_name: state.playerName,
           passive_user_id: state.passiveParticipant?.userId || null,
-          passive_player_name: state.passiveParticipant?.displayName || null,
+          passive_player_name: state.passiveParticipant?.displayName || state.passiveParticipant?.email || null,
           responses: state.responses,
           timer_started_at: state.timerStartedAt,
           timer_duration_seconds: state.timerMinutes * 60,
@@ -36,7 +36,7 @@ export default function useDoublesDbSync(state, dispatch, userId) {
     }, 30000);
 
     return () => clearInterval(dbSyncRef.current);
-  }, [state.phase, state.part1SessionId, state.part2SessionId, state.playerName, state.passiveParticipant?.userId, state.passiveParticipant?.displayName, state.responses, state.timerStartedAt, state.timerMinutes]);
+  }, [state.phase, state.part1SessionId, state.part2SessionId, state.playerName, state.passiveParticipant?.userId, state.passiveParticipant?.displayName, state.passiveParticipant?.email, state.responses, state.timerStartedAt, state.timerMinutes]);
 
   const createPartSession = useCallback(async (partNumber) => {
     if (!userId) return;
@@ -60,7 +60,7 @@ export default function useDoublesDbSync(state, dispatch, userId) {
         part: partNumber,
         player_name: state.playerName,
         passive_user_id: state.passiveParticipant?.userId || null,
-        passive_player_name: state.passiveParticipant?.displayName || null,
+        passive_player_name: state.passiveParticipant?.displayName || state.passiveParticipant?.email || null,
         responses: {},
         timer_started_at: new Date().toISOString(),
         timer_duration_seconds: state.timerMinutes * 60,
@@ -83,7 +83,7 @@ export default function useDoublesDbSync(state, dispatch, userId) {
         part: partNumber,
         player_name: state.playerName,
         passive_user_id: state.passiveParticipant?.userId || null,
-        passive_player_name: state.passiveParticipant?.displayName || null,
+        passive_player_name: state.passiveParticipant?.displayName || state.passiveParticipant?.email || null,
         responses: state.responses,
         timer_started_at: state.timerStartedAt,
         timer_duration_seconds: state.timerMinutes * 60,

@@ -145,7 +145,7 @@ export default function DoublesPlayerSetup({ packTitle, onSubmit, onBack }) {
               )}
               {partnerStatus === 'found' && partnerData && (
                 <span className="doubles-player-setup__status--found">
-                  Partner found: <strong>{partnerData.displayName || 'User'}</strong>
+                  Partner found: <strong>{partnerData.displayName || partnerEmail.trim()}</strong>
                 </span>
               )}
               {partnerStatus === 'not_found' && (
