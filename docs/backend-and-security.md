@@ -8,7 +8,7 @@ This document covers data storage, access control, and the shared backend utilit
 
 ### Content & Play
 - **`questions_master`**: The central question bank (UUID, text, answer, category, media_url, points, status).
-- **`quiz_packs`**: Curated collections of questions (is_premium, is_public, statuses).
+- **`quiz_packs`**: Curated collections of questions (is_premium, is_public, statuses, expires_at). Supports optional expiration — packs with `expires_at` in the past are hidden from non-admin users via RLS.
 - **`quiz_sessions`**: Tracks player progress for resumable usage (score, status, metadata JSONB).
 
 ### Real-time Buzzer
@@ -45,7 +45,7 @@ Controls granular access. Examples: `read`, `write`, `manage` specific categorie
 5. **`user`**: Base role.
 
 ### Row-Level Security (RLS)
-- **Pack Visibility**: App layer gating handles playback. Active pack *metadata* is public for the landing page carousel.
+- **Pack Visibility**: Active, non-expired pack *metadata* is public for the landing page carousel. Expiration is enforced at the RLS level (`expires_at IS NULL OR expires_at > now()`) on `quiz_packs`, `pack_questions`, and `questions_master` policies. App layer gating handles playback (premium/host filtering).
 - **Admin Bypass**: Policies utilize custom Postgres functions `is_admin()` and `is_superadmin()`.
 
 #### Buzzer RLS Policies (`buzzer_participants`)

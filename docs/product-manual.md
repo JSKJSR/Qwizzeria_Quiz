@@ -54,7 +54,7 @@ The Admin CMS is integrated into the application and accessible at `/admin` for 
 2. **Question Management (`/admin/questions`)**: 
    - Full CRUD for questions (media URLs, point values). 
    - **Bulk Import (`/admin/import`)**: High-speed Excel (.xlsx) ingestion with immediate Pack assignment capabilities.
-3. **Pack Management (`/admin/packs`)**: Manage curated collections, adjust premium/public visibility, and reorder questions.
+3. **Pack Management (`/admin/packs`)**: Manage curated collections, adjust premium/public visibility, set optional expiration dates, and reorder questions. Expired packs are automatically hidden from players but remain visible to admins.
 4. **User Management (`/admin/users`)**: Restricted to `superadmin`. Lists users and provides the ability to update roles (e.g., promote `user` to `premium` or `admin`).
 
 ---

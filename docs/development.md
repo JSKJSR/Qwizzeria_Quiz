@@ -79,7 +79,7 @@ npm run test
 cd apps/quiz-app && npx vitest run
 ```
 
-### Current Coverage (181 tests, 16 files)
+### Current Coverage (244 tests, 19 files)
 - `gamification.test.js` — Core XP, Streak, and Badge engine (21 tests)
 - `hostQuizReducer.test.js` — Core host state machine (39 tests)
 - `tournamentBracket.test.js` — Bracket generation, seeding, advancement (36 tests)
@@ -96,6 +96,9 @@ cd apps/quiz-app && npx vitest run
 - `TieBreakerModal.test.jsx` — Tie-breaker UI logic (3 tests)
 - `supabaseClient.test.js` — Supabase SDK wrapper connection checks (2 tests)
 - `AuthContext.test.js` — Auth provider initialization (1 test)
+- `packExpiration.test.js` — Pack expiration utilities (23 tests)
+- `freeQuizReducer.test.js` — Free quiz state machine
+- `answerMatcher.test.js` — Answer matching logic
 
 ### Coverage Goals
 - Integration tests for Host multiplayer broadcast.
@@ -136,14 +139,14 @@ Before finalizing any feature or bugfix, the following must be verified:
 ### Database Migrations
 Migrations are stored in `packages/supabase-client/migrations`.
 **Note**: Migrations must be run manually via the Supabase SQL Editor in order:
-1. `001_initial_schema.sql` through `020_buzzer_rooms.sql`
+1. `001_initial_schema.sql` through `029_pack_expiration.sql`
 
 ### CI/CD
 The project includes a GitHub Actions pipeline (`.github/workflows/ci.yml`) that runs on every push/PR to `main`:
 1. `npm ci` — Install dependencies
 2. `npm run lint` — Lint all packages
 3. `npm run build` — Build all packages
-4. `npm run test` — Run test suite (181 tests)
+4. `npm run test` — Run test suite (244 tests)
 
 Production deployment is configured for **Vercel** via `vercel.json` (output: `apps/quiz-app/dist`). Set `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` as environment variables in the Vercel dashboard.
 

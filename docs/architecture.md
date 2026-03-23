@@ -83,7 +83,7 @@ Host Quiz supports a **Tournament Mode** for single-elimination bracket competit
 
 ## 🧪 Quality & Accessibility
 
-- **Test Coverage**: 181 tests across 16 files (Vitest + jsdom) — includes gamification progression, core state machines (reducers), AI generation logic, tournament brackets, session persistence, media detection, auth, and sub-millisecond buzzer resolution.
+- **Test Coverage**: 244 tests across 19 files (Vitest + jsdom) — includes gamification progression, core state machines (reducers), AI generation logic, tournament brackets, session persistence, media detection, auth, sub-millisecond buzzer resolution, and pack expiration utilities.
 - **Error Handling**: All data-fetching pages display error UI with retry buttons (no silent failures).
 - **WCAG Compliance**: focus-visible states, WCAG-AA contrast ratios, 44px minimum touch targets, `prefers-reduced-motion` support, semantic ARIA labels on interactive elements.
 - **CI/CD**: GitHub Actions pipeline (lint → build → test) on every push/PR; Vercel deployment config.
@@ -94,10 +94,10 @@ Host Quiz supports a **Tournament Mode** for single-elimination bracket competit
 
 The landing page (`LandingPageB`) serves as the public-facing marketing page:
 - **Hero section**: Headline, CTAs (Free Game Night + Unlock Packs), Qwizzeria logo preview card.
-- **Pack Carousel**: Horizontal scrollable showcase of all active quiz packs fetched via `fetchShowcasePacks()`. Displays cover images, titles, and category tags. Uses scroll-snap for smooth navigation with arrow buttons.
+- **Pack Carousel**: Horizontal scrollable showcase of all active, non-expired quiz packs fetched via `fetchShowcasePacks()`. Displays cover images, titles, and category tags. Uses scroll-snap for smooth navigation with arrow buttons.
 - **Footer**: Social links (Patreon, Instagram, email).
 
-Pack metadata (title, image, category) is visible to anonymous users via RLS. Playing is gated by app-layer role checks after login.
+Pack metadata (title, image, category) is visible to anonymous users via RLS. Expired packs are automatically hidden at the database level. Playing is gated by app-layer role checks after login.
 
 ---
 

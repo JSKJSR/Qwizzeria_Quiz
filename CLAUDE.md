@@ -92,7 +92,8 @@ Access restricted via role checks (editor, admin, superadmin).
   - **Export results**: CSV download + PDF print from HostResultsView
   - **Certificates**: Canvas-based PNG certificates for top 3 finishers (1200×800, Qwizzeria branding)
 - **Landing page**: LandingPageB with hero section + pack carousel (fetches all active packs via `fetchShowcasePacks`)
-- **Pack visibility**: Packs default to `is_public=false, status='draft'`. Must set `status='active'` (via Admin CMS) for packs to be visible. RLS allows all active packs to be read by everyone (including anonymous); app-layer role checks control who can actually play (premium/host gating).
+- **Pack visibility**: Packs default to `is_public=false, status='draft', expires_at=NULL`. Must set `status='active'` (via Admin CMS) for packs to be visible. Optional `expires_at` timestamp hides packs after expiration. RLS allows all active non-expired packs to be read by everyone (including anonymous); app-layer role checks control who can actually play (premium/host gating).
+- **Pack expiration**: Optional `expires_at TIMESTAMPTZ` on `quiz_packs`. Enforced at DB level via RLS (`expires_at IS NULL OR expires_at > now()`). Three policies updated: `packs_select_public`, `pack_questions_select_public`, `questions_select_via_active_pack`. Admin sees all packs including expired. Utility functions in `utils/packExpiration.js`, reusable `ExpirationBadge` component.
 - **Session tracking**: createQuizSession → recordAttempt → completeQuizSession (non-blocking)
 - **Session lifecycle**: in_progress → completed (on finish) or abandoned (on quit)
 - **Resume**: Sessions store metadata (question_ids, format) in JSONB; ResumePlay restores state
@@ -118,7 +119,7 @@ Access restricted via role checks (editor, admin, superadmin).
 ## Database Tables
 
 - `questions_master` — All quiz questions (question_text, answer_text, category, media_url, points, status, is_public)
-- `quiz_packs` — Curated question sets (title, category, is_premium, is_public, status, question_count, play_count). Defaults: `is_public=false`, `status='draft'`
+- `quiz_packs` — Curated question sets (title, category, is_premium, is_public, status, question_count, play_count, expires_at). Defaults: `is_public=false`, `status='draft'`, `expires_at=NULL` (no expiration)
 - `pack_questions` — Junction: pack_id ↔ question_id with sort_order
 - `quiz_sessions` — Play sessions (user_id, is_free_quiz, quiz_pack_id, score, status, metadata JSONB)
 - `question_attempts` — Per-question results (session_id, question_id, is_correct, time_spent_ms)
@@ -140,8 +141,8 @@ Two independent systems control access:
 
 ## RLS Policies (Key)
 
-- `quiz_packs`: All active packs readable by everyone (including anonymous). Admin sees all packs (including drafts). Admin has full CRUD. Editors can read/write granted packs.
-- `pack_questions`: Readable if parent pack is public+active, or user is admin, or editor with grant.
+- `quiz_packs`: All active non-expired packs readable by everyone (including anonymous). Expired packs (`expires_at` in the past) are hidden from non-admin users. Admin sees all packs (including drafts and expired). Admin has full CRUD. Editors can read/write granted packs.
+- `pack_questions`: Readable if parent pack is public+active+non-expired, or user is admin, or editor with grant.
 - `questions_master`: Public+active readable by all. Admin has full CRUD. Editors can read/write granted categories.
 - `user_profiles`: Users read own. Admins read all. Superadmin can update any (role assignment).
 - `feature_access`: Admin can read. Superadmin can insert/delete. Users can read own grants.
@@ -184,6 +185,8 @@ Two independent systems control access:
 - `apps/quiz-app/src/components/host/AIGenerateModal.jsx` — AI quiz generation modal (input/generating/preview/error states)
 - `apps/quiz-app/src/components/host/HostPackSelect.jsx` — Browse & select packs from DB + "Generate with AI" card
 - `apps/quiz-app/src/components/host/HostParticipantSetup.jsx` — Player names (2-8)
+- `apps/quiz-app/src/utils/packExpiration.js` — Pack expiration utilities (isExpired, isExpiringSoon, getExpirationStatus, formatExpiration, toExpiresAtValue, toDatetimeLocalValue)
+- `apps/quiz-app/src/components/ExpirationBadge.jsx` — Reusable expiration badge (Expired/Expiring soon)
 - `apps/quiz-app/src/config/tiers.js` — Centralized tier config (TIERS, FEATURE_TIERS, tierSatisfies, getTierList)
 - `apps/quiz-app/src/hooks/useEntitlement.js` — Feature entitlement hook (allowed, requiredTier, reason)
 - `apps/quiz-app/src/components/SubscriptionGate.jsx` — TierRoute (layout) + SubscriptionGate (wrapper)

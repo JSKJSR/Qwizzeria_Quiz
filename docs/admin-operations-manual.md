@@ -232,11 +232,11 @@ Same form as create. All fields are editable. `updated_at` timestamp is auto-upd
 | Filter | Options |
 |---|---|
 | Category | Dropdown |
-| Status | `draft`, `active`, `archived` |
+| Status | `draft`, `active`, `archived`, `expired` |
 | Search | Title/description text search |
 | Page Size | 20 per page |
 
-Columns: Title, Category, Questions, Type (badges: Host/Premium/Public), Status, Plays, Updated.
+Columns: Title, Category, Questions, Type (badges: Host/Premium/Public), Status, Expires (with badge: Expired/Expiring soon), Plays, Updated.
 
 ### 5.2 Creating a Pack
 
@@ -249,6 +249,7 @@ Columns: Title, Category, Questions, Type (badges: Host/Premium/Public), Status,
 | `cover_image_url` | No | Cover image URL |
 | `category` | No | Category (autocomplete from existing) |
 | `status` | Yes | `draft` / `active` / `archived` |
+| `expires_at` | No | Expiration date/time (leave empty for no expiration) |
 | `is_premium` | No | Requires paid subscription tier to play |
 | `is_public` | No | Visible to non-editors in browse |
 | `is_host` | No | Available only in Host Quiz mode |
@@ -265,12 +266,16 @@ Columns: Title, Category, Questions, Type (badges: Host/Premium/Public), Status,
 ```
 draft → active → archived
   │        │
-  │        └── Visible to players (if is_public=true)
+  │        ├── Visible to players (if is_public=true AND not expired)
+  │        │
+  │        └── expires_at reached → hidden from players (still active in DB)
   │
   └── Only visible to admin/editor in CMS
 ```
 
-**Important defaults:** New packs are `is_public=false, status='draft'`. You must explicitly set both `status='active'` AND `is_public=true` for the pack to be visible to players.
+**Important defaults:** New packs are `is_public=false, status='draft', expires_at=NULL`. You must explicitly set both `status='active'` AND `is_public=true` for the pack to be visible to players.
+
+**Expiration:** Optionally set an `expires_at` date/time. After this date, the pack automatically stops appearing to players — no manual archival needed. Admins can extend the expiration by editing the pack and setting a new date, or clear it to remove the expiration entirely. Expired packs remain visible in the Admin CMS with a red "Expired" badge.
 
 ### 5.4 Deleting a Pack
 
@@ -568,7 +573,7 @@ ORDER BY created_at DESC;
 | Table | Purpose |
 |---|---|
 | `questions_master` | All quiz questions |
-| `quiz_packs` | Curated question sets |
+| `quiz_packs` | Curated question sets (with optional `expires_at` for time-limited packs) |
 | `pack_questions` | Junction: pack ↔ question with sort_order |
 | `quiz_sessions` | Player quiz sessions |
 | `question_attempts` | Per-question results |
@@ -618,7 +623,7 @@ Migrations are in `packages/supabase-client/migrations/`. They must be run manua
 3. Paste the migration SQL
 4. Click **Run**
 
-Migrations are numbered sequentially (e.g., `006_rbac.sql`, `011_tournaments.sql`, `020_buzzer_rooms.sql`, `021_doubles_config.sql`).
+Migrations are numbered sequentially (e.g., `006_rbac.sql`, `011_tournaments.sql`, `020_buzzer_rooms.sql`, `029_pack_expiration.sql`).
 
 ---
 
@@ -673,8 +678,8 @@ These cannot be done from the Admin CMS — use the Stripe Dashboard:
 | Table | Public (anonymous) | Authenticated `user` | `editor` | `admin`+ |
 |---|---|---|---|---|
 | `questions_master` | Read active+public | Read active+public | Read/write granted categories | Full CRUD |
-| `quiz_packs` | Read active+public | Read active+public | Read/write granted packs | Full CRUD (including drafts) |
-| `pack_questions` | Read via active pack | Read via active pack | Manage granted packs | Full CRUD |
+| `quiz_packs` | Read active+public+non-expired | Read active+public+non-expired | Read/write granted packs | Full CRUD (including drafts & expired) |
+| `pack_questions` | Read via active+non-expired pack | Read via active+non-expired pack | Manage granted packs | Full CRUD |
 | `user_profiles` | - | Read own | Read own | Read all, superadmin update any |
 | `subscriptions` | - | Read own | Read own | Read all |
 | `content_permissions` | - | Read own grants | Read own grants | Read all, superadmin manage |
@@ -698,7 +703,7 @@ These cannot be done from the Admin CMS — use the Stripe Dashboard:
 | Issue | Cause | Solution |
 |---|---|---|
 | Editor can't see a pack | Missing `content_permissions` grant | Add a grant via SQL (see [Section 11](#11-content-permissions-editor-grants)) |
-| Pack not visible to players | `status='draft'` or `is_public=false` | Edit pack in CMS, set `status='active'` and `is_public=true` |
+| Pack not visible to players | `status='draft'`, `is_public=false`, or `expires_at` in the past | Edit pack in CMS: set `status='active'`, `is_public=true`, and check expiration date. Clear `expires_at` or set a future date if expired |
 | Questions blank for non-admin | RLS policy missing or migration 019 not applied | Run migration `019_questions_via_active_pack.sql` |
 | User still has access after role demotion | Cached auth state | User needs to refresh the page or sign out/in |
 | Webhook not processing | Signature mismatch or duplicate event | Check `stripe_webhook_log` for errors; verify `STRIPE_WEBHOOK_SECRET` |
@@ -730,8 +735,14 @@ SELECT event_id, event_type, status, error_message, created_at
 FROM stripe_webhook_log
 ORDER BY created_at DESC LIMIT 10;
 
--- Check active packs visible to players
-SELECT id, title, status, is_public, is_premium, question_count
+-- Check active packs visible to players (includes expiration check)
+SELECT id, title, status, is_public, is_premium, question_count, expires_at
 FROM quiz_packs
-WHERE status = 'active' AND is_public = true;
+WHERE status = 'active' AND is_public = true
+  AND (expires_at IS NULL OR expires_at > now());
+
+-- Find expired packs that may need attention
+SELECT id, title, expires_at, status
+FROM quiz_packs
+WHERE status = 'active' AND expires_at IS NOT NULL AND expires_at <= now();
 ```

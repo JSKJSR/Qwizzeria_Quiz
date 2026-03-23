@@ -306,10 +306,14 @@ export default function AdminOpsManual() {
             <span className="rtg-step__num">4</span>
             <span>Set <code>is_public=true</code> for it to appear in browse/carousel</span>
           </div>
+          <div className="rtg-step">
+            <span className="rtg-step__num">5</span>
+            <span><strong>Optionally</strong> set an <code>expires_at</code> date &mdash; pack auto-hides after this date</span>
+          </div>
         </div>
 
         <div className="rtg-callout rtg-callout--important">
-          <strong>Both flags required.</strong> A pack must have <code>status=active</code> AND <code>is_public=true</code> to be visible to players. Missing either flag means the pack stays hidden.
+          <strong>Visibility rules:</strong> A pack must have <code>status=active</code> AND <code>is_public=true</code> AND not be expired to be visible to players. Missing any condition means the pack stays hidden. Expired packs show a red &ldquo;Expired&rdquo; badge in the admin pack list. To re-enable an expired pack, edit it and set a new future expiration date or clear the field entirely.
         </div>
 
         <h3 className="rtg-h3">Pack Fields</h3>
@@ -323,6 +327,7 @@ export default function AdminOpsManual() {
             <tr><td>cover_image_url</td><td>No</td><td>Cover image URL</td></tr>
             <tr><td>category</td><td>No</td><td>Category (autocomplete from existing)</td></tr>
             <tr><td>status</td><td>Yes</td><td>draft / active / archived</td></tr>
+            <tr><td>expires_at</td><td>No</td><td>Expiration date/time (leave empty for no expiration). Pack auto-hides after this date.</td></tr>
             <tr><td>is_premium</td><td>No</td><td>Requires paid subscription to play</td></tr>
             <tr><td>is_public</td><td>No</td><td>Visible in browse/carousel</td></tr>
             <tr><td>is_host</td><td>No</td><td>Available only in Host Quiz mode</td></tr>
@@ -736,8 +741,8 @@ WHERE user_id = 'editor-user-uuid'
           <tbody>
             {[
               ['questions_master', 'Read active+public', 'Read active+public', 'R/W granted categories', 'Full CRUD'],
-              ['quiz_packs', 'Read active+public', 'Read active+public', 'R/W granted packs', 'Full CRUD (incl. drafts)'],
-              ['pack_questions', 'Read via active pack', 'Read via active pack', 'Manage granted packs', 'Full CRUD'],
+              ['quiz_packs', 'Read active+public+non-expired', 'Read active+public+non-expired', 'R/W granted packs', 'Full CRUD (incl. drafts & expired)'],
+              ['pack_questions', 'Read via active+non-expired pack', 'Read via active+non-expired pack', 'Manage granted packs', 'Full CRUD'],
               ['user_profiles', CROSS, 'Read own', 'Read own', 'Read all; superadmin update'],
               ['subscriptions', CROSS, 'Read own', 'Read own', 'Read all'],
               ['content_permissions', CROSS, 'Read own grants', 'Read own grants', 'Read all; superadmin manage'],
@@ -780,8 +785,8 @@ WHERE user_id = 'editor-user-uuid'
             </tr>
             <tr>
               <td>Pack not visible to players</td>
-              <td>status=draft or is_public=false</td>
-              <td>Edit pack: set status=active and is_public=true</td>
+              <td>status=draft, is_public=false, or expires_at in the past</td>
+              <td>Edit pack: set status=active, is_public=true, and check expiration date (clear or set future date)</td>
             </tr>
             <tr>
               <td>Questions blank for non-admin</td>
