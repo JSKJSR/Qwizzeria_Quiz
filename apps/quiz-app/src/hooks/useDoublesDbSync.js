@@ -68,7 +68,7 @@ export default function useDoublesDbSync(state, dispatch, userId) {
     } catch {
       // Non-blocking — local state is the source of truth
     }
-  }, [userId, state.pack, state.part1Questions, state.part2Questions, state.playerName, state.passiveParticipant, state.part1TimerMinutes, state.part2TimerMinutes, dispatch]);
+  }, [userId, state, dispatch]);
 
   const savePartToDb = useCallback(async (partNumber) => {
     const sessionId = partNumber === 1 ? state.part1SessionId : state.part2SessionId;
