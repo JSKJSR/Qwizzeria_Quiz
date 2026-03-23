@@ -1,7 +1,33 @@
 import { useState, useEffect } from 'react';
 import { fetchDoublesPacks } from '@qwizzeria/supabase-client';
 
-export default function DoublesEventSelect({ onSelect }) {
+function getPackDisplayInfo(pack) {
+  const cfg = pack.config || {};
+  const hasNewConfig = cfg.doubles_part1_questions != null;
+  const hasPart2 = hasNewConfig ? cfg.doubles_part2_questions > 0 : true;
+
+  let questionLabel;
+  if (hasNewConfig) {
+    questionLabel = hasPart2
+      ? `${cfg.doubles_part1_questions} + ${cfg.doubles_part2_questions} questions`
+      : `${cfg.doubles_part1_questions} questions`;
+  } else {
+    questionLabel = `${pack.question_count} questions`;
+  }
+
+  let timerLabel;
+  if (hasNewConfig) {
+    timerLabel = hasPart2
+      ? `Part 1: ${cfg.doubles_part1_timer_minutes}min / Part 2: ${cfg.doubles_part2_timer_minutes}min`
+      : `${cfg.doubles_part1_timer_minutes} min`;
+  } else {
+    timerLabel = `${cfg.doubles_timer_minutes || 60} min per part`;
+  }
+
+  return { questionLabel, timerLabel };
+}
+
+export default function DoublesEventSelect({ onSelect, error: externalError }) {
   const [packs, setPacks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -43,49 +69,41 @@ export default function DoublesEventSelect({ onSelect }) {
   return (
     <div className="doubles-select">
       <h2 className="doubles-select__title">Qwizzeria Doubles</h2>
+      {externalError && (
+        <div className="doubles-error">{externalError}</div>
+      )}
       <p className="doubles-select__subtitle">Select an event to begin</p>
 
       <div className="doubles-select__grid">
-        {packs.map((pack) => (
-          <button
-            key={pack.id}
-            className="doubles-select__card"
-            onClick={() => onSelect(pack)}
-          >
-            {pack.cover_image_url && (
-              <img
-                src={pack.cover_image_url}
-                alt=""
-                className="doubles-select__card-image"
-              />
-            )}
-            <div className="doubles-select__card-body">
-              <h3 className="doubles-select__card-title">{pack.title}</h3>
-              {pack.description && (
-                <p className="doubles-select__card-desc">{pack.description}</p>
+        {packs.map((pack) => {
+          const { questionLabel, timerLabel } = getPackDisplayInfo(pack);
+          return (
+            <button
+              key={pack.id}
+              className="doubles-select__card"
+              onClick={() => onSelect(pack)}
+            >
+              {pack.cover_image_url && (
+                <img
+                  src={pack.cover_image_url}
+                  alt=""
+                  className="doubles-select__card-image"
+                />
               )}
-              <div className="doubles-select__card-meta">
-                {pack.category && <span className="doubles-select__card-category">{pack.category}</span>}
-                <span className="doubles-select__card-count">
-                  {pack.config?.doubles_part1_questions != null
-                    ? (pack.config.doubles_part2_questions > 0
-                        ? `${pack.config.doubles_part1_questions} + ${pack.config.doubles_part2_questions} questions`
-                        : `${pack.config.doubles_part1_questions} questions`)
-                    : `${pack.question_count} questions`
-                  }
-                </span>
-                <span className="doubles-select__card-timer">
-                  {pack.config?.doubles_part1_timer_minutes != null
-                    ? (pack.config.doubles_part2_questions > 0
-                        ? `Part 1: ${pack.config.doubles_part1_timer_minutes}min / Part 2: ${pack.config.doubles_part2_timer_minutes}min`
-                        : `${pack.config.doubles_part1_timer_minutes} min`)
-                    : `${pack.config?.doubles_timer_minutes || 60} min per part`
-                  }
-                </span>
+              <div className="doubles-select__card-body">
+                <h3 className="doubles-select__card-title">{pack.title}</h3>
+                {pack.description && (
+                  <p className="doubles-select__card-desc">{pack.description}</p>
+                )}
+                <div className="doubles-select__card-meta">
+                  {pack.category && <span className="doubles-select__card-category">{pack.category}</span>}
+                  <span className="doubles-select__card-count">{questionLabel}</span>
+                  <span className="doubles-select__card-timer">{timerLabel}</span>
+                </div>
               </div>
-            </div>
-          </button>
-        ))}
+            </button>
+          );
+        })}
       </div>
     </div>
   );

@@ -1,4 +1,4 @@
-import { useReducer, useCallback, useEffect, useRef } from 'react';
+import { useReducer, useCallback, useEffect, useRef, useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { fetchPackPlayQuestions } from '@qwizzeria/supabase-client';
 import { reducer, initialState, ACTIONS } from './doublesReducer';
@@ -13,6 +13,7 @@ import DoublesPlayerSetup from './DoublesPlayerSetup';
 import DoublesRules from './DoublesRules';
 import DoublesPartView from './DoublesPartView';
 import DoublesReviewView from './DoublesReviewView';
+import DoublesBreakView from './DoublesBreakView';
 import DoublesResultsView from './DoublesResultsView';
 import '@/styles/DoublesQuiz.css';
 
@@ -63,15 +64,23 @@ export default function DoublesQuiz() {
   }, []);
 
   // Handlers
+  const [loadError, setLoadError] = useState(null);
+
   const handleSelectPack = useCallback(async (pack) => {
+    setLoadError(null);
     try {
       const questions = await fetchPackPlayQuestions(pack.id);
+      if (!questions || questions.length === 0) {
+        setLoadError('No questions found for this pack. The pack may not be accessible — please contact the host.');
+        return;
+      }
       dispatch({
         type: ACTIONS.SELECT_PACK,
         payload: { pack, questions, config: pack.config },
       });
     } catch (err) {
       console.error('Failed to load pack questions:', err);
+      setLoadError('Failed to load questions. Please try again.');
     }
   }, []);
 
@@ -126,7 +135,7 @@ export default function DoublesQuiz() {
   // Render based on phase
   switch (state.phase) {
     case 'select':
-      return <DoublesEventSelect onSelect={handleSelectPack} />;
+      return <DoublesEventSelect onSelect={handleSelectPack} error={loadError} />;
 
     case 'playerSetup':
       return (
@@ -183,23 +192,11 @@ export default function DoublesQuiz() {
 
     case 'break':
       return (
-        <div className="doubles-break">
-          <h2 className="doubles-break__title">Part 1 Complete!</h2>
-          <p className="doubles-break__text">Take a breather. When you're ready, start Part 2.</p>
-          <p className="doubles-break__info">
-            Part 2 has {state.part2Questions.length} questions with a {state.part2TimerMinutes}-minute timer.
-          </p>
-          <div className="doubles-rules__warning">
-            <strong>Important:</strong> Once you start Part 2, you cannot go back or reset the quiz. The timer begins immediately.
-          </div>
-          <button
-            type="button"
-            className="doubles-btn doubles-btn--primary doubles-btn--large"
-            onClick={handleStartPart2}
-          >
-            Start Part 2
-          </button>
-        </div>
+        <DoublesBreakView
+          part2QuestionCount={state.part2Questions.length}
+          part2TimerMinutes={state.part2TimerMinutes}
+          onStartPart2={handleStartPart2}
+        />
       );
 
     case 'part2':
