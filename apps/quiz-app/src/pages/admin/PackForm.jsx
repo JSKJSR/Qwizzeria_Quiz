@@ -233,29 +233,60 @@ export default function PackForm() {
           {form.config?.doubles_enabled && (
             <div style={{ display: 'flex', gap: '1.5rem', flexWrap: 'wrap' }}>
               <div className="form-group" style={{ flex: '1', minWidth: '160px' }}>
-                <label className="form-label">Timer per Part (minutes)</label>
+                <label className="form-label">Part 1 Questions</label>
                 <input
                   type="number"
                   className="form-input"
-                  value={form.config?.doubles_timer_minutes ?? 60}
-                  onChange={(e) => handleChange('config', { ...form.config, doubles_timer_minutes: parseInt(e.target.value) || 60 })}
+                  value={form.config?.doubles_part1_questions ?? ''}
+                  onChange={(e) => handleChange('config', { ...form.config, doubles_part1_questions: parseInt(e.target.value) || undefined })}
+                  min="1"
+                  placeholder="e.g. 50"
+                />
+                <small style={{ color: 'var(--text-secondary)', fontSize: '0.78rem' }}>
+                  Number of questions for Part 1.
+                </small>
+              </div>
+              <div className="form-group" style={{ flex: '1', minWidth: '160px' }}>
+                <label className="form-label">Part 2 Questions</label>
+                <input
+                  type="number"
+                  className="form-input"
+                  value={form.config?.doubles_part2_questions ?? ''}
+                  onChange={(e) => handleChange('config', { ...form.config, doubles_part2_questions: parseInt(e.target.value) ?? undefined })}
+                  min="0"
+                  placeholder="e.g. 50, or 0 to skip"
+                />
+                <small style={{ color: 'var(--text-secondary)', fontSize: '0.78rem' }}>
+                  Set to 0 for a single-part quiz (no break or Part 2).
+                </small>
+              </div>
+              <div className="form-group" style={{ flex: '1', minWidth: '160px' }}>
+                <label className="form-label">Part 1 Timer (minutes)</label>
+                <input
+                  type="number"
+                  className="form-input"
+                  value={form.config?.doubles_part1_timer_minutes ?? 60}
+                  onChange={(e) => handleChange('config', { ...form.config, doubles_part1_timer_minutes: parseInt(e.target.value) || 60 })}
                   min="1"
                   max="180"
                 />
               </div>
               <div className="form-group" style={{ flex: '1', minWidth: '160px' }}>
-                <label className="form-label">Part 1 / Part 2 Split (question index)</label>
+                <label className="form-label">Part 2 Timer (minutes)</label>
                 <input
                   type="number"
                   className="form-input"
-                  value={form.config?.doubles_split_index ?? ''}
-                  onChange={(e) => handleChange('config', { ...form.config, doubles_split_index: parseInt(e.target.value) || undefined })}
+                  value={form.config?.doubles_part2_timer_minutes ?? 60}
+                  onChange={(e) => handleChange('config', { ...form.config, doubles_part2_timer_minutes: parseInt(e.target.value) || 60 })}
                   min="1"
-                  placeholder="Default: midpoint"
+                  max="180"
+                  disabled={form.config?.doubles_part2_questions === 0}
                 />
-                <small style={{ color: 'var(--text-secondary)', fontSize: '0.78rem' }}>
-                  Questions before this index = Part 1, remaining = Part 2. Leave blank for midpoint.
-                </small>
+                {form.config?.doubles_part2_questions === 0 && (
+                  <small style={{ color: 'var(--text-secondary)', fontSize: '0.78rem' }}>
+                    N/A when Part 2 is skipped.
+                  </small>
+                )}
               </div>
             </div>
           )}

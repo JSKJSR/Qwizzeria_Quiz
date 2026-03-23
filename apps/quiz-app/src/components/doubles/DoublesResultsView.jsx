@@ -1,6 +1,6 @@
 import { exportDoublesCSV } from '@/utils/exportDoubles';
 
-export default function DoublesResultsView({ pack, playerName, passiveParticipant, part1Questions, part2Questions, responses, onReset }) {
+export default function DoublesResultsView({ pack, playerName, passiveParticipant, part1Questions, part2Questions, part2Skipped, responses, onReset }) {
   const totalQuestions = part1Questions.length + part2Questions.length;
   const answeredCount = [...part1Questions, ...part2Questions].filter(q => responses[q.id]?.trim()).length;
 
@@ -28,7 +28,7 @@ export default function DoublesResultsView({ pack, playerName, passiveParticipan
         {passiveParticipant && (
           <div className="doubles-results__stat">
             <span className="doubles-results__stat-label">Partner</span>
-            <span className="doubles-results__stat-value">{passiveParticipant.displayName || passiveParticipant.email || 'Partner'}</span>
+            <span className="doubles-results__stat-value">{passiveParticipant.displayName || 'Partner'}</span>
           </div>
         )}
         <div className="doubles-results__stat">
@@ -36,17 +36,19 @@ export default function DoublesResultsView({ pack, playerName, passiveParticipan
           <span className="doubles-results__stat-value">{answeredCount} / {totalQuestions}</span>
         </div>
         <div className="doubles-results__stat">
-          <span className="doubles-results__stat-label">Part 1</span>
+          <span className="doubles-results__stat-label">{part2Skipped ? 'Answered' : 'Part 1'}</span>
           <span className="doubles-results__stat-value">
             {part1Questions.filter(q => responses[q.id]?.trim()).length} / {part1Questions.length}
           </span>
         </div>
-        <div className="doubles-results__stat">
-          <span className="doubles-results__stat-label">Part 2</span>
-          <span className="doubles-results__stat-value">
-            {part2Questions.filter(q => responses[q.id]?.trim()).length} / {part2Questions.length}
-          </span>
-        </div>
+        {!part2Skipped && (
+          <div className="doubles-results__stat">
+            <span className="doubles-results__stat-label">Part 2</span>
+            <span className="doubles-results__stat-value">
+              {part2Questions.filter(q => responses[q.id]?.trim()).length} / {part2Questions.length}
+            </span>
+          </div>
+        )}
       </div>
 
       <div className="doubles-results__actions">

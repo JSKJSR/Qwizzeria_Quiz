@@ -66,9 +66,21 @@ export default function DoublesEventSelect({ onSelect }) {
               )}
               <div className="doubles-select__card-meta">
                 {pack.category && <span className="doubles-select__card-category">{pack.category}</span>}
-                <span className="doubles-select__card-count">{pack.question_count} questions</span>
+                <span className="doubles-select__card-count">
+                  {pack.config?.doubles_part1_questions != null
+                    ? (pack.config.doubles_part2_questions > 0
+                        ? `${pack.config.doubles_part1_questions} + ${pack.config.doubles_part2_questions} questions`
+                        : `${pack.config.doubles_part1_questions} questions`)
+                    : `${pack.question_count} questions`
+                  }
+                </span>
                 <span className="doubles-select__card-timer">
-                  {pack.config?.doubles_timer_minutes || 60} min per part
+                  {pack.config?.doubles_part1_timer_minutes != null
+                    ? (pack.config.doubles_part2_questions > 0
+                        ? `Part 1: ${pack.config.doubles_part1_timer_minutes}min / Part 2: ${pack.config.doubles_part2_timer_minutes}min`
+                        : `${pack.config.doubles_part1_timer_minutes} min`)
+                    : `${pack.config?.doubles_timer_minutes || 60} min per part`
+                  }
                 </span>
               </div>
             </div>

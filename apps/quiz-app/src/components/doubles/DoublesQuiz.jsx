@@ -48,6 +48,20 @@ export default function DoublesQuiz() {
     return () => clearTimeout(saveTimerRef.current);
   }, [state]);
 
+  const handleFinish = useCallback(() => {
+    dispatch({ type: ACTIONS.FINISH_QUIZ });
+    clearDoublesSession();
+  }, []);
+
+  const handleReset = useCallback(() => {
+    dispatch({ type: ACTIONS.RESET });
+    clearDoublesSession();
+  }, []);
+
+  const handleBackToSelect = useCallback(() => {
+    dispatch({ type: ACTIONS.RESET });
+  }, []);
+
   // Handlers
   const handleSelectPack = useCallback(async (pack) => {
     try {
@@ -75,14 +89,24 @@ export default function DoublesQuiz() {
   }, []);
 
   const handleSubmitPart1 = useCallback(() => {
-    dispatch({ type: ACTIONS.SUBMIT_PART });
-    savePartToDb(1);
-  }, [savePartToDb]);
+    if (state.part2Skipped) {
+      savePartToDb(1);
+      handleFinish();
+    } else {
+      dispatch({ type: ACTIONS.SUBMIT_PART });
+      savePartToDb(1);
+    }
+  }, [state.part2Skipped, handleFinish, savePartToDb]);
 
   const handleTimerExpiredPart1 = useCallback(() => {
-    dispatch({ type: ACTIONS.TIMER_EXPIRED });
-    savePartToDb(1);
-  }, [savePartToDb]);
+    if (state.part2Skipped) {
+      savePartToDb(1);
+      handleFinish();
+    } else {
+      dispatch({ type: ACTIONS.TIMER_EXPIRED });
+      savePartToDb(1);
+    }
+  }, [state.part2Skipped, handleFinish, savePartToDb]);
 
   const handleStartPart2 = useCallback(() => {
     dispatch({ type: ACTIONS.START_PART2 });
@@ -98,20 +122,6 @@ export default function DoublesQuiz() {
     dispatch({ type: ACTIONS.TIMER_EXPIRED_PART2 });
     savePartToDb(2);
   }, [savePartToDb]);
-
-  const handleFinish = useCallback(() => {
-    dispatch({ type: ACTIONS.FINISH_QUIZ });
-    clearDoublesSession();
-  }, []);
-
-  const handleReset = useCallback(() => {
-    dispatch({ type: ACTIONS.RESET });
-    clearDoublesSession();
-  }, []);
-
-  const handleBackToSelect = useCallback(() => {
-    dispatch({ type: ACTIONS.RESET });
-  }, []);
 
   // Render based on phase
   switch (state.phase) {
@@ -131,10 +141,12 @@ export default function DoublesQuiz() {
       return (
         <DoublesRules
           packTitle={state.pack.title}
-          timerMinutes={state.timerMinutes}
+          part1TimerMinutes={state.part1TimerMinutes}
+          part2TimerMinutes={state.part2TimerMinutes}
           part1Count={state.part1Questions.length}
           part2Count={state.part2Questions.length}
-          partnerName={state.passiveParticipant?.displayName || state.passiveParticipant?.email}
+          part2Skipped={state.part2Skipped}
+          partnerName={state.passiveParticipant?.displayName}
           onAccept={handleAcceptRules}
           onBack={handleBackToSelect}
         />
@@ -145,9 +157,10 @@ export default function DoublesQuiz() {
         <div className="doubles-overlay">
           <DoublesPartView
             partNumber={1}
+            part2Skipped={state.part2Skipped}
             questions={state.part1Questions}
             responses={state.responses}
-            timerMinutes={state.timerMinutes}
+            timerMinutes={state.part1TimerMinutes}
             timerStartedAt={state.timerStartedAt}
             onResponseChange={handleResponseChange}
             onSubmit={handleSubmitPart1}
@@ -160,10 +173,11 @@ export default function DoublesQuiz() {
       return (
         <DoublesReviewView
           partNumber={1}
+          part2Skipped={state.part2Skipped}
           questions={state.part1Questions}
           responses={state.responses}
-          onContinue={() => dispatch({ type: ACTIONS.GO_TO_BREAK })}
-          continueLabel="Continue to Break"
+          onContinue={state.part2Skipped ? handleFinish : () => dispatch({ type: ACTIONS.GO_TO_BREAK })}
+          continueLabel={state.part2Skipped ? 'See Results' : 'Continue to Break'}
         />
       );
 
@@ -173,7 +187,7 @@ export default function DoublesQuiz() {
           <h2 className="doubles-break__title">Part 1 Complete!</h2>
           <p className="doubles-break__text">Take a breather. When you're ready, start Part 2.</p>
           <p className="doubles-break__info">
-            Part 2 has {state.part2Questions.length} questions with a {state.timerMinutes}-minute timer.
+            Part 2 has {state.part2Questions.length} questions with a {state.part2TimerMinutes}-minute timer.
           </p>
           <div className="doubles-rules__warning">
             <strong>Important:</strong> Once you start Part 2, you cannot go back or reset the quiz. The timer begins immediately.
@@ -195,7 +209,7 @@ export default function DoublesQuiz() {
             partNumber={2}
             questions={state.part2Questions}
             responses={state.responses}
-            timerMinutes={state.timerMinutes}
+            timerMinutes={state.part2TimerMinutes}
             timerStartedAt={state.timerStartedAt}
             onResponseChange={handleResponseChange}
             onSubmit={handleSubmitPart2}
@@ -223,6 +237,7 @@ export default function DoublesQuiz() {
           passiveParticipant={state.passiveParticipant}
           part1Questions={state.part1Questions}
           part2Questions={state.part2Questions}
+          part2Skipped={state.part2Skipped}
           responses={state.responses}
           onReset={handleReset}
         />

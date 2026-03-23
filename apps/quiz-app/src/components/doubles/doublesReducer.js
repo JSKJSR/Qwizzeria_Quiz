@@ -25,14 +25,16 @@ export const initialState = {
   responses: {},
   part1Locked: false,
   part2Locked: false,
-  timerMinutes: 60,
+  part1TimerMinutes: 60,
+  part2TimerMinutes: 60,
+  part2Skipped: false,
   timerStartedAt: null,
   part1SessionId: null,
   part2SessionId: null,
 };
 
 /**
- * Split questions into two parts at the given split index.
+ * Split questions into two parts at the given split index (legacy).
  */
 function splitQuestions(questions, splitIndex) {
   const idx = Math.min(splitIndex, questions.length);
@@ -42,13 +44,42 @@ function splitQuestions(questions, splitIndex) {
   };
 }
 
+/**
+ * Split questions by explicit part counts.
+ */
+function splitQuestionsByCount(questions, part1Count, part2Count) {
+  const p1 = Math.min(part1Count, questions.length);
+  const remaining = questions.slice(p1);
+  const p2 = part2Count > 0 ? Math.min(part2Count, remaining.length) : 0;
+  return {
+    part1: questions.slice(0, p1),
+    part2: remaining.slice(0, p2),
+  };
+}
+
 export function reducer(state, action) {
   switch (action.type) {
     case ACTIONS.SELECT_PACK: {
       const { pack, questions, config } = action.payload;
-      const splitIndex = config?.doubles_split_index || Math.ceil(questions.length / 2);
-      const timerMinutes = config?.doubles_timer_minutes || 60;
-      const { part1, part2 } = splitQuestions(questions, splitIndex);
+      let part1, part2, p1Timer, p2Timer, skipPart2;
+
+      if (config?.doubles_part1_questions != null) {
+        // New config format: explicit question counts per part
+        const p1Count = config.doubles_part1_questions;
+        const p2Count = config.doubles_part2_questions ?? 0;
+        ({ part1, part2 } = splitQuestionsByCount(questions, p1Count, p2Count));
+        p1Timer = config.doubles_part1_timer_minutes || 60;
+        p2Timer = config.doubles_part2_timer_minutes || 60;
+        skipPart2 = p2Count === 0 || part2.length === 0;
+      } else {
+        // Legacy config format (backward compat)
+        const splitIndex = config?.doubles_split_index || Math.ceil(questions.length / 2);
+        const timerMinutes = config?.doubles_timer_minutes || 60;
+        ({ part1, part2 } = splitQuestions(questions, splitIndex));
+        p1Timer = timerMinutes;
+        p2Timer = timerMinutes;
+        skipPart2 = part2.length === 0;
+      }
 
       return {
         ...initialState,
@@ -56,7 +87,9 @@ export function reducer(state, action) {
         pack,
         part1Questions: part1,
         part2Questions: part2,
-        timerMinutes,
+        part1TimerMinutes: p1Timer,
+        part2TimerMinutes: p2Timer,
+        part2Skipped: skipPart2,
       };
     }
 

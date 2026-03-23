@@ -5,7 +5,8 @@ const DEBOUNCE_MS = 500;
 
 export default function DoublesPlayerSetup({ packTitle, onSubmit, onBack }) {
   const [name, setName] = useState('');
-  const [showPartner, setShowPartner] = useState(false);
+  const [partnerName, setPartnerName] = useState('');
+  const [showEmailLink, setShowEmailLink] = useState(false);
   const [partnerEmail, setPartnerEmail] = useState('');
   const [partnerStatus, setPartnerStatus] = useState('empty'); // empty | checking | found | not_found | unavailable | self_error | error
   const [partnerData, setPartnerData] = useState(null); // { userId, displayName }
@@ -64,8 +65,8 @@ export default function DoublesPlayerSetup({ packTitle, onSubmit, onBack }) {
     }, DEBOUNCE_MS);
   }, [validateEmail]);
 
-  const handleTogglePartner = () => {
-    setShowPartner((prev) => {
+  const handleToggleEmailLink = () => {
+    setShowEmailLink((prev) => {
       if (prev) {
         setPartnerEmail('');
         setPartnerStatus('empty');
@@ -75,18 +76,20 @@ export default function DoublesPlayerSetup({ packTitle, onSubmit, onBack }) {
     });
   };
 
-  const isPartnerValid = !showPartner || partnerStatus === 'found';
-  const canSubmit = name.trim() && isPartnerValid;
+  const canSubmit = name.trim() && partnerName.trim() && (!showEmailLink || partnerStatus !== 'checking');
 
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!canSubmit) return;
 
+    const linkedPartner = showEmailLink && partnerStatus === 'found' && partnerData;
+
     onSubmit({
       playerName: name.trim(),
-      passiveParticipant: showPartner && partnerData
-        ? { userId: partnerData.userId, displayName: partnerData.displayName, email: partnerEmail.trim().toLowerCase() }
-        : null,
+      passiveParticipant: {
+        displayName: partnerName.trim(),
+        ...(linkedPartner ? { userId: partnerData.userId, email: partnerEmail.trim().toLowerCase() } : {}),
+      },
     });
   };
 
@@ -112,17 +115,32 @@ export default function DoublesPlayerSetup({ packTitle, onSubmit, onBack }) {
           />
         </div>
 
+        <div className="doubles-player-setup__section">
+          <label className="doubles-player-setup__label" htmlFor="partner-name">
+            Partner&apos;s Name
+          </label>
+          <input
+            id="partner-name"
+            type="text"
+            className="doubles-player-setup__input"
+            value={partnerName}
+            onChange={(e) => setPartnerName(e.target.value)}
+            placeholder="Partner's name"
+            maxLength={50}
+          />
+        </div>
+
         <div className="doubles-player-setup__partner-toggle">
           <button
             type="button"
             className="doubles-btn doubles-btn--link"
-            onClick={handleTogglePartner}
+            onClick={handleToggleEmailLink}
           >
-            {showPartner ? 'Remove partner' : 'Add a partner'}
+            {showEmailLink ? 'Remove email link' : 'Link to registered partner'}
           </button>
         </div>
 
-        {showPartner && (
+        {showEmailLink && (
           <div className="doubles-player-setup__section doubles-player-setup__partner">
             <label className="doubles-player-setup__label" htmlFor="partner-email">
               Partner&apos;s Registered Email

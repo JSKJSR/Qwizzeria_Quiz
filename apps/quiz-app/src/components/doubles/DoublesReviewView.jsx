@@ -1,9 +1,11 @@
-export default function DoublesReviewView({ partNumber, questions, responses, onContinue, continueLabel }) {
+export default function DoublesReviewView({ partNumber, part2Skipped = false, questions, responses, onContinue, continueLabel }) {
   const answeredCount = questions.filter(q => responses[q.id]?.trim()).length;
 
   return (
     <div className="doubles-review">
-      <h2 className="doubles-review__title">Part {partNumber} Review</h2>
+      <h2 className="doubles-review__title">
+        {partNumber === 1 && part2Skipped ? 'Review Your Answers' : `Part ${partNumber} Review`}
+      </h2>
       <p className="doubles-review__summary">
         You answered {answeredCount} of {questions.length} questions.
       </p>

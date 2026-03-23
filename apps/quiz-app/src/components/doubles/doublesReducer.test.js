@@ -26,10 +26,12 @@ describe('doublesReducer', () => {
     expect(state.pack).toBe(mockPack);
     expect(state.part1Questions).toHaveLength(5);
     expect(state.part2Questions).toHaveLength(5);
-    expect(state.timerMinutes).toBe(30);
+    expect(state.part1TimerMinutes).toBe(30);
+    expect(state.part2TimerMinutes).toBe(30);
+    expect(state.part2Skipped).toBe(false);
   });
 
-  it('SELECT_PACK defaults to midpoint split when no split_index', () => {
+  it('SELECT_PACK defaults to midpoint split when no split_index (legacy)', () => {
     const state = reducer(initialState, {
       type: ACTIONS.SELECT_PACK,
       payload: { pack: mockPack, questions: mockQuestions, config: { doubles_enabled: true } },
@@ -37,7 +39,64 @@ describe('doublesReducer', () => {
 
     expect(state.part1Questions).toHaveLength(5);
     expect(state.part2Questions).toHaveLength(5);
-    expect(state.timerMinutes).toBe(60);
+    expect(state.part1TimerMinutes).toBe(60);
+    expect(state.part2TimerMinutes).toBe(60);
+    expect(state.part2Skipped).toBe(false);
+  });
+
+  it('SELECT_PACK with new config splits by explicit question counts', () => {
+    const newConfig = {
+      doubles_enabled: true,
+      doubles_part1_questions: 3,
+      doubles_part2_questions: 7,
+      doubles_part1_timer_minutes: 20,
+      doubles_part2_timer_minutes: 40,
+    };
+    const state = reducer(initialState, {
+      type: ACTIONS.SELECT_PACK,
+      payload: { pack: mockPack, questions: mockQuestions, config: newConfig },
+    });
+
+    expect(state.part1Questions).toHaveLength(3);
+    expect(state.part2Questions).toHaveLength(7);
+    expect(state.part1TimerMinutes).toBe(20);
+    expect(state.part2TimerMinutes).toBe(40);
+    expect(state.part2Skipped).toBe(false);
+  });
+
+  it('SELECT_PACK with part2_questions=0 sets part2Skipped', () => {
+    const skipConfig = {
+      doubles_enabled: true,
+      doubles_part1_questions: 10,
+      doubles_part2_questions: 0,
+      doubles_part1_timer_minutes: 45,
+    };
+    const state = reducer(initialState, {
+      type: ACTIONS.SELECT_PACK,
+      payload: { pack: mockPack, questions: mockQuestions, config: skipConfig },
+    });
+
+    expect(state.part1Questions).toHaveLength(10);
+    expect(state.part2Questions).toHaveLength(0);
+    expect(state.part1TimerMinutes).toBe(45);
+    expect(state.part2Skipped).toBe(true);
+  });
+
+  it('SELECT_PACK clamps when more questions requested than available', () => {
+    const overConfig = {
+      doubles_enabled: true,
+      doubles_part1_questions: 8,
+      doubles_part2_questions: 5,
+      doubles_part1_timer_minutes: 30,
+      doubles_part2_timer_minutes: 30,
+    };
+    const state = reducer(initialState, {
+      type: ACTIONS.SELECT_PACK,
+      payload: { pack: mockPack, questions: mockQuestions, config: overConfig },
+    });
+
+    expect(state.part1Questions).toHaveLength(8);
+    expect(state.part2Questions).toHaveLength(2); // only 2 remaining
   });
 
   it('SET_PLAYER with string payload transitions to rules (backward compat)', () => {

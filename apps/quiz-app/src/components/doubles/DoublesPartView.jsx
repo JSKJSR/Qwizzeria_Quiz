@@ -4,6 +4,7 @@ import DoublesQuestionView from './DoublesQuestionView';
 
 export default function DoublesPartView({
   partNumber,
+  part2Skipped = false,
   questions,
   responses,
   timerMinutes,
@@ -46,7 +47,9 @@ export default function DoublesPartView({
       {/* Sticky top bar */}
       <div className="doubles-part__topbar">
         <div className="doubles-part__info">
-          <span className="doubles-part__label">Part {partNumber}</span>
+          {!(partNumber === 1 && part2Skipped) && (
+            <span className="doubles-part__label">Part {partNumber}</span>
+          )}
           <span className="doubles-part__progress">
             {answeredCount}/{questions.length} answered
           </span>
@@ -59,7 +62,7 @@ export default function DoublesPartView({
           className="doubles-btn doubles-btn--submit"
           onClick={handleSubmitClick}
         >
-          Submit Part {partNumber}
+          {partNumber === 1 && part2Skipped ? 'Submit Results' : `Submit Part ${partNumber}`}
         </button>
       </div>
 
@@ -84,9 +87,12 @@ export default function DoublesPartView({
       {showConfirm && (
         <div className="doubles-confirm-overlay" onClick={handleCancel}>
           <div className="doubles-confirm" onClick={(e) => e.stopPropagation()}>
-            <h3 className="doubles-confirm__title">Submit Part {partNumber}?</h3>
+            <h3 className="doubles-confirm__title">
+              {partNumber === 1 && part2Skipped ? 'Submit Results?' : `Submit Part ${partNumber}?`}
+            </h3>
             <p className="doubles-confirm__text">
-              Once submitted, you will <strong>not be able to edit</strong> your responses for Part {partNumber}.
+              Once submitted, you will <strong>not be able to edit</strong> your responses
+              {partNumber === 1 && part2Skipped ? '.' : ` for Part ${partNumber}.`}
             </p>
             {unansweredCount > 0 && (
               <p className="doubles-confirm__warning">

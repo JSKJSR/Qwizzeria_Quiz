@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-export default function DoublesRules({ packTitle, timerMinutes, part1Count, part2Count, partnerName, onAccept, onBack }) {
+export default function DoublesRules({ packTitle, part1TimerMinutes, part2TimerMinutes, part1Count, part2Count, part2Skipped, partnerName, onAccept, onBack }) {
   const [accepted, setAccepted] = useState(false);
 
   return (
@@ -13,14 +13,21 @@ export default function DoublesRules({ packTitle, timerMinutes, part1Count, part
 
       <div className="doubles-rules__card">
         <ul className="doubles-rules__list">
-          <li>The quiz has <strong>two parts</strong>: Part 1 ({part1Count} questions) and Part 2 ({part2Count} questions).</li>
-          <li>You have <strong>{timerMinutes} minutes</strong> per part.</li>
+          {part2Skipped ? (
+            <li>The quiz has <strong>{part1Count} questions</strong> with a <strong>{part1TimerMinutes}-minute</strong> timer.</li>
+          ) : (
+            <>
+              <li>The quiz has <strong>two parts</strong>: Part 1 ({part1Count} questions, {part1TimerMinutes} min) and Part 2 ({part2Count} questions, {part2TimerMinutes} min).</li>
+            </>
+          )}
           <li>Type your answer for each question in the text field provided.</li>
           <li>All questions are visible in a scrollable list &mdash; answer in any order.</li>
           <li>Your responses are <strong>auto-saved</strong> as you type.</li>
           <li>When the timer expires, your part is <strong>automatically submitted</strong>.</li>
           <li>You can also submit manually before the timer runs out.</li>
-          <li>After each part, you will see a <strong>review</strong> of all questions with correct answers.</li>
+          {!part2Skipped && (
+            <li>After each part, you will see a <strong>review</strong> of all questions with correct answers.</li>
+          )}
           <li>Do <strong>not</strong> refresh or close the browser during the quiz &mdash; your progress will be saved, but the timer keeps running.</li>
         </ul>
       </div>
@@ -52,7 +59,7 @@ export default function DoublesRules({ packTitle, timerMinutes, part1Count, part
           disabled={!accepted}
           onClick={onAccept}
         >
-          Start Part 1
+          {part2Skipped ? 'Start Quiz' : 'Start Part 1'}
         </button>
       </div>
     </div>
