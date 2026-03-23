@@ -86,12 +86,14 @@ export default function DashboardLayout() {
         <button className="dashboard__hamburger" onClick={handleToggleSidebar} aria-label="Toggle menu">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><line x1="3" y1="6" x2="21" y2="6" /><line x1="3" y1="12" x2="21" y2="12" /><line x1="3" y1="18" x2="21" y2="18" /></svg>
         </button>
-        <img
-          src="/qwizzeria-logo.png"
-          alt="Qwizzeria"
-          className="dashboard__mobile-logo"
-          onError={(e) => { e.target.src = '/qwizzeria-logo.svg'; }}
-        />
+        <NavLink to="/dashboard" className="dashboard__mobile-logo-link">
+          <img
+            src="/qwizzeria-logo.png"
+            alt="Qwizzeria — Go to Dashboard"
+            className="dashboard__mobile-logo"
+            onError={(e) => { e.target.src = '/qwizzeria-logo.svg'; }}
+          />
+        </NavLink>
       </div>
 
       {/* Mobile overlay */}
@@ -105,15 +107,15 @@ export default function DashboardLayout() {
 
       {/* Sidebar */}
       <aside className={`dashboard__sidebar ${sidebarOpen ? 'dashboard__sidebar--open' : ''}`}>
-        <div className="dashboard__sidebar-header">
+        <NavLink to="/dashboard" className="dashboard__sidebar-header">
           <img
             src="/qwizzeria-logo.png"
-            alt="Qwizzeria"
+            alt="Qwizzeria — Go to Dashboard"
             className="dashboard__sidebar-logo"
             onError={(e) => { e.target.src = '/qwizzeria-logo.svg'; }}
           />
           <span className="dashboard__sidebar-tagline">I learn, therefore I am</span>
-        </div>
+        </NavLink>
 
         <nav className="dashboard__nav">
           {NAV_ITEMS.map((item) => {

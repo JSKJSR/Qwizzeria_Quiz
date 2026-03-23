@@ -53,12 +53,14 @@ export default function LandingPageB() {
 
       {/* Header */}
       <header className="landing-b__header">
-        <img
-          src="/qwizzeria-logo.png"
-          alt="Qwizzeria"
-          className="landing-b__logo"
-          onError={(e) => { e.target.src = '/qwizzeria-logo.svg'; }}
-        />
+        <Link to="/" className="landing-b__logo-link">
+          <img
+            src="/qwizzeria-logo.png"
+            alt="Qwizzeria — Home"
+            className="landing-b__logo"
+            onError={(e) => { e.target.src = '/qwizzeria-logo.svg'; }}
+          />
+        </Link>
         <nav className="landing-b__header-nav">
           <button
             className="landing-b__theme-btn"
