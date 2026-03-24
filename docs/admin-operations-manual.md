@@ -21,7 +21,8 @@ A comprehensive guide for Admin and Superadmin users to manage the Qwizzeria pla
 13. [Database Administration](#13-database-administration)
 14. [Stripe & Billing Administration](#14-stripe--billing-administration)
 15. [Security & RLS Policies](#15-security--rls-policies)
-16. [Troubleshooting](#16-troubleshooting)
+16. [AI Quiz Generation](#16-ai-quiz-generation-pro-feature)
+17. [Troubleshooting](#17-troubleshooting)
 
 ---
 
@@ -261,7 +262,16 @@ Columns: Title, Category, Questions, Type (badges: Host/Premium/Public), Status,
 3. When ready, edit the pack and set `status='active'` to publish
 4. Set `is_public=true` for the pack to appear in browse/carousel
 
-### 5.3 Pack Publication Lifecycle
+### 5.3 AI-Generated Packs
+
+Admins and Pro users can generate entire quiz packs using AI:
+1. From the **Host Quiz** setup or **Admin CMS**, select **Generate with AI**.
+2. Enter a topic (e.g., "90s Britpop"), question count (5-20), and difficulty.
+3. The system calls Claude 3.5 Sonnet to generate questions, answers, and explanations.
+4. **Review & Save:** Always review generated questions before saving. You can edit text or regenerate individual questions.
+5. Generated packs are saved with `is_public=false` and `status='draft'` by default.
+
+### 5.4 Pack Publication Lifecycle
 
 ```
 draft → active → archived
@@ -431,6 +441,12 @@ CSV export with columns: Name, Email, Role, Quizzes, Tournaments, Avg Score, Las
 | **Basic** | $9.99/mo | + Packs, History, Leaderboard, Resume |
 | **Pro** | $99.99/mo | + Doubles, Host Quiz, Tournaments, AI Generate, Buzzer, Export, Certificates |
 
+### Doubles Quiz (Pro)
+
+The Doubles Quiz supports single-part or multi-part formats:
+- **Single-Part Quizzes:** If a quiz has only one part, the "Review Part" phase is automatically skipped, and the player proceeds directly to results. Labels like "Part 1" are hidden for a cleaner UI.
+- **Multi-Part Quizzes:** Standard "Part 1" → Review → "Part 2" flow.
+
 ### How Subscriptions Work
 
 1. User visits **Pricing** page and clicks Subscribe
@@ -535,6 +551,7 @@ All admin CMS actions are logged to the `admin_audit_log` table.
 | `remove_question_from_pack` | Removing a question from a pack |
 | `update_pack_question_order` | Reordering questions in a pack |
 | `update_user_role` | Changing a user's role |
+| `ai_generate` | AI quiz generation attempt |
 
 ### Log Entry Fields
 
@@ -696,7 +713,23 @@ These cannot be done from the Admin CMS — use the Stripe Dashboard:
 
 ---
 
-## 16. Troubleshooting
+## 16. AI Quiz Generation (Pro Feature)
+
+### Overview
+Powered by Claude 3.5 Sonnet, AI generation allows users to create custom quiz packs instantly.
+
+### Rate Limits
+- **Standard Pro Users:** 5 generations per hour, 20 per day.
+- **Staff (Editor/Admin/Superadmin):** Unlimited generation.
+- Limits are enforced via the `ai_generation_log` and `get_ai_usage_stats()` RPC.
+
+### Quality Control
+- All AI content must be reviewed by an editor/admin before being marked as `is_public`.
+- Generation includes: Question text, Answer, Explanation, and auto-tagging.
+
+---
+
+## 17. Troubleshooting
 
 ### Common Issues
 

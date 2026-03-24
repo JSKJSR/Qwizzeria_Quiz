@@ -10,13 +10,13 @@ While Vitest reports high coverage percentages, it is only measuring the 16 file
 ## 2. 🟡 Medium: Component Bloat & "God Files"
 Several components have grown into "God Components" that handle layout, business logic, data fetching, and state management all in one file.
 
-* `AdminOpsManual.jsx`: **826 lines**
-* `HostQuiz.jsx`: **621 lines**
+* `AdminOpsManual.jsx`: **832 lines** (Updated content, still monolithic)
+* `HostQuiz.jsx`: **621 lines** (Logic extracted, UI decomposition complete)
 * `GuideVisuals.jsx`: **574 lines**
 * `TournamentMatchPage.jsx`: **516 lines**
 * `Profile.jsx`: **491 lines**
 
-* **Recommendation:** Refactor by extracting smaller UI fragments. For `HostQuiz.jsx`, move the grid, the question overlay, and the results scoreboard into separate files (e.g., `HostQuizGrid.jsx`, `HostQuizResults.jsx`). Similarly, split `GuideVisuals.jsx` into smaller domain-specific visual sub-files.
+* **Outcome:** `HostQuiz.jsx` now uses `hostQuizReducer.js` and lifecycle hooks. `UserList.jsx` has been split into `UserKpis`, `UserTable`, and `UserFilters`.
 
 ## 3. 🟡 Medium: Inline Styling (CSS Debt)
 A sweep of the codebase reveals **over 146 instances** of hardcoded inline styling (`style={{ ... }}`). For example, heavy usage in `TournamentMatchPage.jsx`, `ResumePlay.jsx`, and `BulkImport.jsx`.
@@ -29,5 +29,4 @@ If a database sync fails in the middle of a `FreeQuiz` answer mapping, or an une
 
 ## 5. 🔵 Low: UX / Gamification Gaps outside FreeQuiz
 Although gamification (XP, badges, streaks) is fully functional inside `FreeQuiz.jsx` and syncs down to the Database correctly, the rest of the application is blind to it.
-* **The Problem:** The `Profile.jsx` and `DashboardHome.jsx` only pull legacy stats (accuracy, total standard quizzes played).
-* **Recommendation:** Surface gamification variables on the User Dashboard. This visually reinforces the value proposition of creating an account.
+* **Outcome:** Gamification (XP, levels, badges) is now surfaced on the User Dashboard and Profile pages.

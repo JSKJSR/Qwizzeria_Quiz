@@ -19,11 +19,11 @@ export default function FreeQuizSection() {
       <GuideStep
         number={3}
         title="Answer & Progress"
-        description="Type your answer. The quiz uses fuzzy matching — close answers count! If you're marked wrong but were close, tap 'I was close' to override."
+        description="Type your answer. The quiz uses fuzzy matching — close answers count! Earn XP, level up, and unlock badges as you play. If you're marked wrong but were close, tap 'I was close' to override."
         visual={<FreeQuizInputVisual />}
       />
       <GuideTip>
-        The free quiz pulls random questions each time, so every session is different. Your score is tracked for the session — try to beat your personal best!
+        The free quiz pulls random questions each time. Your XP, streak, and badges are saved to your profile (or locally if not logged in). Try to reach Level 10: Qwizzeria Legend!
       </GuideTip>
     </GuideSection>
   );

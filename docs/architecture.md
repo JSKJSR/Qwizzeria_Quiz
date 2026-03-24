@@ -21,7 +21,10 @@ Developed using **Turborepo** and npm workspaces, the codebase is split into ind
   - Aggregated leaderboard and analytics queries via Postgres RPCs.
   - Database schema migrations (located in `packages/supabase-client/migrations`).
   - **Barrel Exports**: All core logic is re-exported from `index.js` for clean imports.
-- **`shared-types/`**: Shared TypeScript interfaces to ensure type safety across the monorepo. (Work in progress/Partial).
+- **`shared-utils/`**: Shared logic for both app and packages.
+  - **`gamification.js`**: Pure functions for XP, levels, and badge logic.
+  - **`answerMatcher.js`**: Fuzzy matching algorithm for text inputs.
+- **`shared-types/`**: Shared TypeScript interfaces to ensure type safety.
 
 ---
 
@@ -42,6 +45,12 @@ The Host Quiz integrates an AI generation flow powered by **Claude 3.5 Sonnet**:
 - **`question`**: Active question being displayed.
 - **`answer`**: Result reveal and point awarding.
 - **`results`**: Final score tally and medals.
+- **`feedback`**: (Free Quiz only) Immediate correct/wrong validation with XP reveal.
+
+### Gamification & Answer Matching
+Used in Free Quiz to increase engagement:
+- **Fuzzy Matching**: Uses Levenshtein distance and normalization to accept close answers.
+- **Progression**: XP-based levels (1-10) and achievement badges stored in `localStorage` (synced to DB for logged-in users).
 
 ### Real-time Buzzer & Host UI
 The Host Quiz features a modular **Host UI** with responsive layouts, collapsible scoreboards (Drawers), hero-sized Timer Controls, and a high-contrast Light/Dark mode toggle implementation.

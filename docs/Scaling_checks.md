@@ -59,3 +59,6 @@
 
 ## 20. No TypeScript on AI-generated code
 > AI writes confident, wrong, untyped code—and you ship it anyway
+
+## 21. No rate limiting on AI generation
+> An expensive LLM bot can bankrupt you in hours if routes are public and unmetered

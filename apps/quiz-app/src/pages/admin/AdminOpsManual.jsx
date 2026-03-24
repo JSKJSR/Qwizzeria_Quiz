@@ -161,6 +161,12 @@ export default function AdminOpsManual() {
               <td>admin+</td>
               <td>This page &mdash; comprehensive admin operations guide</td>
             </tr>
+            <tr>
+              <td><strong>AI Generate</strong></td>
+              <td><code>/host</code> (Host Mode)</td>
+              <td>Pro / staff</td>
+              <td>AI quiz pack generation (Claude 3.5 Sonnet)</td>
+            </tr>
           </tbody>
         </table>
       </SectionCard>
@@ -289,6 +295,10 @@ export default function AdminOpsManual() {
         </p>
 
         <h3 className="rtg-h3">Pack Publication Lifecycle</h3>
+        <p className="rtg-intro">
+          Packs can be created manually via the CMS, uploaded via Bulk Import, or <strong>generated with AI</strong> (Pro feature).
+        </p>
+
         <div className="rtg-steps">
           <div className="rtg-step">
             <span className="rtg-step__num">1</span>
@@ -508,6 +518,12 @@ export default function AdminOpsManual() {
           </tbody>
         </table>
 
+        <h3 className="rtg-h3">Doubles Quiz (Pro)</h3>
+        <ul className="rtg-list">
+          <li><strong>Single-Part:</strong> If a quiz has only one part, the review phase is skipped and labels like &ldquo;Part 1&rdquo; are hidden for a cleaner UX.</li>
+          <li><strong>Multi-Part:</strong> Standard two-part flow with review phase.</li>
+        </ul>
+
         <h3 className="rtg-h3">Subscription Statuses</h3>
         <table className="rtg-table">
           <thead>
@@ -612,6 +628,7 @@ WHERE user_id = 'editor-user-uuid'
               ['remove_question_from_pack', 'Removing a question from a pack'],
               ['update_pack_question_order', 'Reordering questions in a pack'],
               ['update_user_role', 'Changing a user role (superadmin)'],
+              ['ai_generate', 'AI quiz generation attempt'],
             ].map(([action, desc]) => (
               <tr key={action}>
                 <td><code>{action}</code></td>
