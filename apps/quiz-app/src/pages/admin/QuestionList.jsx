@@ -247,11 +247,22 @@ export default function QuestionList() {
       )}
 
       {loading ? (
-        <p style={{ color: 'var(--text-secondary)' }}>Loading...</p>
+        <div className="admin-table-skeleton">
+          {Array.from({ length: 8 }).map((_, i) => (
+            <div key={i} className="skeleton skeleton--row" />
+          ))}
+        </div>
       ) : questions.length === 0 ? (
-        <p style={{ color: 'var(--text-secondary)' }}>No questions found.</p>
+        <div className="admin-empty">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" strokeWidth="1.5" strokeLinecap="round" aria-hidden="true">
+            <circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" />
+          </svg>
+          <p className="admin-empty__title">No questions found</p>
+          <p className="admin-empty__hint">Try adjusting your filters or add a new question.</p>
+        </div>
       ) : (
         <>
+          <div className="admin-table-scroll">
           <table className="data-table">
             <thead>
               <tr>
@@ -329,6 +340,7 @@ export default function QuestionList() {
               ))}
             </tbody>
           </table>
+          </div>
 
           {totalPages > 1 && (
             <div className="pagination">

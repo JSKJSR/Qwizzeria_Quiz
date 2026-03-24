@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, Link } from 'react-router-dom';
 import {
   fetchPackById,
   fetchPackQuestions,
@@ -27,6 +27,7 @@ export default function PackQuestionsManager() {
   const [categoryFilter, setCategoryFilter] = useState('');
   const [categories, setCategories] = useState([]);
   const [browseLoading, setBrowseLoading] = useState(true);
+  const [removeTarget, setRemoveTarget] = useState(null);
 
   const browsePageSize = 20;
 
@@ -55,7 +56,7 @@ export default function PackQuestionsManager() {
     loadPack();
   }, [loadPack]);
 
-  // Browse all questions — loads on mount and when filters/page change
+  // Browse all questions
   const loadBrowseQuestions = useCallback(async () => {
     setBrowseLoading(true);
     try {
@@ -87,7 +88,6 @@ export default function PackQuestionsManager() {
   const handleSearchSubmit = useCallback((e) => {
     e?.preventDefault();
     setBrowsePage(1);
-    // loadBrowseQuestions will re-run via useEffect due to browsePage change
   }, []);
 
   const handleCategoryChange = useCallback((e) => {
@@ -99,7 +99,6 @@ export default function PackQuestionsManager() {
     try {
       const nextOrder = packQuestions.length;
       await addQuestionToPack(packId, questionId, nextOrder);
-      // Reload pack questions
       const questions = await fetchPackQuestions(packId);
       setPackQuestions(questions);
     } catch (err) {
@@ -112,6 +111,7 @@ export default function PackQuestionsManager() {
       await removeQuestionFromPack(packQuestionId, packId);
       const questions = await fetchPackQuestions(packId);
       setPackQuestions(questions);
+      setRemoveTarget(null);
     } catch (err) {
       alert(`Failed to remove question: ${err.message}`);
     }
@@ -148,13 +148,18 @@ export default function PackQuestionsManager() {
   const browseTotalPages = Math.ceil(totalCount / browsePageSize);
 
   if (loading) {
-    return <p style={{ color: 'var(--text-secondary)' }}>Loading...</p>;
+    return (
+      <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', color: 'var(--text-secondary)', padding: '3rem 0' }}>
+        <div className="admin-spinner" />
+        <span>Loading pack...</span>
+      </div>
+    );
   }
 
   if (error) {
     return (
       <div>
-        <p style={{ color: '#f44336' }}>{error}</p>
+        <div className="admin-error-banner">{error}</div>
         <button className="btn btn-secondary" onClick={() => navigate('/admin/packs')}>
           Back to Packs
         </button>
@@ -164,8 +169,20 @@ export default function PackQuestionsManager() {
 
   return (
     <div>
+      {/* Breadcrumb */}
+      <nav className="admin-breadcrumb" aria-label="Breadcrumb">
+        <Link to="/admin/packs" className="admin-breadcrumb__link">Packs</Link>
+        <span className="admin-breadcrumb__sep" aria-hidden="true">/</span>
+        <Link to={`/admin/packs/${packId}/edit`} className="admin-breadcrumb__link">{pack?.title || 'Pack'}</Link>
+        <span className="admin-breadcrumb__sep" aria-hidden="true">/</span>
+        <span className="admin-breadcrumb__current">Questions</span>
+      </nav>
+
       <div className="page-header">
-        <h1>Questions: {pack?.title}</h1>
+        <div className="page-header__title-group">
+          <h1>Manage Questions</h1>
+          <span className="page-header__subtitle">{pack?.title} &middot; {packQuestions.length} questions</span>
+        </div>
         <button className="btn btn-secondary" onClick={() => navigate(`/admin/packs/${packId}/edit`)}>
           Back to Pack
         </button>
@@ -183,7 +200,7 @@ export default function PackQuestionsManager() {
             onChange={(e) => setSearchTerm(e.target.value)}
           />
           <select
-            className="form-input"
+            className="form-select"
             value={categoryFilter}
             onChange={handleCategoryChange}
           >
@@ -202,13 +219,19 @@ export default function PackQuestionsManager() {
         </form>
 
         {browseLoading ? (
-          <p style={{ color: 'var(--text-secondary)', marginTop: '0.75rem' }}>Loading questions...</p>
+          <div className="admin-table-skeleton" style={{ marginTop: '0.75rem' }}>
+            {Array.from({ length: 5 }).map((_, i) => (
+              <div key={i} className="skeleton skeleton--row" />
+            ))}
+          </div>
         ) : availableQuestions.length === 0 && allQuestions.length === 0 ? (
-          <p style={{ color: 'var(--text-secondary)', marginTop: '0.75rem' }}>
-            No questions found. Try a different search or check the Questions page.
-          </p>
+          <div className="admin-empty admin-empty--compact">
+            <p className="admin-empty__title">No questions found</p>
+            <p className="admin-empty__hint">Try a different search or check the Questions page.</p>
+          </div>
         ) : (
           <>
+            <div className="admin-table-scroll">
             <table className="data-table" style={{ marginTop: '0.75rem' }}>
               <thead>
                 <tr>
@@ -247,9 +270,10 @@ export default function PackQuestionsManager() {
                 )}
               </tbody>
             </table>
+            </div>
 
             {browseTotalPages > 1 && (
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginTop: '0.75rem' }}>
+              <div className="pagination" style={{ marginTop: '0.75rem' }}>
                 <button
                   className="btn btn-secondary btn-sm"
                   disabled={browsePage <= 1}
@@ -257,7 +281,7 @@ export default function PackQuestionsManager() {
                 >
                   Previous
                 </button>
-                <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
+                <span>
                   Page {browsePage} of {browseTotalPages} ({totalCount} total)
                 </span>
                 <button
@@ -280,10 +304,12 @@ export default function PackQuestionsManager() {
         </h3>
 
         {packQuestions.length === 0 ? (
-          <p style={{ color: 'var(--text-secondary)' }}>
-            No questions in this pack yet. Use the list above to add questions.
-          </p>
+          <div className="admin-empty admin-empty--compact">
+            <p className="admin-empty__title">No questions yet</p>
+            <p className="admin-empty__hint">Use the search above to add questions to this pack.</p>
+          </div>
         ) : (
+          <div className="admin-table-scroll">
           <table className="data-table">
             <thead>
               <tr>
@@ -311,6 +337,7 @@ export default function PackQuestionsManager() {
                           disabled={index === 0}
                           onClick={() => handleMoveUp(index)}
                           title="Move up"
+                          aria-label={`Move question ${index + 1} up`}
                         >
                           ↑
                         </button>
@@ -319,6 +346,7 @@ export default function PackQuestionsManager() {
                           disabled={index === packQuestions.length - 1}
                           onClick={() => handleMoveDown(index)}
                           title="Move down"
+                          aria-label={`Move question ${index + 1} down`}
                         >
                           ↓
                         </button>
@@ -327,7 +355,7 @@ export default function PackQuestionsManager() {
                     <td>
                       <button
                         className="btn btn-danger btn-sm"
-                        onClick={() => handleRemove(pq.id)}
+                        onClick={() => setRemoveTarget(pq.id)}
                       >
                         Remove
                       </button>
@@ -337,8 +365,27 @@ export default function PackQuestionsManager() {
               })}
             </tbody>
           </table>
+          </div>
         )}
       </div>
+
+      {/* Remove confirmation dialog */}
+      {removeTarget && (
+        <div className="confirm-overlay" onClick={() => setRemoveTarget(null)}>
+          <div className="confirm-dialog" onClick={(e) => e.stopPropagation()}>
+            <h3>Remove Question</h3>
+            <p>Remove this question from the pack? The question itself won't be deleted.</p>
+            <div className="confirm-dialog__actions">
+              <button className="btn btn-secondary" onClick={() => setRemoveTarget(null)}>
+                Cancel
+              </button>
+              <button className="btn btn-danger" onClick={() => handleRemove(removeTarget)}>
+                Remove
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

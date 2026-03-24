@@ -129,15 +129,18 @@ export default function Profile() {
     }
   };
 
+  const [deleteError, setDeleteError] = useState(null);
+
   const handleDeleteAccount = async () => {
     if (deleteConfirm !== 'DELETE') return;
     setDeleting(true);
+    setDeleteError(null);
     try {
       await deleteOwnAccount();
       await signOut();
       navigate('/');
     } catch (err) {
-      alert(`Failed to delete account: ${err.message}`);
+      setDeleteError(err.message);
       setDeleting(false);
     }
   };
@@ -441,6 +444,12 @@ export default function Profile() {
         <p className="profile__danger-text">
           Once you delete your account, there is no going back. All your data will be permanently removed.
         </p>
+
+        {deleteError && (
+          <p className="profile__feedback profile__feedback--error" role="alert">
+            Failed to delete account: {deleteError}
+          </p>
+        )}
 
         {!showDeleteConfirm ? (
           <button

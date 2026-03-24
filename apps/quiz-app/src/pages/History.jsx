@@ -155,9 +155,11 @@ export default function History() {
 
               return (
                 <div key={session.id} className="history__item">
-                  <div
+                  <button
+                    type="button"
                     className="history__item-row"
                     onClick={() => handleToggleExpand(session.id)}
+                    aria-expanded={isExpanded}
                   >
                     <div className="history__item-info">
                       <div className="history__item-pack">
@@ -185,10 +187,10 @@ export default function History() {
                     <span className={`history__item-status history__item-status--${session.status || 'completed'}`}>
                       {session.status === 'in_progress' ? 'In Progress' : session.status === 'abandoned' ? 'Abandoned' : 'Completed'}
                     </span>
-                    <span className={`history__item-expand ${isExpanded ? 'history__item-expand--open' : ''}`}>
+                    <span className={`history__item-expand ${isExpanded ? 'history__item-expand--open' : ''}`} aria-hidden="true">
                       &#9654;
                     </span>
-                  </div>
+                  </button>
 
                   {isExpanded && (
                     <div className="history__detail">
@@ -266,16 +268,6 @@ export default function History() {
                       {!isHostQuiz && session.status === 'in_progress' && (
                         <button
                           className="history__resume-btn"
-                          style={{
-                            marginTop: '0.75rem',
-                            padding: '0.5rem 1rem',
-                            background: 'var(--accent-primary, #e85c1a)',
-                            color: '#fff',
-                            border: 'none',
-                            borderRadius: '8px',
-                            cursor: 'pointer',
-                            fontSize: '0.85rem',
-                          }}
                           onClick={() => navigate(`/play/resume/${session.id}`)}
                         >
                           Resume Quiz

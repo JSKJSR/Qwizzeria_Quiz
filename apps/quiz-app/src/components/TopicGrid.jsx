@@ -13,7 +13,17 @@ export default function TopicGrid({ topics, completedQuestionIds, onSelectQuesti
               <div
                 key={q.id}
                 className={`topic-grid__cell ${isCompleted ? 'topic-grid__cell--completed' : ''}`}
+                role={isCompleted ? undefined : 'button'}
+                tabIndex={isCompleted ? -1 : 0}
                 onClick={() => !isCompleted && onSelectQuestion(q)}
+                onKeyDown={(e) => {
+                  if (!isCompleted && (e.key === 'Enter' || e.key === ' ')) {
+                    e.preventDefault();
+                    onSelectQuestion(q);
+                  }
+                }}
+                aria-label={`${q.topic}, ${q.points} points${isCompleted ? ', completed' : ''}`}
+                aria-disabled={isCompleted || undefined}
               >
                 <div className="topic-grid__topic">{q.topic}</div>
                 <div className="topic-grid__points">{q.points}</div>

@@ -29,7 +29,17 @@ export default function HostTopicGrid({ topics, completedQuestionIds, skippedQue
               <div
                 key={q.id}
                 className={cellClass}
+                role={isCompleted ? undefined : 'button'}
+                tabIndex={isCompleted ? -1 : 0}
                 onClick={() => !isCompleted && onSelectQuestion(q)}
+                onKeyDown={(e) => {
+                  if (!isCompleted && (e.key === 'Enter' || e.key === ' ')) {
+                    e.preventDefault();
+                    onSelectQuestion(q);
+                  }
+                }}
+                aria-label={`${q.topic}, ${q.points} points${isCompleted ? ', answered' : isSkipped ? ', skipped' : ''}`}
+                aria-disabled={isCompleted || undefined}
               >
                 {/* Status badge */}
                 {isCompleted && (

@@ -101,13 +101,15 @@ button:disabled {
   opacity: 0.5;
 }
 
-input {
+input, select, textarea {
   font-family: var(--font-family);
+  font-size: 16px; /* Prevents iOS zoom on focus */
 }
 
 button:focus-visible,
 input:focus-visible,
 select:focus-visible,
+textarea:focus-visible,
 a:focus-visible {
   outline: 2px solid var(--accent-primary);
   outline-offset: 2px;

@@ -23,7 +23,7 @@
 .leaderboard__back-btn {
   background: none;
   border: none;
-  color: #aaa;
+  color: var(--text-secondary);
   font-size: 0.9rem;
   cursor: pointer;
 }
@@ -75,7 +75,7 @@
 .leaderboard__table th {
   text-align: left;
   font-size: 0.75rem;
-  color: #999;
+  color: var(--text-muted);
   text-transform: uppercase;
   letter-spacing: 0.05em;
   padding: 0.75rem 0.75rem;
@@ -122,7 +122,7 @@
 .leaderboard__empty {
   text-align: center;
   padding: 3rem;
-  color: #999;
+  color: var(--text-muted);
 }
 
 .leaderboard__loading {
@@ -146,7 +146,7 @@
 /* Pack leaderboard (mini version on PackDetail) */
 .leaderboard__skeleton { padding: 1rem 0; display: flex; flex-direction: column; gap: 0.75rem; }
 
-.leaderboard__error { text-align: center; padding: 3rem; color: #999; }
+.leaderboard__error { text-align: center; padding: 3rem; color: var(--text-muted); }
 .leaderboard__retry-btn {
   margin-top: 1rem;
   padding: 0.6rem 1.2rem;
@@ -177,7 +177,7 @@
 .pack-leaderboard__table th {
   text-align: left;
   font-size: 0.7rem;
-  color: #999;
+  color: var(--text-muted);
   text-transform: uppercase;
   padding: 0.5rem;
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);

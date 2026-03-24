@@ -21,7 +21,7 @@
 .pack-browse__back-btn {
   background: none;
   border: none;
-  color: #aaa;
+  color: var(--text-secondary);
   font-size: 0.9rem;
   cursor: pointer;
   padding: 0.25rem 0.5rem;
@@ -122,7 +122,7 @@
   padding: 0.2rem 0.5rem;
   border-radius: 4px;
   background: rgba(255, 255, 255, 0.08);
-  color: #aaa;
+  color: var(--text-secondary);
 }
 
 .pack-browse__badge--premium {
@@ -148,7 +148,7 @@
 
 .pack-browse__card-desc {
   font-size: 0.85rem;
-  color: #999;
+  color: var(--text-muted);
   margin-bottom: 0.75rem;
   display: -webkit-box;
   -webkit-line-clamp: 2;
@@ -160,13 +160,13 @@
   display: flex;
   justify-content: space-between;
   font-size: 0.8rem;
-  color: #777;
+  color: var(--text-muted);
 }
 
 .pack-browse__empty {
   text-align: center;
   padding: 3rem;
-  color: #999;
+  color: var(--text-muted);
 }
 
 .pack-browse__loading {
@@ -184,7 +184,7 @@
   gap: 1.25rem;
 }
 
-.pack-browse__error { text-align: center; padding: 3rem; color: #999; }
+.pack-browse__error { text-align: center; padding: 3rem; color: var(--text-muted); }
 .pack-browse__retry-btn {
   margin-top: 1rem;
   padding: 0.6rem 1.2rem;

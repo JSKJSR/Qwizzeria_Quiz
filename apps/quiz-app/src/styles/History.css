@@ -23,7 +23,7 @@
 .history__back-btn {
   background: none;
   border: none;
-  color: #aaa;
+  color: var(--text-secondary);
   font-size: 0.9rem;
   cursor: pointer;
 }
@@ -79,6 +79,12 @@
   padding: 1rem 1.25rem;
   cursor: pointer;
   transition: background 0.15s;
+  width: 100%;
+  background: none;
+  border: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
 }
 
 .history__item-row:hover {
@@ -96,7 +102,7 @@
 
 .history__item-date {
   font-size: 0.8rem;
-  color: #999;
+  color: var(--text-muted);
 }
 
 .history__item-score {
@@ -125,11 +131,11 @@
 
 .history__item-status--abandoned {
   background: rgba(255, 255, 255, 0.06);
-  color: #888;
+  color: var(--text-muted);
 }
 
 .history__item-expand {
-  color: #777;
+  color: var(--text-muted);
   font-size: 0.9rem;
   transition: transform 0.2s;
 }
@@ -168,7 +174,7 @@
 }
 
 .history__detail-message {
-  color: #999;
+  color: var(--text-muted);
   font-size: 0.85rem;
   padding: 0.5rem;
 }
@@ -195,7 +201,7 @@
 .history__detail-table th {
   text-align: left;
   font-size: 0.75rem;
-  color: #999;
+  color: var(--text-muted);
   padding: 0.4rem 0.5rem;
   border-bottom: 1px solid rgba(255, 255, 255, 0.06);
 }
@@ -211,11 +217,11 @@
 }
 
 .history__detail-wrong {
-  color: #f44336;
+  color: var(--accent-danger);
 }
 
 .history__detail-skipped {
-  color: #888;
+  color: var(--text-muted);
 }
 
 /* Pagination */
@@ -243,13 +249,13 @@
 
 .history__page-text {
   font-size: 0.85rem;
-  color: #999;
+  color: var(--text-muted);
 }
 
 .history__empty {
   text-align: center;
   padding: 3rem;
-  color: #999;
+  color: var(--text-muted);
 }
 
 .history__loading {
@@ -263,7 +269,7 @@
 
 .history__skeleton { padding: 1rem 0; display: flex; flex-direction: column; gap: 0.75rem; }
 
-.history__error { text-align: center; padding: 3rem; color: #999; }
+.history__error { text-align: center; padding: 3rem; color: var(--text-muted); }
 .history__retry-btn {
   margin-top: 1rem;
   padding: 0.6rem 1.2rem;
@@ -283,4 +289,43 @@
   border-top-color: var(--accent-primary, #e85c1a);
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
+}
+
+/* Resume button (was inline-styled) */
+.history__resume-btn {
+  margin-top: 0.75rem;
+  padding: 0.5rem 1rem;
+  background: var(--accent-primary, #e85c1a);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 600;
+  transition: opacity 0.15s;
+}
+
+.history__resume-btn:hover {
+  opacity: 0.85;
+}
+
+/* Detail table scroll on mobile */
+.history__detail {
+  overflow-x: auto;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .history__item-row {
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .history__item-score {
+    margin-right: 0.5rem;
+  }
+
+  .history__item-status {
+    font-size: 0.65rem;
+  }
 }
