@@ -197,6 +197,19 @@ export async function updateUserRole(userId, role) {
 }
 
 /**
+ * Admin-set user subscription tier (admin/superadmin only).
+ * tier: 'free' | 'basic' | 'pro'
+ */
+export async function adminSetUserSubscription(userId, tier) {
+  const supabase = getSupabase();
+  const { error } = await supabase.rpc('admin_set_user_subscription', {
+    target_user_id: userId,
+    new_tier: tier,
+  });
+  if (error) throw new Error(`Failed to update subscription: ${error.message}`);
+}
+
+/**
  * Fetch all users with emails via admin RPC (admin/superadmin only).
  * Returns { users: [...], total: number }
  */
@@ -208,11 +221,12 @@ export async function fetchUserManagementKPIs() {
   return data;
 }
 
-export async function fetchAllUsersWithEmail({ search, role, page = 1, pageSize = 20 } = {}) {
+export async function fetchAllUsersWithEmail({ search, role, tier, page = 1, pageSize = 20 } = {}) {
   const supabase = getSupabase();
   const { data, error } = await supabase.rpc('get_all_users_admin', {
     search_query: search || null,
     role_filter: role || null,
+    tier_filter: tier || null,
     result_limit: pageSize,
     result_offset: (page - 1) * pageSize,
   });

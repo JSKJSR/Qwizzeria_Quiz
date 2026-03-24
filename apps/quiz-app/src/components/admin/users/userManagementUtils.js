@@ -25,11 +25,12 @@ export function isStaffRole(role) {
 }
 
 export function exportCSV(users) {
-  const headers = ['Name', 'Email', 'Role', 'Quizzes', 'Tournaments', 'Avg Score', 'Last Active', 'Joined'];
+  const headers = ['Name', 'Email', 'Role', 'Subscription', 'Quizzes', 'Tournaments', 'Avg Score', 'Last Active', 'Joined'];
   const rows = users.map((u) => [
     u.display_name || '',
     u.email || '',
     u.role || '',
+    isStaffRole(u.role) ? 'Staff' : (u.subscription_tier || 'free'),
     u.quiz_count ?? '',
     u.tournament_count ?? '',
     u.avg_score ?? '',

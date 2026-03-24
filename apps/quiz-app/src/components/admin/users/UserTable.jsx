@@ -1,5 +1,26 @@
 import { isActiveUser, isStaffRole, formatRelativeTime } from './userManagementUtils';
 
+function getTierDisplay(user) {
+  if (isStaffRole(user.role)) return { label: 'Staff', badge: 'badge--subscription-staff', status: null };
+  const tier = user.subscription_tier;
+  const status = user.subscription_status;
+  if (tier === 'pro' && status && status !== 'expired') return { label: 'Pro', badge: 'badge--subscription-pro', status };
+  if (tier === 'basic' && status && status !== 'expired') return { label: 'Basic', badge: 'badge--subscription-basic', status };
+  return { label: 'Free', badge: 'badge--subscription-free', status: null };
+}
+
+function getStatusHint(status) {
+  if (status === 'canceled') return { text: 'Canceled', className: 'sub-status-text--warning' };
+  if (status === 'past_due') return { text: 'Past due', className: 'sub-status-text--danger' };
+  return null;
+}
+
+function getUserTier(user) {
+  if (isStaffRole(user.role)) return 'pro';
+  if (user.subscription_tier && user.subscription_status !== 'expired') return user.subscription_tier;
+  return 'free';
+}
+
 export default function UserTable({
   users,
   editingUser,
@@ -9,6 +30,7 @@ export default function UserTable({
   onSaveRole,
   onCancelEdit,
   onSetActionMenuOpen,
+  onSubscriptionChange,
   roles,
 }) {
   return (
@@ -31,6 +53,8 @@ export default function UserTable({
           const selectedRole = isEditing ? editingUser.newRole : u.role;
           const hasChanged = isEditing && editingUser.newRole !== u.role;
           const active = isActiveUser(u.last_active);
+          const tierInfo = getTierDisplay(u);
+          const statusHint = getStatusHint(tierInfo.status);
 
           return (
             <tr key={u.id}>
@@ -41,36 +65,17 @@ export default function UserTable({
                     <img
                       src={u.avatar_url}
                       alt=""
-                      style={{
-                        width: 32,
-                        height: 32,
-                        borderRadius: '50%',
-                        objectFit: 'cover',
-                        flexShrink: 0,
-                      }}
+                      className="user-table__avatar"
                       onError={(e) => { e.target.style.display = 'none'; }}
                     />
                   ) : (
-                    <div
-                      style={{
-                        width: 32,
-                        height: 32,
-                        borderRadius: '50%',
-                        background: 'var(--bg-card-hover)',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        fontSize: '0.8rem',
-                        color: 'var(--text-muted)',
-                        flexShrink: 0,
-                      }}
-                    >
+                    <div className="user-table__avatar-placeholder">
                       {(u.display_name || u.email || '?')[0].toUpperCase()}
                     </div>
                   )}
                   <div className="user-table__name-info">
                     <span className="user-table__name">
-                      {u.display_name || '—'}
+                      {u.display_name || '\u2014'}
                     </span>
                     <span className="user-table__email">
                       {u.email}
@@ -79,11 +84,14 @@ export default function UserTable({
                 </div>
               </td>
 
-              {/* Subscription badge */}
+              {/* Subscription badge + status hint */}
               <td>
-                <span className={`badge ${isStaffRole(u.role) ? 'badge--subscription-premium' : 'badge--subscription-free'}`}>
-                  {isStaffRole(u.role) ? 'Staff' : 'User'}
-                </span>
+                <span className={`badge ${tierInfo.badge}`}>{tierInfo.label}</span>
+                {statusHint && (
+                  <span className={`sub-status-text ${statusHint.className}`}>
+                    {statusHint.text}
+                  </span>
+                )}
               </td>
 
               {/* Quizzes */}
@@ -98,11 +106,11 @@ export default function UserTable({
 
               {/* Avg Score */}
               <td className="col-avg-score">
-                {u.avg_score != null ? `${u.avg_score}%` : '—'}
+                {u.avg_score != null ? `${u.avg_score}%` : '\u2014'}
               </td>
 
               {/* Last Active */}
-              <td className="col-last-active" style={{ fontSize: 'var(--font-size-xs)', color: 'var(--text-muted)' }}>
+              <td className="col-last-active col-muted">
                 {formatRelativeTime(u.last_active)}
               </td>
 
@@ -117,7 +125,7 @@ export default function UserTable({
               {/* Actions */}
               <td>
                 {hasChanged ? (
-                  <div style={{ display: 'flex', gap: '0.4rem' }}>
+                  <div className="user-table__action-btns">
                     <button
                       className="btn btn-primary btn-sm"
                       onClick={() =>
@@ -156,14 +164,17 @@ export default function UserTable({
                       onClick={() =>
                         onSetActionMenuOpen(actionMenuOpen === u.id ? null : u.id)
                       }
-                      aria-label="Actions"
+                      aria-label={`Actions for ${u.display_name || u.email}`}
+                      aria-haspopup="true"
+                      aria-expanded={actionMenuOpen === u.id || undefined}
                     >
                       &#8942;
                     </button>
                     {actionMenuOpen === u.id && (
-                      <div className="action-dropdown__menu">
+                      <div className="action-dropdown__menu" role="menu">
                         <button
                           className="action-dropdown__item"
+                          role="menuitem"
                           onClick={() => {
                             onRoleChange(u.id, u.role);
                             onSetActionMenuOpen(null);
@@ -173,6 +184,17 @@ export default function UserTable({
                         </button>
                         <button
                           className="action-dropdown__item"
+                          role="menuitem"
+                          onClick={() => {
+                            onSubscriptionChange(u.id, u.display_name || u.email, getUserTier(u));
+                            onSetActionMenuOpen(null);
+                          }}
+                        >
+                          Change Subscription
+                        </button>
+                        <button
+                          className="action-dropdown__item"
+                          role="menuitem"
                           disabled
                           title="Coming soon"
                         >
@@ -180,6 +202,7 @@ export default function UserTable({
                         </button>
                         <button
                           className="action-dropdown__item action-dropdown__item--danger"
+                          role="menuitem"
                           disabled
                           title="Coming soon"
                         >

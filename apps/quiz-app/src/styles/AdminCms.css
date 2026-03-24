@@ -513,15 +513,146 @@
   text-overflow: ellipsis;
 }
 
-/* Subscription badge */
-.badge--subscription-premium {
+/* Subscription badges */
+.badge--subscription-staff {
+  background: rgba(156, 39, 176, 0.15);
+  color: #ce93d8;
+}
+
+.badge--subscription-pro {
   background: rgba(232, 168, 37, 0.15);
   color: var(--accent-warning);
+}
+
+.badge--subscription-basic {
+  background: rgba(33, 150, 243, 0.15);
+  color: #64b5f6;
 }
 
 .badge--subscription-free {
   background: rgba(176, 160, 165, 0.1);
   color: var(--text-muted);
+}
+
+/* Subscription modal */
+.confirm-dialog--subscription {
+  max-width: 460px;
+}
+
+.confirm-dialog__user {
+  margin-bottom: 1rem;
+}
+
+.sub-tier-picker {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1.25rem;
+}
+
+.sub-tier-card {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-color);
+  background: transparent;
+  color: var(--text-primary);
+  font: inherit;
+  cursor: pointer;
+  text-align: left;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.sub-tier-card:hover {
+  border-color: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.sub-tier-card--selected {
+  border-color: var(--accent-primary);
+  background: rgba(232, 92, 26, 0.08);
+}
+
+.sub-tier-card--current {
+  position: relative;
+}
+
+.sub-tier-card__desc {
+  flex: 1;
+  font-size: var(--font-size-xs);
+  color: var(--text-muted);
+}
+
+.sub-tier-card__tag {
+  font-size: 0.65rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+  background: rgba(255, 255, 255, 0.06);
+  padding: 0.15rem 0.4rem;
+  border-radius: 3px;
+}
+
+.sub-modal__alert {
+  margin-bottom: 1rem;
+}
+
+.sub-modal__note {
+  font-size: var(--font-size-xs);
+  color: var(--text-muted);
+  margin: 0 0 1rem;
+}
+
+/* User table avatar */
+.user-table__avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.user-table__avatar-placeholder {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--bg-card-hover);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+
+/* User table helpers */
+.user-table__action-btns {
+  display: flex;
+  gap: 0.4rem;
+}
+
+.col-muted {
+  font-size: var(--font-size-xs);
+  color: var(--text-muted);
+}
+
+/* Subscription status sub-text */
+.sub-status-text {
+  display: block;
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  margin-top: 0.15rem;
+}
+
+.sub-status-text--warning {
+  color: var(--accent-warning);
+}
+
+.sub-status-text--danger {
+  color: var(--accent-danger);
 }
 
 /* Status badge with dot */

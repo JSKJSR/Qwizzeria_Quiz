@@ -3,11 +3,13 @@ import {
     fetchAllUsersWithEmail,
     fetchUserManagementKPIs,
     updateUserRole,
+    adminSetUserSubscription,
 } from '@qwizzeria/supabase-client';
 import UserKpis from '../../components/admin/users/UserKpis';
 import UserFilters from '../../components/admin/users/UserFilters';
 import UserTable from '../../components/admin/users/UserTable';
 import UserRoleConfirmModal from '../../components/admin/users/UserRoleConfirmModal';
+import UserSubscriptionModal from '../../components/admin/users/UserSubscriptionModal';
 import { exportCSV } from '../../components/admin/users/userManagementUtils';
 
 const ROLES = ['user', 'editor', 'admin', 'superadmin'];
@@ -16,10 +18,11 @@ export default function UserList() {
     const [users, setUsers] = useState([]);
     const [total, setTotal] = useState(0);
     const [page, setPage] = useState(1);
-    const [filters, setFilters] = useState({ search: '', role: '' });
+    const [filters, setFilters] = useState({ search: '', role: '', tier: '' });
     const [loading, setLoading] = useState(true);
     const [editingUser, setEditingUser] = useState(null);
     const [confirmTarget, setConfirmTarget] = useState(null);
+    const [subscriptionTarget, setSubscriptionTarget] = useState(null);
     const [saving, setSaving] = useState(false);
     const [feedback, setFeedback] = useState(null);
     const [kpis, setKpis] = useState(null);
@@ -62,6 +65,7 @@ export default function UserList() {
             const result = await fetchAllUsersWithEmail({
                 search: filters.search || undefined,
                 role: filters.role || undefined,
+                tier: filters.tier || undefined,
                 page,
                 pageSize,
             });
@@ -98,6 +102,11 @@ export default function UserList() {
         setPage(1);
     };
 
+    const handleTierFilterChange = (value) => {
+        setFilters((prev) => ({ ...prev, tier: value }));
+        setPage(1);
+    };
+
     const handleRoleChange = (userId, newRole) => {
         setEditingUser({ id: userId, newRole });
         setActionMenuOpen(null);
@@ -123,6 +132,35 @@ export default function UserList() {
             loadKpis();
         } catch (err) {
             setFeedback({ type: 'error', message: `Failed to update role: ${err.message}` });
+        } finally {
+            setSaving(false);
+        }
+    };
+
+    const handleSubscriptionChange = (userId, displayName, currentTier) => {
+        setSubscriptionTarget({ userId, displayName, currentTier, newTier: currentTier });
+        setActionMenuOpen(null);
+    };
+
+    const handleSubscriptionTierChange = (newTier) => {
+        setSubscriptionTarget((prev) => prev ? { ...prev, newTier } : null);
+    };
+
+    const handleConfirmSubscription = async () => {
+        if (!subscriptionTarget) return;
+        setSaving(true);
+        setFeedback(null);
+        try {
+            await adminSetUserSubscription(subscriptionTarget.userId, subscriptionTarget.newTier);
+            setFeedback({
+                type: 'success',
+                message: `${subscriptionTarget.displayName || 'User'} subscription updated to ${subscriptionTarget.newTier}`,
+            });
+            setSubscriptionTarget(null);
+            loadUsers();
+            loadKpis();
+        } catch (err) {
+            setFeedback({ type: 'error', message: `Failed to update subscription: ${err.message}` });
         } finally {
             setSaving(false);
         }
@@ -178,6 +216,8 @@ export default function UserList() {
               onSearchChange={setSearchInput}
               roleFilter={filters.role}
               onRoleFilterChange={handleRoleFilterChange}
+              tierFilter={filters.tier}
+              onTierFilterChange={handleTierFilterChange}
               roles={ROLES}
               tableRef={tableRef}
             />
@@ -198,6 +238,7 @@ export default function UserList() {
                       onSaveRole={handleSaveRole}
                       onCancelEdit={() => setEditingUser(null)}
                       onSetActionMenuOpen={setActionMenuOpen}
+                      onSubscriptionChange={handleSubscriptionChange}
                       roles={ROLES}
                     />
 
@@ -230,6 +271,14 @@ export default function UserList() {
               saving={saving}
               onConfirm={handleConfirmSave}
               onCancel={() => setConfirmTarget(null)}
+            />
+
+            <UserSubscriptionModal
+              target={subscriptionTarget}
+              saving={saving}
+              onConfirm={handleConfirmSubscription}
+              onCancel={() => setSubscriptionTarget(null)}
+              onTierChange={handleSubscriptionTierChange}
             />
         </div>
     );
