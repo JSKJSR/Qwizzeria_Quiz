@@ -5,7 +5,10 @@ export default function FreeAnswerView({ question, isCorrect, userAnswer, xpEarn
   useEffect(() => {
     function handleKey(e) {
       if (e.key === 'Escape') onReturn();
-      if (e.key === 'Enter') onContinue();
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        onContinue();
+      }
     }
     window.addEventListener('keydown', handleKey);
     return () => window.removeEventListener('keydown', handleKey);

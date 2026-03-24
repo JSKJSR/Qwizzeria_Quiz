@@ -86,7 +86,7 @@ export default function QuestionView({ question, onRevealAnswer, onSubmitAnswer,
 
   const handleFormSubmit = (e) => {
     e?.preventDefault();
-    if (showAnswerInput && onSubmitAnswer) doSubmit(answerText);
+    if (showAnswerInput && onSubmitAnswer && answerText.trim()) doSubmit(answerText);
   };
 
   useEffect(() => {
