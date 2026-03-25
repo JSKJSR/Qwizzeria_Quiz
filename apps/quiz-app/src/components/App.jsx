@@ -18,7 +18,9 @@ import ResumePlay from '../pages/ResumePlay';
 import HostQuizPage from '../pages/HostQuizPage';
 import DoublesPage from '../pages/DoublesPage';
 import Guide from '../pages/Guide';
-import Pricing from '../pages/Pricing';
+// To restore full pricing page: swap PricingComingSoon → Pricing
+// import Pricing from '../pages/Pricing';
+import PricingComingSoon from '../pages/PricingComingSoon';
 import TournamentBracketPage from '../pages/TournamentBracketPage';
 import TournamentMatchPage from '../pages/TournamentMatchPage';
 import BuzzerPage from '../pages/BuzzerPage';
@@ -58,7 +60,7 @@ export default function App() {
             <Route path="/dashboard" element={<DashboardHome />} />
             <Route path="/profile" element={<Profile />} />
             <Route path="/guide" element={<Guide />} />
-            <Route path="/pricing" element={<Pricing />} />
+            <Route path="/pricing" element={<PricingComingSoon />} />
 
             {/* Basic tier routes */}
             <Route element={<TierRoute requiredTier="basic" />}>

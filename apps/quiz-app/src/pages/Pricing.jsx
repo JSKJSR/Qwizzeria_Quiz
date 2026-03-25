@@ -70,7 +70,7 @@ export default function Pricing() {
     <div className="pricing">
       <SEO
         title="Pricing"
-        description="Choose your Qwizzeria plan. Free, Basic ($9.99/mo), or Pro ($99.99/mo) — host quizzes, play packs, and compete on leaderboards."
+        description="Choose your Qwizzeria plan. Free, Basic ($9.99/mo), or Pro ($19.99/mo) — host quizzes, play packs, and compete on leaderboards."
         path="/pricing"
         jsonLd={{
           '@context': 'https://schema.org',

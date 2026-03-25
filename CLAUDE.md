@@ -106,7 +106,7 @@ Access restricted via role checks (editor, admin, superadmin).
 ## Subscription & Tier System
 
 - **Tier config**: `apps/quiz-app/src/config/tiers.js` — single source of truth for tier hierarchy, pricing, feature-to-tier mapping
-- **Tiers**: Free ($0) → Basic ($4.99/mo) → Pro ($9.99/mo). Staff roles bypass all gating.
+- **Tiers**: Free ($0) → Basic ($9.99/mo) → Pro ($19.99/mo). Staff roles bypass all gating.
 - **Trial**: 14-day Pro trial computed from `user_profiles.created_at` (no Stripe trial)
 - **Gating hook**: `useEntitlement(feature)` — returns `{ allowed, requiredTier, currentTier, reason }`
 - **Gating components**: `TierRoute` (layout route), `SubscriptionGate` (wrapper), `UpgradeWall` (contextual messaging)

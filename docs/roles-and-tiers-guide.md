@@ -12,7 +12,7 @@ Every user in Qwizzeria belongs to one of three pricing tiers. The tier determin
 
 | | **Free** | **Basic** | **Pro** |
 |---|---|---|---|
-| **Price** | $0 | $9.99/month | $99.99/month |
+| **Price** | $0 | $9.99/month | $19.99/month |
 | **How to get it** | Default after trial expires | Subscribe via Pricing page | Subscribe via Pricing page |
 
 ### What Each Tier Includes
@@ -176,11 +176,11 @@ Each subscription is per-user. For team or classroom pricing, contact us for bul
 | Play a quick quiz | Nothing (Free Quiz is public) |
 | Play curated quiz packs | Basic ($9.99/mo) |
 | Track my scores and compete | Basic ($9.99/mo) |
-| Play Doubles quiz | Pro ($99.99/mo) |
-| Host a live quiz for my team | Pro ($99.99/mo) |
-| Generate quizzes with AI | Pro ($99.99/mo) |
-| Run a tournament bracket | Pro ($99.99/mo) |
-| Use the real-time buzzer | Pro ($99.99/mo) |
+| Play Doubles quiz | Pro ($19.99/mo) |
+| Host a live quiz for my team | Pro ($19.99/mo) |
+| Generate quizzes with AI | Pro ($19.99/mo) |
+| Run a tournament bracket | Pro ($19.99/mo) |
+| Use the real-time buzzer | Pro ($19.99/mo) |
 
 ### For Internal Team
 | I want to... | I need... |

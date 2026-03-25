@@ -25,7 +25,7 @@ export const TIERS = {
   },
   pro: {
     name: 'Pro',
-    price: '$99.99',
+    price: '$19.99',
     period: '/month',
     popular: true,
     priceId: import.meta.env.VITE_STRIPE_PRO_PRICE_ID || null,

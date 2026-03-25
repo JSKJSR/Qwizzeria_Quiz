@@ -139,14 +139,22 @@
   100% { transform: translate(-50%, -50%) scale(1.5); opacity: 0; }
 }
 
-/* Question count selector */
-.free-quiz__count-selector {
+/* Settings bar (questions + timer selectors) */
+.free-quiz__settings-bar {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0.5rem;
+  gap: 1.5rem;
   padding: 0.75rem 1.5rem;
   border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  flex-wrap: wrap;
+}
+
+/* Question count / timer selector */
+.free-quiz__count-selector {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
 .free-quiz__count-label {
@@ -755,7 +763,8 @@
     font-size: 2rem;
   }
 
-  .free-quiz__count-selector {
+  .free-quiz__settings-bar {
+    gap: 1rem;
     padding: 0.5rem 1rem;
   }
 }

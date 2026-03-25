@@ -5,7 +5,7 @@ import { fetchGridQuestions, createQuizSession, recordAttempt, updateAttempt, co
 import { saveBestScore, incrementPlayCount, getXP, addXP, getStreak, saveStreak, getBadges, addBadges, addTotalCorrect, getTotalCorrect, applyGamificationState } from '@/utils/freeQuizStorage';
 import { matchAnswer } from '@/utils/answerMatcher';
 import { calculateXP, getLevel, getLevelTitle, getLevelProgress, checkNewBadges, updateStreak, SESSION_COMPLETE_XP } from '@/utils/gamification';
-import { reducer, initialState, ACTIONS, enrichWithMedia, QUESTION_COUNTS, SECONDS_PER_QUESTION } from './free/freeQuizReducer';
+import { reducer, initialState, ACTIONS, enrichWithMedia, QUESTION_COUNTS, TIMER_OPTIONS, SECONDS_PER_QUESTION } from './free/freeQuizReducer';
 import FreeQuizHeader from './free/FreeQuizHeader';
 import FreeQuizResults from './free/FreeQuizResults';
 import TopicGrid from './TopicGrid';
@@ -64,6 +64,7 @@ export default function FreeQuiz({ resumeData } = {}) {
   const [isNewBest, setIsNewBest] = useState(false);
   const [shareConfirm, setShareConfirm] = useState(false);
   const [questionCount, setQuestionCount] = useState(QUESTION_COUNTS[0]);
+  const [timerSetting, setTimerSetting] = useState(SECONDS_PER_QUESTION);
   const [gamificationData, setGamificationData] = useState(null);
   const [resultsComputedForPhase, setResultsComputedForPhase] = useState(null);
 
@@ -316,7 +317,7 @@ export default function FreeQuiz({ resumeData } = {}) {
           question={currentQuestion}
           onSubmitAnswer={handleSubmitAnswer}
           onBack={handleBackToGrid}
-          timerSeconds={SECONDS_PER_QUESTION}
+          timerSeconds={timerSetting}
           showAnswerInput
         />
       </div>
@@ -366,17 +367,31 @@ export default function FreeQuiz({ resumeData } = {}) {
       </div>
 
       {completedQuestionIds.length === 0 && (
-        <div className="free-quiz__count-selector">
-          <span className="free-quiz__count-label">Questions:</span>
-          {QUESTION_COUNTS.map((qc) => (
-            <button
-              key={qc.label}
-              className={`free-quiz__count-btn ${questionCount.label === qc.label ? 'free-quiz__count-btn--active' : ''}`}
-              onClick={() => handleQuestionCountChange(qc)}
-            >
-              {qc.label}
-            </button>
-          ))}
+        <div className="free-quiz__settings-bar">
+          <div className="free-quiz__count-selector">
+            <span className="free-quiz__count-label">Questions:</span>
+            {QUESTION_COUNTS.map((qc) => (
+              <button
+                key={qc.label}
+                className={`free-quiz__count-btn ${questionCount.label === qc.label ? 'free-quiz__count-btn--active' : ''}`}
+                onClick={() => handleQuestionCountChange(qc)}
+              >
+                {qc.label}
+              </button>
+            ))}
+          </div>
+          <div className="free-quiz__count-selector">
+            <span className="free-quiz__count-label">Timer:</span>
+            {TIMER_OPTIONS.map((opt) => (
+              <button
+                key={opt.value}
+                className={`free-quiz__count-btn ${timerSetting === opt.value ? 'free-quiz__count-btn--active' : ''}`}
+                onClick={() => setTimerSetting(opt.value)}
+              >
+                {opt.label}
+              </button>
+            ))}
+          </div>
         </div>
       )}
 

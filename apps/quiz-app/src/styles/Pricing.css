@@ -203,6 +203,68 @@
   outline-color: var(--text-primary, #f0f0f0);
 }
 
+/* ============================================================
+   Coming Soon State
+   ============================================================ */
+
+.pricing__coming-soon {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  min-height: 50vh;
+  gap: 1rem;
+}
+
+.pricing__coming-soon-icon {
+  color: var(--accent-primary, #e85c1a);
+  margin-bottom: 0.5rem;
+  opacity: 0.9;
+}
+
+.pricing__coming-soon .pricing__title {
+  font-size: 2rem;
+  margin: 0;
+}
+
+.pricing__coming-soon-text {
+  color: var(--text-secondary, #b0a0a5);
+  font-size: 1.05rem;
+  max-width: 400px;
+  margin: 0;
+  line-height: 1.6;
+}
+
+.pricing__coming-soon-subtext {
+  color: var(--text-muted, #998888);
+  font-size: 0.9rem;
+  max-width: 400px;
+  margin: 0;
+}
+
+.pricing__back-btn {
+  display: inline-block;
+  margin-top: 1rem;
+  padding: 0.7rem 1.75rem;
+  background: var(--accent-primary, #e85c1a);
+  color: #fff;
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 0.95rem;
+  text-decoration: none;
+  transition: background 0.15s ease;
+}
+
+.pricing__back-btn:hover {
+  background: #d04f15;
+}
+
+.pricing__back-btn:focus-visible {
+  outline: 2px solid var(--accent-primary, #e85c1a);
+  outline-offset: 2px;
+}
+
 @media (max-width: 900px) {
   .pricing__cards {
     grid-template-columns: 1fr;

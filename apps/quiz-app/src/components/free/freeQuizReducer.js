@@ -2,6 +2,14 @@ import { detectMediaType } from '@/utils/mediaDetector';
 
 export const SECONDS_PER_QUESTION = 15;
 
+export const TIMER_OPTIONS = [
+  { label: 'Off', value: 0 },
+  { label: '10s', value: 10 },
+  { label: '15s', value: 15 },
+  { label: '20s', value: 20 },
+  { label: '30s', value: 30 },
+];
+
 export const QUESTION_COUNTS = [
   { label: '9', categories: 3, perCategory: 3 },
   { label: '18', categories: 6, perCategory: 3 },

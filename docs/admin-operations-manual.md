@@ -439,7 +439,7 @@ CSV export with columns: Name, Email, Role, Quizzes, Tournaments, Avg Score, Las
 |---|---|---|
 | **Free** | $0 | Free Quiz (Gamified), Dashboard, Profile, Guide |
 | **Basic** | $9.99/mo | + Packs, History, Leaderboard, Resume |
-| **Pro** | $99.99/mo | + Doubles, Host Quiz, Tournaments, AI Generate, Buzzer, Export, Certificates |
+| **Pro** | $19.99/mo | + Doubles, Host Quiz, Tournaments, AI Generate, Buzzer, Export, Certificates |
 
 ### Doubles Quiz (Pro)
 
