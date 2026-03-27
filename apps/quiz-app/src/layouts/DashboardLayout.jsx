@@ -194,6 +194,15 @@ export default function DashboardLayout() {
         <SubscriptionSuccessBanner />
         <TrialBanner />
         <Outlet />
+        <footer className="dashboard__main-footer">
+          <div className="dashboard__main-footer-links">
+            <a href="https://patreon.com/Qwizzeria" target="_blank" rel="noopener noreferrer">Patreon</a>
+            <span className="dashboard__main-footer-sep">&middot;</span>
+            <a href="https://instagram.com/qwizzeria" target="_blank" rel="noopener noreferrer">Instagram</a>
+            <span className="dashboard__main-footer-sep">&middot;</span>
+            <a href="mailto:rajan@qwizzeria.com">rajan@qwizzeria.com</a>
+          </div>
+        </footer>
       </main>
     </div>
   );

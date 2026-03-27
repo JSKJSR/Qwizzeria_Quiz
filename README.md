@@ -14,14 +14,14 @@ Qwizzeria is a high-performance, premium quiz platform built with a modern tech 
 
 ### 🎮 Player Experience
 - **Landing Page Showcase**: Browse all available quiz packs with cover images in a scrollable carousel — no login required.
-- **3-Day Free Trial**: All new users get full access to every feature for 3 days.
+- **14-Day Free Trial**: All new users get full access to every feature for 14 days.
 - **Jeopardy & Sequential Formats**: Choose how you want to play curated quiz packs — either a points-based topic grid or a linear question flow.
 - **Multisided Multiplayer**: Host live quiz sessions with a dedicated teacher/host view and participant scoring.
 - **AI Quiz Generation**: Generate high-quality quiz packs on any topic instantly using the Claude 3.5 Sonnet API.
 - **Tournament Mode**: Single-elimination bracket competitions for 2–16 teams with realtime bracket updates, shareable match URLs, and multi-tab parallel play.
 - **Resume Anywhere**: In-progress sessions are synced, allowing users to pick up where they left off.
 - **Leaderboards**: Compete globally or per-pack with real-time score tracking.
-- **Subscription Tiers**: Free, Player ($3.99/mo), and Host ($12.99/mo) plans powered by Stripe.
+- **Subscription Tiers**: Free, Basic ($9.99/mo), and Pro ($19.99/mo) plans powered by Stripe.
 
 ### 🛡️ Security & Access Control
 - **Two-Gate Security Model**:

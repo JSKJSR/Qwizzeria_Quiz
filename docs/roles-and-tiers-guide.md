@@ -169,7 +169,7 @@ Each subscription is per-user. For team or classroom pricing, contact us for bul
 
 ## Part 6: Quick Reference Card
 
-### For Customers TO UPDATE PRICING $ -> edit tiers.js
+### For Customers
 | I want to... | I need... |
 |---|---|
 | Try Qwizzeria | Just sign up (14 days free) |

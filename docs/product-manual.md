@@ -63,11 +63,9 @@ The Admin CMS is integrated into the application and accessible at `/admin` for 
 
 Qwizzeria implements a hybrid SaaS and One-Time Purchase model powered by Stripe.
 
-- **3-Day Free Trial**: Full access to all features (including AI generation) for 3 days.
+- **14-Day Free Trial**: Full access to all features (including AI generation) for 14 days upon sign up.
 - **Free**: $0. Access to Free Quiz (with XP/Level/Badge progression), Dashboard, Profile, and Guide.
-- **Player Tier**: $3.99/mo. Unlocks the entire Quiz Pack library, History, and Global Leaderboards.
-- **Host Tier**: $12.99/mo. Unlocks local/party Game Hosting, AI Quiz Generation (Claude 3.5), Real-Time Buzzer, and Tournament brackets.
-- **Game Night Pass**: A $4.99 one-time purchase granting 48-hour access to the Host Tier features.
-- **Premium Packs**: Individually branded quiz packs available for $2.99 a la carte.
+- **Basic Tier**: $9.99/mo. Unlocks the entire Quiz Pack library, History, Global Leaderboards, and Resume Sessions.
+- **Pro Tier**: $19.99/mo. Unlocks local/party Game Hosting, Doubles Quiz, AI Quiz Generation (Claude 3.5), Real-Time Buzzer, Tournament brackets, Export Results, and Certificates.
 
-*Grace Period*: 3-day access window for `past_due` subscriptions before full gating. Editors/Admins bypass these checks automatically.
+*Grace Period*: Access window for `past_due` subscriptions before full gating. Editors/Admins bypass these checks automatically.

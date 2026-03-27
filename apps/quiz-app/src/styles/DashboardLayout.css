@@ -220,6 +220,39 @@
   margin-left: var(--sidebar-width, 260px);
   min-height: 100vh;
   overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Main content footer */
+.dashboard__main-footer {
+  margin-top: auto;
+  padding: 1.5rem 2rem;
+  text-align: center;
+  border-top: 1px solid var(--border-color, rgba(255, 255, 255, 0.06));
+}
+
+.dashboard__main-footer-links {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.dashboard__main-footer-links a {
+  color: var(--text-secondary, #aaa);
+  text-decoration: none;
+  font-size: 0.85rem;
+  transition: color 0.2s;
+}
+
+.dashboard__main-footer-links a:hover {
+  color: var(--text-primary, #fff);
+}
+
+.dashboard__main-footer-sep {
+  color: var(--text-muted, #444);
 }
 
 /* Mobile hamburger */

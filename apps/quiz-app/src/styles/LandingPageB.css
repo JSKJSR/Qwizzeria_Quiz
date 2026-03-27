@@ -176,6 +176,20 @@
   justify-content: center;
 }
 
+/* ----- Podcast Embed ----- */
+.landing-b__podcast {
+  max-width: 600px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 0 2rem 2rem;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.landing-b__podcast iframe {
+  border-radius: 12px;
+}
+
 /* ----- Pack Carousel ----- */
 .landing-b__packs {
   max-width: 1200px;
