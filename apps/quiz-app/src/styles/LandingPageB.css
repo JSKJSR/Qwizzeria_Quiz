@@ -178,16 +178,14 @@
 
 /* ----- Podcast Embed ----- */
 .landing-b__podcast {
-  max-width: 600px;
+  max-width: 400px;
   width: 100%;
   margin: 0 auto;
-  padding: 0 2rem 2rem;
-  border-radius: 12px;
-  overflow: hidden;
+  padding: 0 2rem 1.5rem;
 }
 
 .landing-b__podcast iframe {
-  border-radius: 12px;
+  border-radius: 8px;
 }
 
 /* ----- Pack Carousel ----- */

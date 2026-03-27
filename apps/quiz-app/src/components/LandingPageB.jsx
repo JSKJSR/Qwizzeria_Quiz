@@ -138,9 +138,9 @@ export default function LandingPageB() {
       {/* Podcast */}
       <section className="landing-b__podcast">
         <iframe
-          src="https://open.spotify.com/embed/show/1razRJJwo5Bd9Wyjhc3kUF?theme=0"
+          src="https://open.spotify.com/embed/show/1razRJJwo5Bd9Wyjhc3kUF?theme=0&utm_source=generator"
           width="100%"
-          height="152"
+          height="80"
           frameBorder="0"
           allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
           loading="lazy"
