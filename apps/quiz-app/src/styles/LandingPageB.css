@@ -7,6 +7,7 @@
   font-family: var(--font-family, 'Inter', system-ui, sans-serif);
   display: flex;
   flex-direction: column;
+  padding-bottom: 80px;
 }
 
 /* ----- Header ----- */
@@ -176,16 +177,19 @@
   justify-content: center;
 }
 
-/* ----- Podcast Embed ----- */
-.landing-b__podcast {
-  max-width: 400px;
-  width: 100%;
-  margin: 0 auto;
-  padding: 0 2rem 1.5rem;
+/* ----- Sticky Spotify Bar ----- */
+.landing-b__spotify-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 50;
+  height: 80px;
+  line-height: 0;
 }
 
-.landing-b__podcast iframe {
-  border-radius: 8px;
+.landing-b__spotify-bar iframe {
+  display: block;
 }
 
 /* ----- Pack Carousel ----- */

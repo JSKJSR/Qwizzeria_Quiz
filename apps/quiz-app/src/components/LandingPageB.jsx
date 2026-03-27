@@ -135,19 +135,6 @@ export default function LandingPageB() {
         </div>
       </section>
 
-      {/* Podcast */}
-      <section className="landing-b__podcast">
-        <iframe
-          src="https://open.spotify.com/embed/show/1razRJJwo5Bd9Wyjhc3kUF?theme=0&utm_source=generator"
-          width="100%"
-          height="80"
-          frameBorder="0"
-          allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-          loading="lazy"
-          title="Qwizzeria Podcast on Spotify"
-        />
-      </section>
-
       {/* Pack Carousel */}
       {packs.length > 0 && (
         <section className="landing-b__packs">
@@ -213,6 +200,19 @@ export default function LandingPageB() {
           <a href="mailto:rajan@qwizzeria.com">rajan@qwizzeria.com</a>
         </div>
       </footer>
+
+      {/* Sticky Spotify Bar */}
+      <div className="landing-b__spotify-bar">
+        <iframe
+          src="https://open.spotify.com/embed/show/1razRJJwo5Bd9Wyjhc3kUF?theme=0&utm_source=generator"
+          width="100%"
+          height="80"
+          frameBorder="0"
+          allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+          loading="lazy"
+          title="Qwizzeria Podcast on Spotify"
+        />
+      </div>
 
       {/* Login Modal */}
       {showLogin && (
