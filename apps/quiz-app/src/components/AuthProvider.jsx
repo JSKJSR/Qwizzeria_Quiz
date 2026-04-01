@@ -33,12 +33,8 @@ export default function AuthProvider({ children }) {
         try {
           const [userRole, subState] = await Promise.all([
             fetchUserRole(currentUser.id),
-            getSubscriptionState(currentUser.id).catch((err) => {
-              console.error('AuthProvider: getSubscriptionState failed:', err);
-              return null;
-            }),
+            getSubscriptionState(currentUser.id).catch(() => null),
           ]);
-          console.log('AuthProvider: subscription state =', subState);
           if (mounted) {
             setRole(userRole);
             setSubscription(subState || DEFAULT_SUBSCRIPTION);

@@ -68,7 +68,7 @@ BEGIN
   FROM subscriptions
   WHERE user_id = target_user_id;
 
-  IF v_sub IS NOT NULL THEN
+  IF FOUND THEN
     -- 3. Has subscription row — return status/tier/dates
     RETURN json_build_object(
       'status', v_sub.status,
