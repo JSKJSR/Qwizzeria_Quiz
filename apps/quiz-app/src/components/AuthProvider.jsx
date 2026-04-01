@@ -151,6 +151,18 @@ export default function AuthProvider({ children }) {
     }
   }, [user]);
 
+  // Refresh subscription when tab becomes visible (catches admin-side changes)
+  useEffect(() => {
+    if (!user) return;
+    const handleVisibility = () => {
+      if (document.visibilityState === 'visible') {
+        refreshSubscription();
+      }
+    };
+    document.addEventListener('visibilitychange', handleVisibility);
+    return () => document.removeEventListener('visibilitychange', handleVisibility);
+  }, [user, refreshSubscription]);
+
   const isEditor = hasMinRole(role, 'editor');
   const isAdmin = hasMinRole(role, 'admin');
   const isSuperadmin = role === 'superadmin';

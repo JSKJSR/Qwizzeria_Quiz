@@ -1,0 +1,3 @@
+- [User Role & Context](user_role.md) — founder/lead dev, makes both product + technical decisions, technically sophisticated
+- [Existing Gamification System](project_gamification_existing.md) — current XP/streak/badges: DB columns exist (026), localStorage-first, FreeQuiz only
+- [Gamification Full System Review](project_gamification_review.md) — 2026-03-31 review: energy system rejected, phased coin economy deferred, MVP = extend to all modes + streak milestones
