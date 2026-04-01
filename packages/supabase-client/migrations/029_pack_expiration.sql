@@ -29,6 +29,8 @@ CREATE POLICY "packs_select_public"
   );
 
 -- 3b. pack_questions: public SELECT (from migration 006)
+-- Aligned with packs_select_public: any active non-expired pack's questions are readable.
+-- App-layer role/tier checks control who can actually play.
 DROP POLICY IF EXISTS "pack_questions_select_public" ON pack_questions;
 CREATE POLICY "pack_questions_select_public"
   ON pack_questions FOR SELECT
@@ -36,7 +38,6 @@ CREATE POLICY "pack_questions_select_public"
     EXISTS (
       SELECT 1 FROM quiz_packs
       WHERE quiz_packs.id = pack_questions.pack_id
-        AND quiz_packs.is_public = true
         AND quiz_packs.status = 'active'
         AND (quiz_packs.expires_at IS NULL OR quiz_packs.expires_at > now())
     )

@@ -396,8 +396,8 @@ export async function browsePublicPacks({ category, userRole, subscriptionTier }
     // Paid subscribers see public + premium packs, but NOT host packs
     query = query.eq('is_host', false);
   } else {
-    // Free/trial-expired users: only public, non-host, non-premium
-    query = query.eq('is_public', true).eq('is_host', false).eq('is_premium', false);
+    // Free/trial-expired users: public, non-host packs (premium shown but gated in PackDetail)
+    query = query.eq('is_public', true).eq('is_host', false);
   }
 
   if (category) {
@@ -438,7 +438,7 @@ export async function fetchPublicPackById(id, { userRole, subscriptionTier } = {
   } else if (subscriptionTier === 'basic' || subscriptionTier === 'pro') {
     query = query.eq('is_host', false);
   } else {
-    query = query.eq('is_public', true).eq('is_host', false).eq('is_premium', false);
+    query = query.eq('is_public', true).eq('is_host', false);
   }
 
   const { data, error } = await query.single();
