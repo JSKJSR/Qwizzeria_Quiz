@@ -105,22 +105,32 @@ describe('gamification', () => {
     });
 
     it('starts a new streak if no current streak', () => {
-      expect(updateStreak(null)).toEqual({ count: 1, lastPlayDate: '2026-03-21' });
+      expect(updateStreak(null)).toEqual({ count: 1, lastPlayDate: '2026-03-21', frozeUsed: false });
     });
 
     it('keeps same streak if played on same day', () => {
       const current = { count: 5, lastPlayDate: '2026-03-21' };
-      expect(updateStreak(current)).toEqual({ count: 5, lastPlayDate: '2026-03-21' });
+      expect(updateStreak(current)).toEqual({ count: 5, lastPlayDate: '2026-03-21', frozeUsed: false });
     });
 
     it('increments streak if played next day', () => {
       const current = { count: 3, lastPlayDate: '2026-03-20' };
-      expect(updateStreak(current)).toEqual({ count: 4, lastPlayDate: '2026-03-21' });
+      expect(updateStreak(current)).toEqual({ count: 4, lastPlayDate: '2026-03-21', frozeUsed: false });
     });
 
     it('resets streak if missed a day', () => {
       const current = { count: 3, lastPlayDate: '2026-03-19' };
-      expect(updateStreak(current)).toEqual({ count: 1, lastPlayDate: '2026-03-21' });
+      expect(updateStreak(current)).toEqual({ count: 1, lastPlayDate: '2026-03-21', frozeUsed: false });
+    });
+
+    it('uses streak freeze if missed exactly 1 day and freeze available', () => {
+      const current = { count: 5, lastPlayDate: '2026-03-19' };
+      expect(updateStreak(current, { hasFreeze: true })).toEqual({ count: 6, lastPlayDate: '2026-03-21', frozeUsed: true });
+    });
+
+    it('resets streak if missed more than 1 day even with freeze', () => {
+      const current = { count: 5, lastPlayDate: '2026-03-18' };
+      expect(updateStreak(current, { hasFreeze: true })).toEqual({ count: 1, lastPlayDate: '2026-03-21', frozeUsed: false });
     });
   });
 });

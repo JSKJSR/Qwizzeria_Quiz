@@ -1,20 +1,15 @@
-import { useReducer, useEffect, useCallback, useRef } from 'react';
+import { useReducer, useEffect, useCallback, useRef, useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { createQuizSession, recordAttempt, completeQuizSession, abandonQuizSession, updateSessionMetadata, incrementPackPlayCount } from '@qwizzeria/supabase-client';
+import { getScoreMessage } from '../utils/freeQuizStorage';
 import { detectMediaType } from '../utils/mediaDetector';
+import { calculateXP } from '../utils/gamification';
+import { computeGamification, syncGamificationToDB } from '../utils/computeGamification';
+import GamificationSummary from './GamificationSummary';
 import TopicGrid from './TopicGrid';
 import QuestionView from './QuestionView';
 import FreeAnswerView from './FreeAnswerView';
 import '../styles/FreeQuiz.css';
-
-function getScoreMessage(score, maxScore) {
-  const pct = (score / maxScore) * 100;
-  if (pct === 100) return 'Perfect score! You are a quiz master!';
-  if (pct >= 80) return 'Excellent! Very impressive knowledge!';
-  if (pct >= 60) return 'Great job! Well done!';
-  if (pct >= 40) return 'Good effort! Keep learning!';
-  return 'Better luck next time! Every quiz makes you smarter.';
-}
 
 function enrichWithMedia(q) {
   const media = q.media_url ? detectMediaType(q.media_url) : { type: 'none', embedUrl: null };
@@ -38,6 +33,9 @@ const initialState = {
   completedQuestionIds: [],
   results: [],
   score: 0,
+  streak: 0,
+  bestStreak: 0,
+  sessionXP: 0,
 };
 
 function reducer(state, action) {
@@ -72,13 +70,14 @@ function reducer(state, action) {
       return { ...state, phase: 'answer' };
 
     case ACTIONS.ANSWER_QUESTION: {
-      const { isCorrect, skipped } = action;
+      const { isCorrect, skipped, xpEarned } = action;
       const q = state.currentQuestion;
       const earnedPoints = isCorrect ? q.points : 0;
-      const newResults = [...state.results, { questionId: q.id, isCorrect, skipped, points: earnedPoints }];
+      const newResults = [...state.results, { questionId: q.id, isCorrect, skipped, points: earnedPoints, xpEarned }];
       const newCompleted = [...state.completedQuestionIds, q.id];
       const newScore = state.score + earnedPoints;
       const allDone = newCompleted.length >= state.allQuestions.length;
+      const newStreak = isCorrect && !skipped ? state.streak + 1 : 0;
 
       return {
         ...state,
@@ -87,6 +86,9 @@ function reducer(state, action) {
         completedQuestionIds: newCompleted,
         results: newResults,
         score: newScore,
+        streak: newStreak,
+        bestStreak: Math.max(state.bestStreak, newStreak),
+        sessionXP: state.sessionXP + (xpEarned || 0),
       };
     }
 
@@ -100,6 +102,16 @@ export default function PackPlayJeopardy({ pack, questions, user, resumeData }) 
   const [state, dispatch] = useReducer(reducer, initialState);
   const sessionIdRef = useRef(null);
   const questionStartRef = useRef(null);
+  const gamificationData = useMemo(() => {
+    if (state.phase !== 'results') return null;
+    return computeGamification({
+      results: state.results,
+      sessionXP: state.sessionXP,
+      totalQuestions: state.allQuestions.length,
+      bestStreak: state.bestStreak,
+    });
+  }, [state.phase, state.results, state.sessionXP, state.allQuestions, state.bestStreak]);
+  const [missionCompletions, setMissionCompletions] = useState(null);
 
   // Build topics (group by category for jeopardy grid)
   useEffect(() => {
@@ -130,7 +142,6 @@ export default function PackPlayJeopardy({ pack, questions, user, resumeData }) 
     const allQuestions = topics.flatMap(t => t.questions);
 
     if (resumeData?.sessionId) {
-      // Resume: restore session state
       sessionIdRef.current = resumeData.sessionId;
       dispatch({
         type: ACTIONS.RESTORE,
@@ -144,7 +155,6 @@ export default function PackPlayJeopardy({ pack, questions, user, resumeData }) 
 
     dispatch({ type: ACTIONS.INIT, topics, allQuestions });
 
-    // Create session (non-critical)
     if (user?.id) {
       createQuizSession({
         userId: user.id,
@@ -154,26 +164,20 @@ export default function PackPlayJeopardy({ pack, questions, user, resumeData }) 
       })
         .then((session) => {
           sessionIdRef.current = session.id;
-          // Save metadata for resume (non-blocking)
           updateSessionMetadata(session.id, {
             format: 'jeopardy',
             question_ids: allQuestions.map(q => q.id),
-          }).catch(err => console.warn('PackPlayJeopardy: Failed to save metadata:', err));
+          }).catch(() => {});
         })
-        .catch(err => {
-          console.error('PackPlayJeopardy: Failed to create session:', err);
-          sessionIdRef.current = null;
-        });
+        .catch(() => { sessionIdRef.current = null; });
     }
 
-    // Increment play count (non-critical)
     incrementPackPlayCount(pack.id).catch(() => {});
   }, [questions, pack.id, user, resumeData]);
 
   const handleQuit = useCallback(() => {
     if (sessionIdRef.current) {
-      abandonQuizSession(sessionIdRef.current)
-        .catch(err => console.warn('PackPlayJeopardy: Failed to abandon session:', err));
+      abandonQuizSession(sessionIdRef.current).catch(() => {});
     }
     navigate(`/packs/${pack.id}`);
   }, [navigate, pack.id]);
@@ -194,8 +198,9 @@ export default function PackPlayJeopardy({ pack, questions, user, resumeData }) 
   const handleSelfAssess = useCallback((isCorrect, skipped = false) => {
     const q = state.currentQuestion;
     const timeSpentMs = questionStartRef.current ? Date.now() - questionStartRef.current : 0;
+    const xpEarned = calculateXP({ isCorrect: isCorrect && !skipped, points: q.points, timeSpentMs, streak: isCorrect ? state.streak : 0 });
 
-    dispatch({ type: ACTIONS.ANSWER_QUESTION, isCorrect, skipped });
+    dispatch({ type: ACTIONS.ANSWER_QUESTION, isCorrect, skipped, xpEarned });
 
     if (sessionIdRef.current) {
       recordAttempt({
@@ -204,16 +209,30 @@ export default function PackPlayJeopardy({ pack, questions, user, resumeData }) 
         isCorrect,
         timeSpentMs,
         skipped,
-      }).catch(err => console.warn('PackPlayJeopardy: Failed to record attempt:', err));
+      }).catch(() => {});
     }
-  }, [state.currentQuestion]);
+  }, [state.currentQuestion, state.streak]);
 
+  // Persist to DB when results phase is reached
   useEffect(() => {
-    if (state.phase === 'results' && sessionIdRef.current) {
-      completeQuizSession(sessionIdRef.current, state.score)
-        .catch(err => console.error('PackPlayJeopardy: Failed to complete session:', err));
+    if (!gamificationData) return;
+
+    if (sessionIdRef.current) {
+      completeQuizSession(sessionIdRef.current, state.score).catch(() => {});
     }
-  }, [state.phase, state.score]);
+
+    if (user?.id) {
+      const correctCount = state.results.filter(r => r.isCorrect).length;
+      syncGamificationToDB(user.id, gamificationData, {
+        totalQuestions: state.allQuestions.length,
+        correctCount,
+        bestStreak: state.bestStreak,
+        isPackQuiz: true,
+      }).then(result => {
+        if (result?.newly_completed?.length > 0) setMissionCompletions(result.newly_completed);
+      });
+    }
+  }, [gamificationData, state.score, state.results, state.bestStreak, state.allQuestions, user]);
 
   const { phase, topics, allQuestions, currentQuestion, completedQuestionIds, results, score } = state;
   const totalQuestions = allQuestions.length;
@@ -242,6 +261,8 @@ export default function PackPlayJeopardy({ pack, questions, user, resumeData }) 
           <p className="free-quiz__score-message">
             {getScoreMessage(score, maxScore)}
           </p>
+
+          <GamificationSummary data={gamificationData} missionCompletions={missionCompletions} />
 
           <div className="free-quiz__review">
             {allQuestions.map((q) => {

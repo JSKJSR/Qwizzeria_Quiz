@@ -1,21 +1,16 @@
-import { useReducer, useEffect, useCallback, useRef } from 'react';
+import { useReducer, useEffect, useCallback, useRef, useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { createQuizSession, recordAttempt, completeQuizSession, abandonQuizSession, updateSessionMetadata, incrementPackPlayCount } from '@qwizzeria/supabase-client';
+import { getScoreMessage } from '../utils/freeQuizStorage';
 import { detectMediaType } from '../utils/mediaDetector';
+import { calculateXP } from '../utils/gamification';
+import { computeGamification, syncGamificationToDB } from '../utils/computeGamification';
+import GamificationSummary from './GamificationSummary';
 import QuestionView from './QuestionView';
 import FreeAnswerView from './FreeAnswerView';
 import '../styles/PackPlaySequential.css';
 
 const POINTS_PER_QUESTION = 10;
-
-function getScoreMessage(score, maxScore) {
-  const pct = (score / maxScore) * 100;
-  if (pct === 100) return 'Perfect score! You are a quiz master!';
-  if (pct >= 80) return 'Excellent! Very impressive knowledge!';
-  if (pct >= 60) return 'Great job! Well done!';
-  if (pct >= 40) return 'Good effort! Keep learning!';
-  return 'Better luck next time! Every quiz makes you smarter.';
-}
 
 function enrichWithMedia(q) {
   const media = q.media_url ? detectMediaType(q.media_url) : { type: 'none', embedUrl: null };
@@ -45,6 +40,9 @@ const initialState = {
   currentIndex: 0,
   results: [],
   score: 0,
+  streak: 0,
+  bestStreak: 0,
+  sessionXP: 0,
 };
 
 function reducer(state, action) {
@@ -72,13 +70,15 @@ function reducer(state, action) {
       return { ...state, phase: 'answer' };
 
     case ACTIONS.ANSWER_QUESTION: {
-      const { isCorrect, skipped } = action;
+      const { isCorrect, skipped, xpEarned } = action;
       const q = state.questions[state.currentIndex];
       const earnedPoints = isCorrect ? q.points : 0;
-      const newResults = [...state.results, { questionId: q.id, isCorrect, skipped, points: earnedPoints }];
+      const newResults = [...state.results, { questionId: q.id, isCorrect, skipped, points: earnedPoints, xpEarned }];
       const newScore = state.score + earnedPoints;
       const nextIndex = state.currentIndex + 1;
       const allDone = nextIndex >= state.questions.length;
+      const newStreak = isCorrect && !skipped ? state.streak + 1 : 0;
+      const newBestStreak = Math.max(state.bestStreak, newStreak);
 
       return {
         ...state,
@@ -86,6 +86,9 @@ function reducer(state, action) {
         currentIndex: allDone ? state.currentIndex : nextIndex,
         results: newResults,
         score: newScore,
+        streak: newStreak,
+        bestStreak: newBestStreak,
+        sessionXP: state.sessionXP + (xpEarned || 0),
       };
     }
 
@@ -99,6 +102,16 @@ export default function PackPlaySequential({ pack, questions, user, resumeData }
   const [state, dispatch] = useReducer(reducer, initialState);
   const sessionIdRef = useRef(null);
   const questionStartRef = useRef(null);
+  const gamificationData = useMemo(() => {
+    if (state.phase !== 'results') return null;
+    return computeGamification({
+      results: state.results,
+      sessionXP: state.sessionXP,
+      totalQuestions: state.questions.length,
+      bestStreak: state.bestStreak,
+    });
+  }, [state.phase, state.results, state.sessionXP, state.questions, state.bestStreak]);
+  const [missionCompletions, setMissionCompletions] = useState(null);
 
   useEffect(() => {
     const enriched = questions.map(enrichWithMedia);
@@ -163,8 +176,9 @@ export default function PackPlaySequential({ pack, questions, user, resumeData }
   const handleSelfAssess = useCallback((isCorrect, skipped = false) => {
     const q = state.questions[state.currentIndex];
     const timeSpentMs = questionStartRef.current ? Date.now() - questionStartRef.current : 0;
+    const xpEarned = calculateXP({ isCorrect: isCorrect && !skipped, points: q.points, timeSpentMs, streak: isCorrect ? state.streak : 0 });
 
-    dispatch({ type: ACTIONS.ANSWER_QUESTION, isCorrect, skipped });
+    dispatch({ type: ACTIONS.ANSWER_QUESTION, isCorrect, skipped, xpEarned });
 
     // Reset timer for next question
     questionStartRef.current = Date.now();
@@ -178,14 +192,29 @@ export default function PackPlaySequential({ pack, questions, user, resumeData }
         skipped,
       }).catch(err => console.warn('PackPlaySequential: Failed to record attempt:', err));
     }
-  }, [state.questions, state.currentIndex]);
+  }, [state.questions, state.currentIndex, state.streak]);
 
+  // Persist to DB when results phase is reached
   useEffect(() => {
-    if (state.phase === 'results' && sessionIdRef.current) {
+    if (!gamificationData) return;
+
+    if (sessionIdRef.current) {
       completeQuizSession(sessionIdRef.current, state.score)
         .catch(err => console.error('PackPlaySequential: Failed to complete session:', err));
     }
-  }, [state.phase, state.score]);
+
+    if (user?.id) {
+      const correctCount = state.results.filter(r => r.isCorrect).length;
+      syncGamificationToDB(user.id, gamificationData, {
+        totalQuestions: state.questions.length,
+        correctCount,
+        bestStreak: state.bestStreak,
+        isPackQuiz: true,
+      }).then(result => {
+        if (result?.newly_completed?.length > 0) setMissionCompletions(result.newly_completed);
+      });
+    }
+  }, [gamificationData, state.score, state.results, state.bestStreak, state.questions, user]);
 
   const { phase, questions: allQuestions, currentIndex, results, score } = state;
   const totalQuestions = allQuestions.length;
@@ -220,6 +249,8 @@ export default function PackPlaySequential({ pack, questions, user, resumeData }
           <p className="seq-play__score-message">
             {getScoreMessage(score, maxScore)}
           </p>
+
+          <GamificationSummary data={gamificationData} missionCompletions={missionCompletions} />
 
           <div className="seq-play__review">
             {allQuestions.map((q, i) => {

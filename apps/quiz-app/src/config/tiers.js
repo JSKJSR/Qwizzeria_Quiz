@@ -58,6 +58,8 @@ export const FEATURE_TIERS = {
   buzzer: 'pro',
   export_results: 'pro',
   certificates: 'pro',
+  streak_freeze_3: 'basic',     // 3 freezes/month
+  streak_freeze_unlimited: 'pro', // 30 freezes/month (effectively unlimited)
 };
 
 /**

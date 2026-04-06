@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../hooks/useAuth';
 import { fetchGlobalLeaderboard } from '@qwizzeria/supabase-client';
 import SEO from '../components/SEO';
+import LeagueStandings from '../components/LeagueStandings';
 import '../styles/Leaderboard.css';
 
 const TIME_FILTERS = [
@@ -129,6 +130,8 @@ export default function Leaderboard() {
           </tbody>
         </table>
       )}
+
+      {user && <LeagueStandings userId={user.id} />}
     </div>
   );
 }

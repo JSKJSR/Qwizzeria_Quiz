@@ -1,7 +1,8 @@
 import { useNavigate } from 'react-router-dom';
 import { getScoreMessage, getBestScore } from '@/utils/freeQuizStorage';
-import { BADGES } from '@/utils/gamification';
+import GamificationSummary from '../GamificationSummary';
 import SignupNudge from './SignupNudge';
+import { BADGES } from '@/utils/gamification';
 
 function getNudgeMessage({ gamification, isNewBest, user }) {
   if (user) return null;
@@ -9,7 +10,6 @@ function getNudgeMessage({ gamification, isNewBest, user }) {
 
   const { newBadges, leveledUp, playCount } = gamification;
 
-  // Priority: badge > level-up > personal best > play count
   if (newBadges?.length > 0) {
     const badge = BADGES.find(b => b.key === newBadges[0]);
     return `You earned ${badge?.label || 'a badge'}! Sign up to display it.`;
@@ -33,7 +33,7 @@ export default function FreeQuizResults({
   score, maxScore, results, allQuestions, bestStreak,
   isNewBest, shareConfirm, user,
   onShareScore, onPlayAgain, onNavigateHome,
-  gamification,
+  gamification, missionCompletions,
 }) {
   const navigate = useNavigate();
   const pct = maxScore > 0 ? Math.round((score / maxScore) * 100) : 0;
@@ -68,56 +68,7 @@ export default function FreeQuizResults({
           {getScoreMessage(score, maxScore)}
         </p>
 
-        {/* Gamification: XP + Level */}
-        {gamification && (
-          <div className="free-quiz__gamification-section">
-            <div className="free-quiz__xp-earned">
-              +{gamification.sessionXP} XP
-            </div>
-
-            {gamification.leveledUp && (
-              <div className="free-quiz__level-up" aria-live="polite">
-                Level Up!
-              </div>
-            )}
-
-            <div className="free-quiz__level-display">
-              <span className="free-quiz__level-title">
-                Level {gamification.level}: {gamification.levelTitle}
-              </span>
-              <div className="free-quiz__xp-progress-bar">
-                <div
-                  className="free-quiz__xp-progress-fill"
-                  style={{ width: `${gamification.levelProgress.pct}%` }}
-                />
-              </div>
-              {gamification.levelProgress.needed > 0 && (
-                <span className="free-quiz__xp-progress-text">
-                  {gamification.levelProgress.current} / {gamification.levelProgress.needed} XP to next level
-                </span>
-              )}
-            </div>
-
-            {/* Badges earned */}
-            {gamification.newBadges?.length > 0 && (
-              <div className="free-quiz__badges-earned">
-                <div className="free-quiz__badges-title">Badges Earned!</div>
-                <div className="free-quiz__badge-tiles">
-                  {gamification.newBadges.map(key => {
-                    const badge = BADGES.find(b => b.key === key);
-                    if (!badge) return null;
-                    return (
-                      <div key={key} className="free-quiz__badge-tile">
-                        <span className="free-quiz__badge-icon">{badge.icon}</span>
-                        <span className="free-quiz__badge-label">{badge.label}</span>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            )}
-          </div>
-        )}
+        <GamificationSummary data={gamification} missionCompletions={missionCompletions} />
 
         <div className="free-quiz__stats-bar">
           <div className="free-quiz__stat">
@@ -188,7 +139,6 @@ export default function FreeQuizResults({
           </div>
         </div>
 
-        {/* Signup nudge for anonymous users */}
         {nudgeMessage && (
           <SignupNudge
             message={nudgeMessage}

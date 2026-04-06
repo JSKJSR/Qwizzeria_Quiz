@@ -1,0 +1,118 @@
+.league-standings {
+  margin-top: 2rem;
+}
+
+.league-standings__title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 1rem;
+}
+
+.league-standings__tabs {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.league-standings__tab {
+  padding: 0.4rem 0.8rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.03);
+  color: #aaa;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.league-standings__tab:hover {
+  border-color: rgba(255, 255, 255, 0.2);
+  color: #ddd;
+}
+
+.league-standings__tab--active {
+  border-color: var(--tab-color, #cd7f32);
+  color: var(--tab-color, #cd7f32);
+  background: color-mix(in srgb, var(--tab-color, #cd7f32) 8%, transparent);
+}
+
+.league-standings__you {
+  font-size: 0.65rem;
+  padding: 0.1rem 0.3rem;
+  background: rgba(232, 92, 26, 0.2);
+  border-radius: 4px;
+  color: var(--accent-primary, #e85c1a);
+}
+
+.league-standings__info {
+  font-size: 0.75rem;
+  color: #777;
+  margin-bottom: 1rem;
+}
+
+.league-standings__loading,
+.league-standings__empty {
+  text-align: center;
+  color: #666;
+  padding: 2rem 1rem;
+  font-size: 0.9rem;
+}
+
+.league-standings__list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.league-standings__row {
+  display: flex;
+  align-items: center;
+  padding: 0.6rem 0.75rem;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  gap: 0.75rem;
+}
+
+.league-standings__row--me {
+  border-color: rgba(232, 92, 26, 0.3);
+  background: rgba(232, 92, 26, 0.06);
+}
+
+.league-standings__rank {
+  min-width: 36px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--accent-primary, #e85c1a);
+}
+
+.league-standings__name {
+  flex: 1;
+  font-size: 0.9rem;
+  color: #ddd;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.league-standings__me-tag {
+  font-size: 0.65rem;
+  padding: 0.1rem 0.3rem;
+  background: rgba(232, 92, 26, 0.15);
+  border-radius: 4px;
+  color: var(--accent-primary, #e85c1a);
+  font-weight: 600;
+}
+
+.league-standings__xp {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--accent-primary, #e85c1a);
+  white-space: nowrap;
+}

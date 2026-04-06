@@ -4,6 +4,7 @@ const XP_KEY = 'qwizzeria_xp';
 const STREAK_KEY = 'qwizzeria_daily_streak';
 const BADGES_KEY = 'qwizzeria_badges';
 const TOTAL_CORRECT_KEY = 'qwizzeria_total_correct';
+const STREAK_FREEZES_KEY = 'qwizzeria_streak_freezes';
 
 export function getBestScore() {
   try {
@@ -99,6 +100,28 @@ export function addTotalCorrect(count) {
   } catch { return 0; }
 }
 
+// --- Streak Freezes ---
+export function getStreakFreezes() {
+  try {
+    return parseInt(localStorage.getItem(STREAK_FREEZES_KEY) || '0', 10);
+  } catch { return 0; }
+}
+
+export function setStreakFreezes(count) {
+  try {
+    localStorage.setItem(STREAK_FREEZES_KEY, String(count));
+  } catch { /* ignore */ }
+}
+
+export function decrementStreakFreezes() {
+  try {
+    const current = getStreakFreezes();
+    if (current > 0) {
+      localStorage.setItem(STREAK_FREEZES_KEY, String(current - 1));
+    }
+  } catch { /* ignore */ }
+}
+
 // --- Bulk read/write for DB sync ---
 export function loadGamificationState() {
   return {
@@ -106,15 +129,17 @@ export function loadGamificationState() {
     streak: getStreak(),
     badges: getBadges(),
     totalCorrect: getTotalCorrect(),
+    streakFreezes: getStreakFreezes(),
   };
 }
 
-export function applyGamificationState({ xp, streak, badges, totalCorrect }) {
+export function applyGamificationState({ xp, streak, badges, totalCorrect, streakFreezes }) {
   try {
     localStorage.setItem(XP_KEY, String(xp || 0));
     if (streak) localStorage.setItem(STREAK_KEY, JSON.stringify(streak));
     if (badges) localStorage.setItem(BADGES_KEY, JSON.stringify(badges));
     localStorage.setItem(TOTAL_CORRECT_KEY, String(totalCorrect || 0));
+    if (streakFreezes != null) localStorage.setItem(STREAK_FREEZES_KEY, String(streakFreezes));
   } catch { /* ignore */ }
 }
 

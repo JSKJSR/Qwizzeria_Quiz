@@ -4,6 +4,8 @@ import { useAuth } from '../hooks/useAuth';
 import { fetchUserHistory, fetchUserStats, fetchGlobalLeaderboard, abandonQuizSession, fetchGamificationStats } from '@qwizzeria/supabase-client';
 import { getLevel, getLevelTitle, getLevelProgress, BADGES } from '../utils/gamification';
 import SEO from '../components/SEO';
+import DailyMissions from '../components/DailyMissions';
+import LeagueBadge from '../components/LeagueBadge';
 import '../styles/DashboardHome.css';
 
 const COLLAPSE_KEY = 'qwizzeria_resume_collapsed';
@@ -115,6 +117,11 @@ export default function DashboardHome() {
               {gamification.daily_streak_count > 0 && (
                 <div className="dash-home__streak-pill">{gamification.daily_streak_count} day streak</div>
               )}
+              {gamification.streak_freezes_remaining > 0 && (
+                <div className="dash-home__freeze-pill" title="Streak freezes protect your streak if you miss a day">
+                  {gamification.streak_freezes_remaining} freeze{gamification.streak_freezes_remaining !== 1 ? 's' : ''}
+                </div>
+              )}
             </div>
             <div className="dash-home__xp-bar">
               <div className="dash-home__xp-fill" style={{ width: `${progress.pct}%` }} />
@@ -129,6 +136,9 @@ export default function DashboardHome() {
           </div>
         );
       })()}
+
+      {user && <LeagueBadge userId={user.id} />}
+      {user && <DailyMissions userId={user.id} />}
 
       {error && (
         <div className="dash-home__error">

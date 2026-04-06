@@ -318,13 +318,41 @@ export async function gradeAllDoublesResponses(sessionId, grades) {
 }
 
 /**
+ * Use a streak freeze for a user.
+ * @returns {Promise<boolean>} true if freeze was consumed
+ */
+export async function useStreakFreeze(userId) {
+  const supabase = getSupabase();
+  const { data, error } = await supabase.rpc('use_streak_freeze', {
+    target_user_id: userId,
+  });
+
+  if (error) throw new Error(`Failed to use streak freeze: ${error.message}`);
+  return data;
+}
+
+/**
+ * Reset monthly streak freezes based on user tier.
+ * Call on login / session start when month may have changed.
+ */
+export async function resetMonthlyStreakFreezes(userId, tier) {
+  const supabase = getSupabase();
+  const { error } = await supabase.rpc('reset_monthly_streak_freezes', {
+    target_user_id: userId,
+    user_tier: tier || 'free',
+  });
+
+  if (error) throw new Error(`Failed to reset streak freezes: ${error.message}`);
+}
+
+/**
  * Fetch gamification stats for a user.
  */
 export async function fetchGamificationStats(userId) {
   const supabase = getSupabase();
   const { data, error } = await supabase
     .from('user_profiles')
-    .select('xp_total, daily_streak_count, daily_streak_last_play, badges, total_correct')
+    .select('xp_total, daily_streak_count, daily_streak_last_play, badges, total_correct, streak_freezes_remaining')
     .eq('id', userId)
     .maybeSingle();
 

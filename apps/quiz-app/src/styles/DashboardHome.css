@@ -82,6 +82,17 @@
   white-space: nowrap;
 }
 
+.dash-home__freeze-pill {
+  background: rgba(100, 181, 246, 0.15);
+  color: #64b5f6;
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 0.2rem 0.5rem;
+  border-radius: 20px;
+  white-space: nowrap;
+  cursor: help;
+}
+
 .dash-home__xp-bar {
   height: 6px;
   background: rgba(255, 255, 255, 0.08);
@@ -429,6 +440,7 @@
   border-radius: 8px;
   color: #999;
 }
+
 .dash-home__retry-btn {
   margin-top: 0.75rem;
   padding: 0.6rem 1.2rem;
@@ -439,7 +451,10 @@
   cursor: pointer;
   font-size: 0.9rem;
 }
-.dash-home__retry-btn:hover { opacity: 0.85; }
+
+.dash-home__retry-btn:hover {
+  opacity: 0.85;
+}
 
 .dash-home__empty {
   color: var(--text-muted, #665555);

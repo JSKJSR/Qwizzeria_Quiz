@@ -81,20 +81,29 @@ export function checkNewBadges(opts) {
 
 /**
  * Update daily streak based on current date.
+ * @param {Object} currentStreak - { count, lastPlayDate }
+ * @param {Object} [opts] - { hasFreeze: boolean } — if true, missed day uses freeze instead of resetting
+ * @returns {{ count, lastPlayDate, frozeUsed: boolean }}
  */
-export function updateStreak(currentStreak) {
+export function updateStreak(currentStreak, opts = {}) {
   const today = new Date().toISOString().split('T')[0];
 
   if (!currentStreak?.lastPlayDate) {
-    return { count: 1, lastPlayDate: today };
+    return { count: 1, lastPlayDate: today, frozeUsed: false };
   }
   if (currentStreak.lastPlayDate === today) {
-    return currentStreak;
+    return { ...currentStreak, frozeUsed: false };
   }
 
   const diffDays = Math.floor((new Date(today) - new Date(currentStreak.lastPlayDate)) / 86400000);
   if (diffDays === 1) {
-    return { count: currentStreak.count + 1, lastPlayDate: today };
+    return { count: currentStreak.count + 1, lastPlayDate: today, frozeUsed: false };
   }
-  return { count: 1, lastPlayDate: today };
+
+  // Missed more than 1 day — try to use freeze if available
+  if (diffDays === 2 && opts.hasFreeze) {
+    return { count: currentStreak.count + 1, lastPlayDate: today, frozeUsed: true };
+  }
+
+  return { count: 1, lastPlayDate: today, frozeUsed: false };
 }

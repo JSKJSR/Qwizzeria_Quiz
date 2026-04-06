@@ -1,10 +1,11 @@
-import { useReducer, useEffect, useCallback, useRef, useState } from 'react';
+import { useReducer, useEffect, useCallback, useRef, useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
-import { fetchGridQuestions, createQuizSession, recordAttempt, updateAttempt, completeQuizSession, abandonQuizSession, updateSessionMetadata, fetchGamificationStats, saveGamificationStats } from '@qwizzeria/supabase-client';
-import { saveBestScore, incrementPlayCount, getXP, addXP, getStreak, saveStreak, getBadges, addBadges, addTotalCorrect, getTotalCorrect, applyGamificationState } from '@/utils/freeQuizStorage';
+import { fetchGridQuestions, createQuizSession, recordAttempt, updateAttempt, completeQuizSession, abandonQuizSession, updateSessionMetadata, fetchGamificationStats } from '@qwizzeria/supabase-client';
+import { saveBestScore, getXP, getStreak, getBadges, getTotalCorrect, getStreakFreezes, applyGamificationState } from '@/utils/freeQuizStorage';
 import { matchAnswer } from '@/utils/answerMatcher';
-import { calculateXP, getLevel, getLevelTitle, getLevelProgress, checkNewBadges, updateStreak, SESSION_COMPLETE_XP } from '@/utils/gamification';
+import { calculateXP, getLevel } from '@/utils/gamification';
+import { computeGamification, syncGamificationToDB } from '@/utils/computeGamification';
 import { reducer, initialState, ACTIONS, enrichWithMedia, QUESTION_COUNTS, TIMER_OPTIONS, SECONDS_PER_QUESTION } from './free/freeQuizReducer';
 import FreeQuizHeader from './free/FreeQuizHeader';
 import FreeQuizResults from './free/FreeQuizResults';
@@ -12,46 +13,6 @@ import TopicGrid from './TopicGrid';
 import QuestionView from './QuestionView';
 import FreeAnswerView from './FreeAnswerView';
 import '@/styles/FreeQuiz.css';
-
-function computeGamification({ results, sessionXP, allQuestions, bestStreak }) {
-  const correctCount = results.filter(r => r.isCorrect).length;
-  const totalSessionXP = sessionXP + SESSION_COMPLETE_XP;
-  const prevXP = getXP();
-  const newTotalXP = addXP(totalSessionXP);
-  const prevLevel = getLevel(prevXP);
-  const newLevel = getLevel(newTotalXP);
-
-  addTotalCorrect(correctCount);
-
-  const currentStreak = getStreak();
-  const updatedStreak = updateStreak(currentStreak);
-  saveStreak(updatedStreak);
-
-  const existingBadges = getBadges();
-  const playCount = incrementPlayCount();
-  const newBadges = checkNewBadges({
-    correctCount,
-    totalCount: allQuestions.length,
-    bestStreak,
-    playCount,
-    level: newLevel,
-    dailyStreakCount: updatedStreak.count,
-    existingBadges,
-  });
-  if (newBadges.length > 0) addBadges(newBadges);
-
-  return {
-    sessionXP: totalSessionXP,
-    totalXP: newTotalXP,
-    level: newLevel,
-    levelTitle: getLevelTitle(newLevel),
-    levelProgress: getLevelProgress(newTotalXP),
-    leveledUp: newLevel > prevLevel,
-    newBadges,
-    dailyStreak: updatedStreak,
-    playCount,
-  };
-}
 
 export default function FreeQuiz({ resumeData } = {}) {
   const navigate = useNavigate();
@@ -61,12 +22,24 @@ export default function FreeQuiz({ resumeData } = {}) {
   const questionStartRef = useRef(null);
   const [scoreBounce, setScoreBounce] = useState(false);
   const [streakFlash, setStreakFlash] = useState(0);
-  const [isNewBest, setIsNewBest] = useState(false);
+  const isNewBest = useMemo(() => {
+    if (state.phase !== 'results') return false;
+    const max = state.allQuestions.reduce((sum, q) => sum + q.points, 0);
+    return saveBestScore(state.score, max);
+  }, [state.phase, state.allQuestions, state.score]);
   const [shareConfirm, setShareConfirm] = useState(false);
   const [questionCount, setQuestionCount] = useState(QUESTION_COUNTS[0]);
   const [timerSetting, setTimerSetting] = useState(SECONDS_PER_QUESTION);
-  const [gamificationData, setGamificationData] = useState(null);
-  const [resultsComputedForPhase, setResultsComputedForPhase] = useState(null);
+  const gamificationData = useMemo(() => {
+    if (state.phase !== 'results') return null;
+    return computeGamification({
+      results: state.results,
+      sessionXP: state.sessionXP,
+      totalQuestions: state.allQuestions.length,
+      bestStreak: state.bestStreak,
+    });
+  }, [state.phase, state.results, state.sessionXP, state.allQuestions, state.bestStreak]);
+  const [missionCompletions, setMissionCompletions] = useState(null);
 
   // Read once for header props (not on every render like before)
   const headerLevel = getLevel(getXP());
@@ -125,8 +98,11 @@ export default function FreeQuiz({ resumeData } = {}) {
           const mergedStreak = dbStreakCount >= localStreakCount
             ? { count: dbStreakCount, lastPlayDate: db.daily_streak_last_play }
             : localStreak || { count: 0, lastPlayDate: null };
-          if (mergedXP > localXP || mergedBadges.length > localBadges.length || mergedCorrect > localCorrect || dbStreakCount > localStreakCount) {
-            applyGamificationState({ xp: mergedXP, streak: mergedStreak, badges: mergedBadges, totalCorrect: mergedCorrect });
+          const localFreezes = getStreakFreezes();
+          const dbFreezes = db.streak_freezes_remaining || 0;
+          const mergedFreezes = Math.max(dbFreezes, localFreezes);
+          if (mergedXP > localXP || mergedBadges.length > localBadges.length || mergedCorrect > localCorrect || dbStreakCount > localStreakCount || dbFreezes > localFreezes) {
+            applyGamificationState({ xp: mergedXP, streak: mergedStreak, badges: mergedBadges, totalCorrect: mergedCorrect, streakFreezes: mergedFreezes });
           }
         }).catch(() => {});
       }
@@ -138,8 +114,7 @@ export default function FreeQuiz({ resumeData } = {}) {
   const loadQuiz = useCallback((qc) => {
     const config = qc || questionCount;
     dispatch({ type: ACTIONS.RESET });
-    setGamificationData(null);
-    setResultsComputedForPhase(null);
+    setMissionCompletions(null);
     fetchQuiz(config);
   }, [questionCount, fetchQuiz]);
 
@@ -222,17 +197,9 @@ export default function FreeQuiz({ resumeData } = {}) {
     loadQuiz(qc);
   }, [loadQuiz]);
 
-  // Compute results state during render (avoids synchronous setState in effect)
-  if (state.phase === 'results' && resultsComputedForPhase !== 'results') {
-    const max = state.allQuestions.reduce((sum, q) => sum + q.points, 0);
-    setResultsComputedForPhase('results');
-    setIsNewBest(saveBestScore(state.score, max));
-    setGamificationData(computeGamification(state));
-  }
-
-  // Side effects only (DB persistence) — no setState
+  // Persist to DB when results phase is reached
   useEffect(() => {
-    if (state.phase !== 'results') return;
+    if (!gamificationData) return;
 
     if (sessionIdRef.current) {
       completeQuizSession(sessionIdRef.current, state.score)
@@ -240,18 +207,17 @@ export default function FreeQuiz({ resumeData } = {}) {
     }
 
     if (user?.id) {
-      const gamData = gamificationData;
-      if (gamData) {
-        saveGamificationStats(user.id, {
-          xp_total: gamData.totalXP,
-          daily_streak_count: gamData.dailyStreak.count,
-          daily_streak_last_play: gamData.dailyStreak.lastPlayDate,
-          badges: getBadges(),
-          total_correct: getTotalCorrect(),
-        }).catch(err => console.warn('FreeQuiz: Failed to sync gamification:', err));
-      }
+      const correctCount = state.results.filter(r => r.isCorrect).length;
+      syncGamificationToDB(user.id, gamificationData, {
+        totalQuestions: state.allQuestions.length,
+        correctCount,
+        bestStreak: state.bestStreak,
+        isPackQuiz: false,
+      }).then(result => {
+        if (result?.newly_completed?.length > 0) setMissionCompletions(result.newly_completed);
+      });
     }
-  }, [state.phase, state.score, user, gamificationData]);
+  }, [gamificationData, state.score, state.results, state.bestStreak, state.allQuestions, user]);
 
   // --- Render ---
 
@@ -302,6 +268,7 @@ export default function FreeQuiz({ resumeData } = {}) {
         onPlayAgain={() => loadQuiz()}
         onNavigateHome={() => navigate('/')}
         gamification={gamificationData}
+        missionCompletions={missionCompletions}
       />
     );
   }
