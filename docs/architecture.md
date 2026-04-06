@@ -10,8 +10,8 @@ Developed using **Turborepo** and npm workspaces, the codebase is split into ind
 
 ### `apps/`
 - **`quiz-app/`**: The primary product (Vite + React 19). It handles:
-  - **Player App**: Landing (with pack showcase carousel), browsing, playing quizzes in **Jeopardy (grid-based)** or **Sequential (linear)** formats, user profiles, and a comprehensive **How to Play Guide**.
-  - **Admin CMS**: Integrated management layer accessible at `/admin`. Provides authorized editors and admins with tools to manage the question bank and quiz packs (including direct pack creation via Bulk Import). Includes a **User Management** interface (`admin/UserList.jsx`) for superadmins, which follows a modular design with sub-components for KPIs, Tables, and Role management.
+  - **Player App**: Landing (with pack showcase carousel), browsing, playing quizzes in **Jeopardy (grid-based)** or **Sequential (linear)** formats, user profiles, and a comprehensive **How to Play Guide**. The dashboard also displays **Daily Missions** (XP-rewarded daily objectives) and a **League Badge** (weekly tier-based competition).
+  - **Admin CMS**: Integrated management layer accessible at `/admin`. Provides authorized editors and admins with tools to manage the question bank, quiz packs, and Doubles sessions (including answer grading). Includes a **User Management** interface (`admin/UserList.jsx`) for superadmins, which follows a modular design with sub-components for KPIs, Tables, Role management, and Subscription tier overrides.
 
 ### `packages/`
 - **`supabase-client/`**: A centralized package wrapping the Supabase SDK. It manages:
@@ -22,8 +22,8 @@ Developed using **Turborepo** and npm workspaces, the codebase is split into ind
   - Database schema migrations (located in `packages/supabase-client/migrations`).
   - **Barrel Exports**: All core logic is re-exported from `index.js` for clean imports.
 - **`shared-utils/`**: Shared logic for both app and packages.
-  - **`gamification.js`**: Pure functions for XP, levels, and badge logic.
-  - **`answerMatcher.js`**: Fuzzy matching algorithm for text inputs.
+  - **`gamification.js`**: Pure functions for XP calculation, level thresholds (1-10), level titles, and badge definitions.
+  - **`answerMatcher.js`**: Fuzzy matching algorithm (Levenshtein distance + normalization) for Free Quiz text inputs.
 - **`shared-types/`**: Shared TypeScript interfaces to ensure type safety.
 
 ---
@@ -42,7 +42,7 @@ The Host Quiz integrates an AI generation flow powered by **Claude 3.5 Sonnet**:
 ### Key States
 - **`loading`**: Fetching questions and initializing the session.
 - **`grid`**: User selecting a topic/category (Jeopardy style).
-- **`question`**: Active question being displayed.
+- **`question`**: Active question being displayed via shared `QuestionView.jsx` component (supports countdown ring timer, media toggle, optional text input).
 - **`answer`**: Result reveal and point awarding.
 - **`results`**: Final score tally and medals.
 - **`feedback`**: (Free Quiz only) Immediate correct/wrong validation with XP reveal.
@@ -92,7 +92,7 @@ Host Quiz supports a **Tournament Mode** for single-elimination bracket competit
 
 ## 🧪 Quality & Accessibility
 
-- **Test Coverage**: 244 tests across 19 files (Vitest + jsdom) — includes gamification progression, core state machines (reducers), AI generation logic, tournament brackets, session persistence, media detection, auth, sub-millisecond buzzer resolution, and pack expiration utilities.
+- **Test Coverage**: 244 tests across 19 files (Vitest + jsdom) — includes gamification progression, core state machines (reducers), AI generation logic, tournament brackets, session persistence, media detection, auth, sub-millisecond buzzer resolution, pack expiration utilities, daily missions, and league rankings.
 - **Error Handling**: All data-fetching pages display error UI with retry buttons (no silent failures).
 - **WCAG Compliance**: focus-visible states, WCAG-AA contrast ratios, 44px minimum touch targets, `prefers-reduced-motion` support, semantic ARIA labels on interactive elements.
 - **CI/CD**: GitHub Actions pipeline (lint → build → test) on every push/PR; Vercel deployment config.

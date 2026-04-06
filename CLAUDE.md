@@ -59,6 +59,7 @@ Access restricted via role checks (editor, admin, superadmin).
 | `/admin/packs/:id/edit`    | PackForm              | Edit pack (status, is_public, is_premium) |
 | `/admin/packs/:id/questions`| PackQuestionsManager | Add/remove/reorder questions    |
 | `/admin/users`             | UserList              | User management (superadmin only) |
+| `/admin/doubles`           | DoublesSessions       | Doubles session browse & grading (admin+) |
 | `/admin/guide`             | RolesAndTiersGuide    | Roles & tiers reference (editor+) |
 | `/admin/ops`               | AdminOpsManual        | Admin operations manual (admin+)  |
 
@@ -114,6 +115,8 @@ Access restricted via role checks (editor, admin, superadmin).
 - **Subscription state**: `get_subscription_state` RPC — staff bypass, subscription row check, trial computation
 - **Post-payment**: `SubscriptionSuccessBanner` polls `refreshSubscription()` after checkout return; Profile refreshes on `visibilitychange`
 - **TrialBanner**: Shows for all trial days (softer tone days 6-14, urgent ≤5 days)
+- **Admin tier override**: Superadmins can change a user's tier directly in Admin → Users via `UserSubscriptionModal` (no Stripe involved; stored in `subscriptions` table)
+- **Streak Freezes**: `streak_freeze_3` (Basic: 3/month) and `streak_freeze_unlimited` (Pro: 30/month) in `FEATURE_TIERS`
 - **Adding/changing tiers**: Edit `config/tiers.js` → all UI auto-adapts. See `docs/tier-strategy.md` for details.
 
 ## Database Tables
@@ -129,6 +132,8 @@ Access restricted via role checks (editor, admin, superadmin).
 - `stripe_webhook_log` — Webhook idempotency + audit (event_id UNIQUE, event_type, status, error_message)
 - `feature_access` — Legacy Gate 1 table (defined but unused — superseded by tier system)
 - `content_permissions` — Gate 2: granular read/write/manage access to specific packs or categories (used in RLS for editor access)
+- `daily_missions` — Per-user daily mission progress (user_id, mission_key, progress, target, xp_reward, completed_at, mission_date)
+- `user_leagues` — Weekly league standings (user_id, league, weekly_xp, week_start)
 
 ## Authorization Model
 
@@ -211,9 +216,14 @@ Two independent systems control access:
 - `apps/quiz-app/src/utils/certificateGenerator.js` — Canvas-based PNG certificate generation for top 3
 - `apps/quiz-app/src/pages/Guide.jsx` — Guide page orchestrator (7 sections)
 - `apps/quiz-app/src/components/guide/` — Guide sub-components (Base, Visuals, Sections: GettingStarted, FreeQuiz, PlayPacks, HostQuiz, AIGenerate, BuzzerMode, Tournament)
+- `apps/quiz-app/src/components/QuestionView.jsx` — Shared question display component with SVG countdown ring timer, media toggle, and optional answer text input (used in Sequential + Doubles play)
+- `apps/quiz-app/src/components/DailyMissions.jsx` — Dashboard widget showing daily mission progress bars and XP rewards (fetches from `fetchDailyMissions` RPC)
+- `apps/quiz-app/src/components/LeagueBadge.jsx` — Dashboard widget showing user's weekly league tier and XP earned (fetches from `fetchUserLeague`)
 - `apps/quiz-app/src/pages/admin/UserList.jsx` — Decomposed admin user management (orchestrator, 184 lines)
-- `apps/quiz-app/src/components/admin/users/` — User management sub-components (KPIs, Table, Filters, Modal, Utils)
-- `apps/quiz-app/src/pages/admin/AdminOpsManual.jsx` — Admin operations manual page (14 sections)
+- `apps/quiz-app/src/components/admin/users/` — User management sub-components (KPIs, Table, Filters, UserRoleConfirmModal, UserSubscriptionModal)
+- `apps/quiz-app/src/pages/admin/DoublesSessions.jsx` — Admin page to browse and grade Doubles quiz sessions (admin+)
+- `apps/quiz-app/src/components/admin/doubles/DoublesGradeModal.jsx` — Modal for grading individual Doubles session answers
+- `apps/quiz-app/src/pages/admin/AdminOpsManual.jsx` — Admin operations manual page (18 sections)
 - `apps/quiz-app/src/pages/admin/RolesAndTiersGuide.jsx` — Roles & tiers reference page
 
 ## Completed Phases
@@ -230,6 +240,7 @@ Two independent systems control access:
 - Phase 9: AI Quiz Generation (Supabase Edge Function + Claude API, AIGenerateModal with preview/edit, "Generate with AI" in HostPackSelect, rate limiting, Pro-gate)
 - Phase 10: Codebase Improvements (HostQuiz.jsx decomposed from 1283→615 lines, Guide.jsx decomposed from 705→23 lines, BuzzerPage.jsx decomposed from 686→105 lines, UserList.jsx decomposed from 574→184 lines, reducer/hooks/components extracted, 168 tests across 15 files, `@/` path aliases, barrel exports for supabase-client)
 - Phase 11: Tier Strategy Implementation (centralized tier config in `config/tiers.js`, `useEntitlement` hook, webhook security fixes — unknown price rejection/explicit status mapping/customer fallback/idempotency, post-payment UX — success banner with polling/visibilitychange refresh, contextual UpgradeWall messaging, TrialBanner for all trial days, downgrade warnings on Pricing page, `invoice.paid`/`charge.refunded`/`charge.dispute.created` webhook handlers, `stripe_webhook_log` table, WCAG focus-visible/aria-labels/sr-only text, DoublesRoute replaced with TierRoute, `tier-strategy.md` updated, removed vestigial `premium` DB role — pack visibility now uses subscription tier instead of role, `feature_access` table marked legacy)
+- Phase 12: Engagement & Admin Improvements (Daily Missions system with progress tracking and XP rewards, Leagues system with weekly tier-based competition, Streak Freezes per tier, `QuestionView.jsx` shared component with countdown ring timer, Doubles Sessions admin page with answer grading modal, `UserSubscriptionModal` for direct admin tier overrides, `DailyMissions` + `LeagueBadge` dashboard widgets, 244 tests across 19 files)
 
 ## Full Documentation
 

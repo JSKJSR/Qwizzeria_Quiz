@@ -87,58 +87,36 @@ export default function DashboardHome() {
 
   const displayName = user?.user_metadata?.display_name || user?.email?.split('@')[0] || 'Quizzer';
 
+  // Gamification derived data
+  const level = gamification?.xp_total > 0 ? getLevel(gamification.xp_total) : null;
+  const levelTitle = level ? getLevelTitle(level) : null;
+  const levelProgress = level ? getLevelProgress(gamification.xp_total) : null;
+  const earnedBadges = gamification ? BADGES.filter(b => (gamification.badges || []).includes(b.key)) : [];
+
   return (
     <div className="dash-home">
       <SEO title="Dashboard" path="/dashboard" noIndex />
-      <div className="dash-home__welcome">
-        <img
-          src="/qwizzeria-logo.png"
-          alt="Qwizzeria"
-          className="dash-home__welcome-logo"
-          onError={(e) => { e.target.src = '/qwizzeria-logo.svg'; }}
-        />
-        <h1 className="dash-home__greeting">Welcome back, {displayName}</h1>
-        <p className="dash-home__subtitle">Ready for your next quiz challenge?</p>
-      </div>
 
-      {gamification && gamification.xp_total > 0 && (() => {
-        const level = getLevel(gamification.xp_total);
-        const title = getLevelTitle(level);
-        const progress = getLevelProgress(gamification.xp_total);
-        const earnedBadges = BADGES.filter(b => (gamification.badges || []).includes(b.key));
-        return (
-          <div className="dash-home__gamification">
-            <div className="dash-home__level-row">
-              <div className="dash-home__level-badge">Lv. {level}</div>
-              <div className="dash-home__level-info">
-                <span className="dash-home__level-title">{title}</span>
-                <span className="dash-home__xp-text">{gamification.xp_total} XP</span>
-              </div>
-              {gamification.daily_streak_count > 0 && (
-                <div className="dash-home__streak-pill">{gamification.daily_streak_count} day streak</div>
-              )}
-              {gamification.streak_freezes_remaining > 0 && (
-                <div className="dash-home__freeze-pill" title="Streak freezes protect your streak if you miss a day">
-                  {gamification.streak_freezes_remaining} freeze{gamification.streak_freezes_remaining !== 1 ? 's' : ''}
-                </div>
-              )}
-            </div>
-            <div className="dash-home__xp-bar">
-              <div className="dash-home__xp-fill" style={{ width: `${progress.pct}%` }} />
-            </div>
-            {earnedBadges.length > 0 && (
-              <div className="dash-home__badges">
-                {earnedBadges.map(b => (
-                  <span key={b.key} className="dash-home__badge" title={b.label}>{b.icon}</span>
-                ))}
-              </div>
+      {/* Compact greeting with inline status pills */}
+      <div className="dash-home__welcome">
+        <div className="dash-home__greeting-row">
+          <h1 className="dash-home__greeting">Welcome back, {displayName}</h1>
+          <div className="dash-home__status-pills">
+            {level > 1 && (
+              <span className="dash-home__level-pill">Lv. {level}</span>
+            )}
+            {gamification?.daily_streak_count > 0 && (
+              <span className="dash-home__streak-pill">{gamification.daily_streak_count}d streak</span>
+            )}
+            {gamification?.streak_freezes_remaining > 0 && (
+              <span className="dash-home__freeze-pill" title="Streak freezes protect your streak if you miss a day">
+                {gamification.streak_freezes_remaining} freeze{gamification.streak_freezes_remaining !== 1 ? 's' : ''}
+              </span>
             )}
           </div>
-        );
-      })()}
-
-      {user && <LeagueBadge userId={user.id} />}
-      {user && <DailyMissions userId={user.id} />}
+        </div>
+        <p className="dash-home__subtitle">Ready for your next quiz challenge?</p>
+      </div>
 
       {error && (
         <div className="dash-home__error">
@@ -147,72 +125,7 @@ export default function DashboardHome() {
         </div>
       )}
 
-      <div className="dash-home__actions">
-        <Link to="/host" className="dash-home__action-card">
-          <span className="dash-home__action-icon">
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><rect x="2" y="6" width="20" height="12" rx="2" /><path d="M12 12h.01" /><path d="M17 12h.01" /><path d="M7 12h.01" /></svg>
-          </span>
-          <span className="dash-home__action-title">Host a Quiz</span>
-          <span className="dash-home__action-desc">Multiplayer mode with timer and live scoreboard</span>
-        </Link>
-        <Link to="/packs" className="dash-home__action-card">
-          <span className="dash-home__action-icon">
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" /><rect x="14" y="3" width="7" height="7" /><rect x="3" y="14" width="7" height="7" /><rect x="14" y="14" width="7" height="7" /></svg>
-          </span>
-          <span className="dash-home__action-title">Browse Quiz Packs</span>
-          <span className="dash-home__action-desc">Curated quiz packs by category and difficulty</span>
-        </Link>
-        <div className="dash-home__action-card dash-home__join-card">
-          <span className="dash-home__action-icon">
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4" /><polyline points="10 17 15 12 10 7" /><line x1="15" y1="12" x2="3" y2="12" /></svg>
-          </span>
-          <span className="dash-home__action-title">Join a Room</span>
-          <span className="dash-home__action-desc">Enter a room code to join a live buzzer session</span>
-          <form className="dash-home__join-form" onSubmit={handleJoinRoom}>
-            <input
-              type="text"
-              className="dash-home__join-input"
-              placeholder="Room code"
-              value={roomCode}
-              onChange={(e) => { setRoomCode(e.target.value.toUpperCase()); setRoomError(null); }}
-              maxLength={8}
-              autoComplete="off"
-              spellCheck="false"
-            />
-            <button type="submit" className="dash-home__join-btn">Join</button>
-          </form>
-          {roomError && <span className="dash-home__join-error">{roomError}</span>}
-        </div>
-      </div>
-
-      {stats && (
-        <div className="dash-home__stats-section">
-          <h2 className="dash-home__section-title">Your Stats</h2>
-          <div className="dash-home__stats-grid">
-            <div className="dash-home__stat-card">
-              <span className="dash-home__stat-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10" /><path d="M12 16v-4" /><path d="M12 8h.01" /></svg></span>
-              <span className="dash-home__stat-value">{stats.accuracy_pct ?? 0}%</span>
-              <span className="dash-home__stat-label">Accuracy</span>
-            </div>
-            <div className="dash-home__stat-card">
-              <span className="dash-home__stat-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" /></svg></span>
-              <span className="dash-home__stat-value">{stats.strongest_category || '—'}</span>
-              <span className="dash-home__stat-label">Strongest Topic</span>
-            </div>
-            <div className="dash-home__stat-card">
-              <span className="dash-home__stat-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" /></svg></span>
-              <span className="dash-home__stat-value">{stats.weakest_category || '—'}</span>
-              <span className="dash-home__stat-label">Needs Work</span>
-            </div>
-            <div className="dash-home__stat-card">
-              <span className="dash-home__stat-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6" /><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18" /><path d="M4 22h16" /><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z" /></svg></span>
-              <span className="dash-home__stat-value">{weeklyRank ? `#${weeklyRank}` : '—'}</span>
-              <span className="dash-home__stat-label">Weekly Rank</span>
-            </div>
-          </div>
-        </div>
-      )}
-
+      {/* Resume banner — above the grid, full width */}
       {resumable.length > 0 && (
         <div className="dash-home__resume-section">
           <button
@@ -222,7 +135,7 @@ export default function DashboardHome() {
           >
             <span className={`dash-home__chevron${collapsed ? '' : ' dash-home__chevron--open'}`}>&#9654;</span>
             <h2 className="dash-home__section-title dash-home__section-title--inline">
-              Resume Incomplete Quizzes ({resumable.length})
+              Resume ({resumable.length})
             </h2>
           </button>
 
@@ -269,6 +182,109 @@ export default function DashboardHome() {
           )}
         </div>
       )}
+
+      {/* Two-column dashboard grid */}
+      <div className="dash-home__grid">
+        {/* Left: Primary actions — what you DO */}
+        <div className="dash-home__actions-col">
+          <Link to="/play/free" className="dash-home__action-card dash-home__action-card--featured">
+            <span className="dash-home__action-icon">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><polygon points="5 3 19 12 5 21 5 3" /></svg>
+            </span>
+            <span className="dash-home__action-title">Surprise Me!</span>
+            <span className="dash-home__action-desc">Jump into random questions instantly</span>
+          </Link>
+          <Link to="/packs" className="dash-home__action-card">
+            <span className="dash-home__action-icon">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" /><rect x="14" y="3" width="7" height="7" /><rect x="3" y="14" width="7" height="7" /><rect x="14" y="14" width="7" height="7" /></svg>
+            </span>
+            <span className="dash-home__action-title">Browse Packs</span>
+            <span className="dash-home__action-desc">Curated quizzes by category</span>
+          </Link>
+          <Link to="/host" className="dash-home__action-card">
+            <span className="dash-home__action-icon">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><rect x="2" y="6" width="20" height="12" rx="2" /><path d="M12 12h.01" /><path d="M17 12h.01" /><path d="M7 12h.01" /></svg>
+            </span>
+            <span className="dash-home__action-title">Host a Quiz</span>
+            <span className="dash-home__action-desc">Multiplayer with live scoreboard</span>
+          </Link>
+          <div className="dash-home__action-card dash-home__join-card">
+            <span className="dash-home__action-icon">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4" /><polyline points="10 17 15 12 10 7" /><line x1="15" y1="12" x2="3" y2="12" /></svg>
+            </span>
+            <span className="dash-home__action-title">Join a Room</span>
+            <span className="dash-home__action-desc">Enter a code to join a live session</span>
+            <form className="dash-home__join-form" onSubmit={handleJoinRoom}>
+              <input
+                type="text"
+                className="dash-home__join-input"
+                placeholder="Room code"
+                value={roomCode}
+                onChange={(e) => { setRoomCode(e.target.value.toUpperCase()); setRoomError(null); }}
+                maxLength={8}
+                autoComplete="off"
+                spellCheck="false"
+              />
+              <button type="submit" className="dash-home__join-btn">Join</button>
+            </form>
+            {roomError && <span className="dash-home__join-error">{roomError}</span>}
+          </div>
+        </div>
+
+        {/* Right: Progression — what you ARE */}
+        <div className="dash-home__progress-col">
+          {/* XP + Level progress */}
+          {gamification && gamification.xp_total > 0 && (
+            <div className="dash-home__gamification">
+              <div className="dash-home__level-row">
+                <div className="dash-home__level-badge">Lv. {level}</div>
+                <div className="dash-home__level-info">
+                  <span className="dash-home__level-title">{levelTitle}</span>
+                  <span className="dash-home__xp-text">{gamification.xp_total} XP</span>
+                </div>
+              </div>
+              <div className="dash-home__xp-bar">
+                <div className="dash-home__xp-fill" style={{ width: `${levelProgress.pct}%` }} />
+              </div>
+              {earnedBadges.length > 0 && (
+                <div className="dash-home__badges">
+                  {earnedBadges.map(b => (
+                    <span key={b.key} className="dash-home__badge" title={b.label}>{b.icon}</span>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+
+          {user && <LeagueBadge userId={user.id} />}
+          {user && <DailyMissions userId={user.id} />}
+
+          {/* Compact stats */}
+          {stats && (
+            <div className="dash-home__stats-section">
+              <h3 className="dash-home__stats-title">Your Stats</h3>
+              <div className="dash-home__stats-grid">
+                <div className="dash-home__stat-row">
+                  <span className="dash-home__stat-label">Accuracy</span>
+                  <span className="dash-home__stat-value">{stats.accuracy_pct ?? 0}%</span>
+                </div>
+                <div className="dash-home__stat-row">
+                  <span className="dash-home__stat-label">Best Topic</span>
+                  <span className="dash-home__stat-value">{stats.strongest_category || '—'}</span>
+                </div>
+                <div className="dash-home__stat-row">
+                  <span className="dash-home__stat-label">Needs Work</span>
+                  <span className="dash-home__stat-value">{stats.weakest_category || '—'}</span>
+                </div>
+                <div className="dash-home__stat-row">
+                  <span className="dash-home__stat-label">Weekly Rank</span>
+                  <span className="dash-home__stat-value">{weeklyRank ? `#${weeklyRank}` : '—'}</span>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
     </div>
   );
 }

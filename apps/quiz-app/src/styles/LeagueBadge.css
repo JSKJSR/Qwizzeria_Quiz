@@ -6,7 +6,6 @@
   background: var(--bg-card);
   border: 1px solid color-mix(in srgb, var(--league-color, #cd7f32) 20%, transparent);
   border-radius: var(--radius);
-  margin-bottom: var(--space-xl);
   transition: border-color var(--duration-normal) ease, box-shadow var(--duration-normal) ease;
 }
 

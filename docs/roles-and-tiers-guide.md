@@ -23,10 +23,13 @@ Every user in Qwizzeria belongs to one of three pricing tiers. The tier determin
 | Dashboard | Yes | Yes | Yes |
 | Profile & How to Play Guide | Yes | Yes | Yes |
 | Pricing Page | Yes | Yes | Yes |
+| Daily Missions & XP Progression | Yes | Yes | Yes |
+| Leagues (weekly XP competition) | Yes | Yes | Yes |
 | Browse & Play Quiz Packs | - | Yes | Yes |
 | Quiz History | - | Yes | Yes |
 | Global Leaderboard | - | Yes | Yes |
 | Resume Saved Sessions | - | Yes | Yes |
+| Streak Freezes | - | 3/month | Unlimited |
 | Doubles | - | - | Yes |
 | Host Quiz (multiplayer, 2-8 players) | - | - | Yes |
 | Tournaments (elimination brackets) | - | - | Yes |
@@ -37,9 +40,9 @@ Every user in Qwizzeria belongs to one of three pricing tiers. The tier determin
 
 ### Key Talking Points
 
-- **Free tier** is not empty — the Free Quiz is a fully functional, unlimited quiz experience with random questions across all categories. It includes a full Gamification engine (XP, Levels, Badges, and Daily Streaks) to encourage daily engagement and account creation. It is the hook that gets people through the door.
-- **Basic tier** is for individual players who want a structured experience — curated packs, leaderboard competition, and the ability to track progress over time.
-- **Pro tier** is for quiz hosts, educators, and event organizers who need multiplayer, AI generation, buzzer rooms, and export capabilities.
+- **Free tier** is not empty — the Free Quiz is a fully functional, unlimited quiz experience with random questions across all categories. It includes a full Gamification engine (XP, Levels, Badges, Daily Streaks, Daily Missions, and Leagues) to encourage daily engagement and account creation. It is the hook that gets people through the door.
+- **Basic tier** is for individual players who want a structured experience — curated packs, leaderboard competition, the ability to track progress over time, and 3 Streak Freezes per month to protect their daily streak.
+- **Pro tier** is for quiz hosts, educators, and event organizers who need multiplayer, AI generation, buzzer rooms, export capabilities, and unlimited Streak Freezes.
 
 ---
 
@@ -174,8 +177,10 @@ Each subscription is per-user. For team or classroom pricing, contact us for bul
 |---|---|
 | Try Qwizzeria | Just sign up (14 days free) |
 | Play a quick quiz | Nothing (Free Quiz is public) |
+| Earn XP and join leagues | Nothing (Free tier includes full gamification) |
 | Play curated quiz packs | Basic ($9.99/mo) |
 | Track my scores and compete | Basic ($9.99/mo) |
+| Protect my streak if I miss a day | Basic ($9.99/mo) — 3 freezes/month |
 | Play Doubles quiz | Pro ($19.99/mo) |
 | Host a live quiz for my team | Pro ($19.99/mo) |
 | Generate quizzes with AI | Pro ($19.99/mo) |

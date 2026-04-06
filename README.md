@@ -19,21 +19,24 @@ Qwizzeria is a high-performance, premium quiz platform built with a modern tech 
 - **Multisided Multiplayer**: Host live quiz sessions with a dedicated teacher/host view and participant scoring.
 - **AI Quiz Generation**: Generate high-quality quiz packs on any topic instantly using the Claude 3.5 Sonnet API.
 - **Tournament Mode**: Single-elimination bracket competitions for 2–16 teams with realtime bracket updates, shareable match URLs, and multi-tab parallel play.
+- **Daily Missions & Leagues**: Players earn XP through daily objectives and compete within weekly tier-based leagues (Bronze → Silver → Gold → Diamond).
+- **Streak Freezes**: Protect daily streaks when missing a day (3/month on Basic, unlimited on Pro).
 - **Resume Anywhere**: In-progress sessions are synced, allowing users to pick up where they left off.
 - **Leaderboards**: Compete globally or per-pack with real-time score tracking.
 - **Subscription Tiers**: Free, Basic ($9.99/mo), and Pro ($19.99/mo) plans powered by Stripe.
 
 ### 🛡️ Security & Access Control
 - **Two-Gate Security Model**:
-  - **Gate 1 (Feature Access)**: Controls entry to platform modules (e.g., Host Quiz, AI Generation, Admin CMS).
-  - **Gate 2 (Content Permissions)**: Granular permissions for specific categories or quiz packs.
-- **DB-Backed Roles**: Secure role management (`user`, `premium`, `editor`, `admin`, `superadmin`) enforced at the database level via Postgres RLS.
+  - **Gate 1 (Subscription Tiers)**: Controls feature access per plan (Free/Basic/Pro) via `useEntitlement` hook + `config/tiers.js`.
+  - **Gate 2 (Content Permissions)**: Granular permissions for specific categories or quiz packs (for editors).
+- **DB-Backed Roles**: Secure role management (`user`, `editor`, `admin`, `superadmin`) enforced at the database level via Postgres RLS. Staff roles bypass all subscription gating.
 
 ### 🛠️ Admin CMS
 - **Content Management**: Full CRUD for questions and quiz packs.
 - **Bulk Operations**: High-speed Excel import for mass question ingestion.
+- **Doubles Session Grading**: Admin interface to review and manually grade player answers for Doubles quiz sessions.
 - **Platform Analytics**: Advanced insights into pack performance, user engagement, question difficulty, and subscription metrics (trial conversion, active subscribers by tier).
-- **User Management**: Superadmin interface for role assignment and platform oversight.
+- **User Management**: Superadmin interface for role assignment, subscription tier overrides, and platform oversight.
 
 ---
 
@@ -55,7 +58,7 @@ packages/
 - **AI**: Claude 3.5 Sonnet (via Anthropic API).
 - **Payments**: Stripe (subscriptions, billing portal).
 - **Orchestration**: Turborepo, npm workspaces.
-- **Testing**: Vitest (168 tests across 15 files).
+- **Testing**: Vitest (244 tests across 19 files).
 - **CI/CD**: GitHub Actions (lint → build → test) + Vercel deployment.
 
 ---
@@ -82,7 +85,7 @@ npm install
 - `npm run dev`: Start all development servers.
 - `npm run build`: Build for production.
 - `npm run lint`: Run linting across the monorepo.
-- `npm run test`: Execute the test suite (168 tests).
+- `npm run test`: Execute the test suite (244 tests across 19 files).
 
 ---
 
