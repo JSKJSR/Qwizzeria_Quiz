@@ -13,16 +13,17 @@ A comprehensive guide for Admin and Superadmin users to manage the Qwizzeria pla
 5. [Quiz Pack Management](#5-quiz-pack-management)
 6. [Pack Questions Manager](#6-pack-questions-manager)
 7. [Bulk Import](#7-bulk-import)
-8. [User Management](#8-user-management)
-9. [Role Assignment & Staff Access](#9-role-assignment--staff-access)
-10. [Subscription & Tier Management](#10-subscription--tier-management)
-11. [Content Permissions (Editor Grants)](#11-content-permissions-editor-grants)
-12. [Audit Logging](#12-audit-logging)
-13. [Database Administration](#13-database-administration)
-14. [Stripe & Billing Administration](#14-stripe--billing-administration)
-15. [Security & RLS Policies](#15-security--rls-policies)
-16. [AI Quiz Generation](#16-ai-quiz-generation-pro-feature)
-17. [Troubleshooting](#17-troubleshooting)
+8. [Doubles Sessions](#8-doubles-sessions)
+9. [User Management](#9-user-management)
+10. [Role Assignment & Staff Access](#10-role-assignment--staff-access)
+11. [Subscription & Tier Management](#11-subscription--tier-management)
+12. [Content Permissions (Editor Grants)](#12-content-permissions-editor-grants)
+13. [Audit Logging](#13-audit-logging)
+14. [Database Administration](#14-database-administration)
+15. [Stripe & Billing Administration](#15-stripe--billing-administration)
+16. [Security & RLS Policies](#16-security--rls-policies)
+17. [AI Quiz Generation](#17-ai-quiz-generation-pro-feature)
+18. [Troubleshooting](#18-troubleshooting)
 
 ---
 
@@ -78,8 +79,10 @@ A comprehensive guide for Admin and Superadmin users to manage the Qwizzeria pla
 | Questions | `/admin/questions` | `editor`+ |
 | Bulk Import | `/admin/import` | `admin`+ |
 | Quiz Packs | `/admin/packs` | `editor`+ |
+| Doubles Sessions | `/admin/doubles` | `admin`+ |
 | Users | `/admin/users` | `superadmin` only |
 | Roles & Tiers | `/admin/guide` | `editor`+ |
+| Ops Manual | `/admin/ops` | `admin`+ |
 | Quiz App | `/dashboard` | All (back link) |
 
 ### Route Guard
@@ -356,7 +359,42 @@ draft → active → archived
 
 ---
 
-## 8. User Management
+## 8. Doubles Sessions
+
+**Route:** `/admin/doubles`
+**Required Role:** `admin`+
+
+The Doubles Sessions page displays all Doubles quiz sessions created on the platform. Admins can browse, filter, and manually grade answers submitted by players.
+
+### 8.1 Session Table
+
+| Column | Description |
+|---|---|
+| Player | Display name of the user who played |
+| Pack | Quiz pack used |
+| Status | `completed`, `in_progress`, or `abandoned` |
+| Answered | Number of responses submitted |
+| Graded | Progress summary (correct / total graded) |
+| Played | Relative timestamp |
+| Actions | Open grading modal |
+
+### 8.2 Filters
+
+- **Search** — by player name (debounced 400ms)
+- **Status filter** — All / Completed / In Progress / Abandoned
+- **Pagination** — 20 sessions per page
+
+### 8.3 Grading Answers (DoublesGradeModal)
+
+1. Click the grade icon on a session row
+2. The modal opens showing all questions with player's text answers
+3. For each answer, click **Correct** or **Incorrect** to record the grade
+4. Grades are saved to the session's `metadata.grades` JSONB column
+5. The session list updates grade progress in real time after saving
+
+---
+
+## 9. User Management
 
 **Route:** `/admin/users`
 **Required Role:** `admin`+ (read), `superadmin` (role changes)
@@ -375,7 +413,7 @@ draft → active → archived
 | Column | Description |
 |---|---|
 | User | Avatar + display name + email |
-| Subscription | Tier badge (free/basic/pro/staff) |
+| Subscription | Tier badge (free/basic/pro/staff) — click to change tier (superadmin only) |
 | Quizzes | Completed quiz count |
 | Tournaments | Tournament creation count |
 | Avg Score | Average quiz score |
@@ -383,19 +421,19 @@ draft → active → archived
 | Status | Active (last 30d) / Inactive badge |
 | Actions | Role dropdown (superadmin only) |
 
-### 8.3 Filters
+### 9.3 Filters
 
 - **Search** — by display name or email (debounced 400ms)
 - **Role filter** — dropdown: all, user, editor, admin, superadmin
 - **Pagination** — 20 per page
 
-### 8.4 Export
+### 9.4 Export
 
 CSV export with columns: Name, Email, Role, Quizzes, Tournaments, Avg Score, Last Active, Joined.
 
 ---
 
-## 9. Role Assignment & Staff Access
+## 10. Role Assignment & Staff Access
 
 **Required Role:** `superadmin` only
 
@@ -431,15 +469,15 @@ CSV export with columns: Name, Email, Role, Quizzes, Tournaments, Avg Score, Las
 
 ---
 
-## 10. Subscription & Tier Management
+## 11. Subscription & Tier Management
 
 ### Tier Structure
 
 | Tier | Price | Features |
 |---|---|---|
 | **Free** | $0 | Free Quiz (Gamified), Dashboard, Profile, Guide |
-| **Basic** | $9.99/mo | + Packs, History, Leaderboard, Resume |
-| **Pro** | $19.99/mo | + Doubles, Host Quiz, Tournaments, AI Generate, Buzzer, Export, Certificates |
+| **Basic** | $9.99/mo | + Packs, History, Leaderboard, Resume, 3 Streak Freezes/month |
+| **Pro** | $19.99/mo | + Doubles, Host Quiz, Tournaments, AI Generate, Buzzer, Export, Certificates, Unlimited Streak Freezes |
 
 ### Doubles Quiz (Pro)
 
@@ -467,8 +505,17 @@ The Doubles Quiz supports single-part or multi-part formats:
 
 ### Admin Actions for Subscriptions
 
-Admins **cannot** directly modify subscriptions from the Admin CMS. Subscription management is handled through:
+Admins **can** directly change a user's subscription tier from the Admin CMS using the **Subscription modal** in User Management:
 
+1. Go to **Admin > Users** (`/admin/users`)
+2. Find the user → click the **tier badge** (Free / Basic / Pro) in the Subscription column
+3. Select the new tier from the tier picker cards (Free / Basic / Pro)
+4. Click **Confirm** — the change is applied immediately (admin-granted, no Stripe involved)
+
+> [!WARNING]
+> Admin-granted tier changes bypass Stripe entirely. If the user later goes to their Billing Portal, it will not reflect this override. Use for support cases and testing only. For real subscriptions, direct users to the Pricing page.
+
+Other subscription management options:
 - **Stripe Dashboard** — cancel, refund, apply coupons, extend trials
 - **Stripe Billing Portal** — users self-manage (upgrade, downgrade, cancel, update payment)
 - **Role promotion** — promote to `editor`+ to bypass tiers entirely (no Stripe involved)
@@ -483,7 +530,7 @@ Edit `apps/quiz-app/src/config/tiers.js` — the single source of truth:
 
 ---
 
-## 11. Content Permissions (Editor Grants)
+## 12. Content Permissions (Editor Grants)
 
 Content permissions control which specific packs and categories an editor can access. **Currently requires manual SQL** (no admin UI).
 
@@ -531,7 +578,7 @@ These permissions are enforced at the database level via RLS policies. Editors a
 
 ---
 
-## 12. Audit Logging
+## 13. Audit Logging
 
 All admin CMS actions are logged to the `admin_audit_log` table.
 
@@ -583,7 +630,7 @@ ORDER BY created_at DESC;
 
 ---
 
-## 13. Database Administration
+## 14. Database Administration
 
 ### Key Tables
 
@@ -644,7 +691,7 @@ Migrations are numbered sequentially (e.g., `006_rbac.sql`, `011_tournaments.sql
 
 ---
 
-## 14. Stripe & Billing Administration
+## 15. Stripe & Billing Administration
 
 ### Webhook Events Handled
 
@@ -688,7 +735,7 @@ These cannot be done from the Admin CMS — use the Stripe Dashboard:
 
 ---
 
-## 15. Security & RLS Policies
+## 16. Security & RLS Policies
 
 ### Row-Level Security Summary
 
@@ -713,7 +760,7 @@ These cannot be done from the Admin CMS — use the Stripe Dashboard:
 
 ---
 
-## 16. AI Quiz Generation (Pro Feature)
+## 17. AI Quiz Generation (Pro Feature)
 
 ### Overview
 Powered by Claude 3.5 Sonnet, AI generation allows users to create custom quiz packs instantly.
@@ -729,7 +776,7 @@ Powered by Claude 3.5 Sonnet, AI generation allows users to create custom quiz p
 
 ---
 
-## 17. Troubleshooting
+## 18. Troubleshooting
 
 ### Common Issues
 

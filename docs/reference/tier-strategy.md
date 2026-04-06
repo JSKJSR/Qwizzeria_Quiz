@@ -6,7 +6,7 @@ This document defines the **Free → Basic → Pro** subscription model. All tie
 
 ## 1. Membership Tiers & Access
 
-| Feature | **Free** ($0) | **Basic** ($4.99/mo) | **Pro** ($9.99/mo) | **Staff** (bypass) |
+| Feature | **Free** ($0) | **Basic** ($9.99/mo) | **Pro** ($19.99/mo) | **Staff** (bypass) |
 |---|:---:|:---:|:---:|:---:|
 | Free Quiz (`/play/free`) | Yes | Yes | Yes | Yes |
 | Dashboard | Yes | Yes | Yes | Yes |

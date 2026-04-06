@@ -12,12 +12,15 @@ This document provides a comprehensive map of the user flow, product features, a
 - **Post-Login**: Routes user to `/dashboard` or `/admin` based on role.
 
 ### 2. Player Journey
-- **Dashboard**: High-level stats, quick-play actions, resumable sessions.
+- **Dashboard**: High-level stats, quick-play actions, resumable sessions, league badge and weekly XP, and daily mission progress.
+  - **Gamification Summary**: Displays current XP level, title, progress bar, daily streak count, and streak freeze credits.
+  - **Daily Missions**: A set of daily objectives (e.g., play 3 quizzes, earn 50 XP, answer 10 correctly) with progress bars. Completing all missions earns a bonus XP reward.
+  - **League Badge**: Shows the user's current league (e.g., Bronze, Silver, Gold) and weekly XP earned within that league.
 - **Browse Packs**: Filterable grid of curated content (Tier-gated).
 - **Play Quiz**:
     - **Free Quiz**: Free-to-play random questions featuring Duolingo-style text input with fuzzy matching. Includes a full progression system (XP, Levels, Badges, Daily Streaks) that syncs to user profiles.
     - **Jeopardy Grid**: Non-linear topic selection with point values.
-    - **Sequential**: Linear question-by-question flow.
+    - **Sequential**: Linear question-by-question flow with a countdown ring timer per question.
 - **Results**: Score summary, accuracy percentage, and history persistence.
 
 ### 3. Host & Tournament Flow
@@ -55,7 +58,8 @@ The Admin CMS is integrated into the application and accessible at `/admin` for 
    - Full CRUD for questions (media URLs, point values). 
    - **Bulk Import (`/admin/import`)**: High-speed Excel (.xlsx) ingestion with immediate Pack assignment capabilities.
 3. **Pack Management (`/admin/packs`)**: Manage curated collections, adjust premium/public visibility, set optional expiration dates, and reorder questions. Expired packs are automatically hidden from players but remain visible to admins.
-4. **User Management (`/admin/users`)**: Restricted to `superadmin`. Lists users and provides the ability to update roles (e.g., promote `user` to `premium` or `admin`).
+4. **Doubles Sessions (`/admin/doubles`)**: Browse all Doubles quiz sessions with status filters and pagination. Admins can open the **grading modal** to manually mark each player answer as correct or incorrect, with grades persisted to `metadata.grades`.
+5. **User Management (`/admin/users`)**: Restricted to `superadmin`. Lists users and provides the ability to update roles (e.g., promote `user` to `admin`) and directly change a user's subscription tier (Free/Basic/Pro) via the tier badge modal.
 
 ---
 
@@ -64,8 +68,8 @@ The Admin CMS is integrated into the application and accessible at `/admin` for 
 Qwizzeria implements a hybrid SaaS and One-Time Purchase model powered by Stripe.
 
 - **14-Day Free Trial**: Full access to all features (including AI generation) for 14 days upon sign up.
-- **Free**: $0. Access to Free Quiz (with XP/Level/Badge progression), Dashboard, Profile, and Guide.
-- **Basic Tier**: $9.99/mo. Unlocks the entire Quiz Pack library, History, Global Leaderboards, and Resume Sessions.
-- **Pro Tier**: $19.99/mo. Unlocks local/party Game Hosting, Doubles Quiz, AI Quiz Generation (Claude 3.5), Real-Time Buzzer, Tournament brackets, Export Results, and Certificates.
+- **Free**: $0. Access to Free Quiz (with XP/Level/Badge/Streak progression + Daily Missions + Leagues), Dashboard, Profile, and Guide.
+- **Basic Tier**: $9.99/mo. Unlocks the entire Quiz Pack library, History, Global Leaderboards, Resume Sessions, and 3 Streak Freezes per month.
+- **Pro Tier**: $19.99/mo. Unlocks local/party Game Hosting, Doubles Quiz, AI Quiz Generation (Claude 3.5), Real-Time Buzzer, Tournament brackets, Export Results, Certificates, and unlimited Streak Freezes.
 
 *Grace Period*: Access window for `past_due` subscriptions before full gating. Editors/Admins bypass these checks automatically.

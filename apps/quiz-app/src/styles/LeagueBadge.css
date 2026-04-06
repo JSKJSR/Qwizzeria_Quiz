@@ -1,25 +1,33 @@
 .league-badge {
   display: flex;
   align-items: center;
-  gap: 0.6rem;
-  padding: 0.5rem 0.75rem;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid color-mix(in srgb, var(--league-color, #cd7f32) 30%, transparent);
-  border-radius: 10px;
+  gap: var(--space-md);
+  padding: var(--space-md) var(--space-lg);
+  background: var(--bg-card);
+  border: 1px solid color-mix(in srgb, var(--league-color, #cd7f32) 20%, transparent);
+  border-radius: var(--radius);
+  margin-bottom: var(--space-xl);
+  transition: border-color var(--duration-normal) ease, box-shadow var(--duration-normal) ease;
+}
+
+.league-badge:hover {
+  border-color: color-mix(in srgb, var(--league-color, #cd7f32) 35%, transparent);
+  box-shadow: 0 0 16px color-mix(in srgb, var(--league-color, #cd7f32) 10%, transparent);
 }
 
 .league-badge__shield {
-  font-size: 0.8rem;
+  font-size: 0.78rem;
   font-weight: 800;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.04em;
   color: var(--league-color, #cd7f32);
-  padding: 0.15rem 0.5rem;
-  background: color-mix(in srgb, var(--league-color, #cd7f32) 12%, transparent);
-  border-radius: 6px;
+  padding: 0.2rem 0.6rem;
+  background: color-mix(in srgb, var(--league-color, #cd7f32) 10%, transparent);
+  border-radius: var(--radius-sm);
 }
 
 .league-badge__xp {
-  font-size: 0.8rem;
-  color: #aaa;
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  font-variant-numeric: tabular-nums;
 }
