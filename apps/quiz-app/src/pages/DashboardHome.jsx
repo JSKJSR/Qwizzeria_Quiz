@@ -109,8 +109,11 @@ export default function DashboardHome() {
               <span className="dash-home__streak-pill">{gamification.daily_streak_count}d streak</span>
             )}
             {gamification?.streak_freezes_remaining > 0 && (
-              <span className="dash-home__freeze-pill" title="Streak freezes protect your streak if you miss a day">
+              <span className="dash-home__freeze-pill" tabIndex={0} aria-label="Streak freeze info">
                 {gamification.streak_freezes_remaining} freeze{gamification.streak_freezes_remaining !== 1 ? 's' : ''}
+                <span className="dash-home__freeze-tooltip">
+                  Miss a day? A freeze saves your streak automatically. Upgrade for more freezes.
+                </span>
               </span>
             )}
           </div>

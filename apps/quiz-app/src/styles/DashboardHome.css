@@ -50,6 +50,7 @@
 }
 
 .dash-home__freeze-pill {
+  position: relative;
   background: rgba(100, 181, 246, 0.1);
   color: #64b5f6;
   font-size: 0.68rem;
@@ -57,6 +58,48 @@
   padding: 0.15rem 0.5rem;
   border-radius: var(--radius-pill);
   cursor: help;
+}
+
+.dash-home__freeze-tooltip {
+  display: none;
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  width: 220px;
+  padding: var(--space-md);
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-lg);
+  color: var(--text-secondary);
+  font-size: 0.78rem;
+  font-weight: 400;
+  line-height: 1.45;
+  text-align: center;
+  white-space: normal;
+  z-index: 10;
+}
+
+.dash-home__freeze-tooltip::before {
+  content: '';
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 6px solid transparent;
+  border-bottom-color: var(--border-color);
+}
+
+.dash-home__freeze-pill:hover .dash-home__freeze-tooltip,
+.dash-home__freeze-pill:focus .dash-home__freeze-tooltip {
+  display: block;
+  animation: tooltipIn var(--duration-fast) var(--ease-out);
+}
+
+@keyframes tooltipIn {
+  from { opacity: 0; transform: translateX(-50%) translateY(4px); }
+  to { opacity: 1; transform: translateX(-50%) translateY(0); }
 }
 
 .dash-home__subtitle {
