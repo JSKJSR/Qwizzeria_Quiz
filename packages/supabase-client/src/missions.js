@@ -18,6 +18,46 @@ export const MISSION_DEFINITIONS = {
 };
 
 /**
+ * Minimum tier required for each mission.
+ * Missions not listed here default to 'free'.
+ * Edit this map when adding new tier-gated missions.
+ */
+export const MISSION_TIERS = {
+  play_pack: 'basic',
+};
+
+/**
+ * Premium teaser missions shown to free users as locked upgrade nudges.
+ * These are NOT in the DB pool — purely client-side teasers.
+ * Each entry mirrors the shape returned by the RPC but with is_locked: true.
+ */
+const PREMIUM_TEASERS = [
+  { mission_key: 'play_pack', target: 1, xp_reward: 50, progress: 0, completed_at: null },
+];
+
+/**
+ * Check if a mission requires a tier above the user's current tier.
+ * @param {string} missionKey
+ * @param {string} userTier - 'free' | 'basic' | 'pro'
+ * @param {Function} tierSatisfies - from config/tiers.js
+ * @returns {boolean} true if the mission is locked for this tier
+ */
+export function isMissionLocked(missionKey, userTier, tierSatisfies) {
+  const requiredTier = MISSION_TIERS[missionKey] || 'free';
+  return !tierSatisfies(userTier, requiredTier);
+}
+
+/**
+ * Get a locked teaser mission for users who don't already have one.
+ * Uses date-based index for daily variety (when more teasers are added).
+ * @returns {Object} teaser mission object
+ */
+export function getLockedTeaser() {
+  const dayIndex = Math.floor(Date.now() / 86400000) % PREMIUM_TEASERS.length;
+  return { ...PREMIUM_TEASERS[dayIndex], is_locked: true };
+}
+
+/**
  * Fetch (or initialize) today's daily missions for a user.
  * @param {string} userId
  * @returns {Promise<Array>} missions with progress

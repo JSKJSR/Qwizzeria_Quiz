@@ -12,7 +12,7 @@ const COLLAPSE_KEY = 'qwizzeria_resume_collapsed';
 
 export default function DashboardHome() {
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, subscription } = useAuth();
   const [roomCode, setRoomCode] = useState('');
   const [roomError, setRoomError] = useState(null);
   const [resumable, setResumable] = useState([]);
@@ -260,7 +260,7 @@ export default function DashboardHome() {
           )}
 
           {user && <LeagueBadge userId={user.id} />}
-          {user && <DailyMissions userId={user.id} />}
+          {user && <DailyMissions userId={user.id} currentTier={subscription?.tier || 'free'} />}
 
           {/* Compact stats */}
           {stats && (

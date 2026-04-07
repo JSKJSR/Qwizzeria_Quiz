@@ -129,6 +129,49 @@
   font-variant-numeric: tabular-nums;
 }
 
+/* Locked mission state */
+.daily-missions__item--locked {
+  opacity: 0.6;
+  border: 1px dashed var(--glass-border);
+  background: transparent;
+}
+
+.daily-missions__item--locked:hover {
+  opacity: 0.75;
+  border-color: var(--accent-primary);
+}
+
+.daily-missions__lock {
+  color: var(--text-muted);
+  display: inline-flex;
+  align-items: center;
+}
+
+.daily-missions__xp--locked {
+  opacity: 0.5;
+}
+
+.daily-missions__upgrade-link {
+  display: inline-block;
+  margin-top: var(--space-xs);
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--accent-primary);
+  text-decoration: none;
+  transition: color var(--duration-normal) ease;
+}
+
+.daily-missions__upgrade-link:hover {
+  color: #ff8a3d;
+  text-decoration: underline;
+}
+
+.daily-missions__upgrade-link:focus-visible {
+  outline: 2px solid var(--accent-primary);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
 .daily-missions__all-done {
   margin-top: var(--space-lg);
   text-align: center;
