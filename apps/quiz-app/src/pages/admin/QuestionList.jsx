@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import {
   fetchAllQuestions,
   fetchCategories,
@@ -42,7 +42,12 @@ export default function QuestionList() {
   const navigate = useNavigate();
   const [questions, setQuestions] = useState([]);
   const [count, setCount] = useState(0);
-  const [page, setPage] = useState(1);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const page = Number(searchParams.get('page')) || 1;
+  const setPage = useCallback((newPage) => {
+    const p = typeof newPage === 'function' ? newPage(page) : newPage;
+    setSearchParams((prev) => { prev.set('page', String(p)); return prev; }, { replace: true });
+  }, [page, setSearchParams]);
   const [categories, setCategories] = useState([]);
   const [filters, setFilters] = useState({ category: '', status: '', search: '', tag: '' });
   const [tagInput, setTagInput] = useState('');
@@ -98,7 +103,7 @@ export default function QuestionList() {
       setPage(1);
     }, 400);
     return () => clearTimeout(timer);
-  }, [tagInput]);
+  }, [tagInput, setPage]);
 
   // Clear selection when page/filters change
   useEffect(() => {

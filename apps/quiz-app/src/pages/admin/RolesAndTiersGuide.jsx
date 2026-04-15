@@ -97,6 +97,8 @@ export default function RolesAndTiersGuide() {
               ['Quiz History', false, true, true],
               ['Global Leaderboard', false, true, true],
               ['Resume Saved Sessions', false, true, true],
+              ['Daily Missions & Leagues', true, true, true],
+              ['Streak Freezes', false, '3/mo', '30/mo'],
               ['Host Quiz (multiplayer)', false, false, true],
               ['Tournaments (brackets)', false, false, true],
               ['AI Quiz Generation', false, false, true],
@@ -106,9 +108,9 @@ export default function RolesAndTiersGuide() {
             ].map(([feature, free, basic, pro]) => (
               <tr key={feature}>
                 <td>{feature}</td>
-                <td className={free ? 'rtg-check' : 'rtg-cross'}>{free ? CHECK : CROSS}</td>
-                <td className={basic ? 'rtg-check' : 'rtg-cross'}>{basic ? CHECK : CROSS}</td>
-                <td className={pro ? 'rtg-check' : 'rtg-cross'}>{pro ? CHECK : CROSS}</td>
+                <td className={free === true ? 'rtg-check' : (free === false ? 'rtg-cross' : '')}>{free === true ? CHECK : (free === false ? CROSS : free)}</td>
+                <td className={basic === true ? 'rtg-check' : (basic === false ? 'rtg-cross' : '')}>{basic === true ? CHECK : (basic === false ? CROSS : basic)}</td>
+                <td className={pro === true ? 'rtg-check' : (pro === false ? 'rtg-cross' : '')}>{pro === true ? CHECK : (pro === false ? CROSS : pro)}</td>
               </tr>
             ))}
           </tbody>
@@ -118,8 +120,8 @@ export default function RolesAndTiersGuide() {
           <strong>Key Talking Points</strong>
           <ul>
             <li><strong>Free</strong> is not empty &mdash; the Free Quiz is unlimited with random questions. It is the hook that gets people through the door.</li>
-            <li><strong>Basic</strong> is for individual players who want curated packs, leaderboard competition, and progress tracking.</li>
-            <li><strong>Pro</strong> is for quiz hosts, educators, and event organizers who need multiplayer, AI generation, buzzer rooms, and exports.</li>
+            <li><strong>Basic</strong> is for individual players who want curated packs, leaderboard competition, progress tracking, and 3 streak freezes/month.</li>
+            <li><strong>Pro</strong> is for quiz hosts, educators, and event organizers who need multiplayer, AI generation, buzzer rooms, exports, and 30 streak freezes/month.</li>
           </ul>
         </div>
       </SectionCard>

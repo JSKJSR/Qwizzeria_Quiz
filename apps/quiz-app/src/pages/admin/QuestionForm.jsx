@@ -434,7 +434,7 @@ export default function QuestionForm() {
             <button
               type="button"
               className="btn btn-secondary qf-action-btn qf-action-btn--secondary"
-              onClick={() => navigate('/admin/questions')}
+              onClick={() => navigate(-1)}
             >
               Cancel
             </button>

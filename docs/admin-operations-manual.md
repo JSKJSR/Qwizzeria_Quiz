@@ -477,7 +477,7 @@ CSV export with columns: Name, Email, Role, Quizzes, Tournaments, Avg Score, Las
 |---|---|---|
 | **Free** | $0 | Free Quiz (Gamified), Dashboard, Profile, Guide |
 | **Basic** | $9.99/mo | + Packs, History, Leaderboard, Resume, 3 Streak Freezes/month |
-| **Pro** | $19.99/mo | + Doubles, Host Quiz, Tournaments, AI Generate, Buzzer, Export, Certificates, Unlimited Streak Freezes |
+| **Pro** | $19.99/mo | + Doubles, Host Quiz, Tournaments, AI Generate, Buzzer, Export, Certificates, 30 Streak Freezes/month |
 
 ### Doubles Quiz (Pro)
 
@@ -508,12 +508,12 @@ The Doubles Quiz supports single-part or multi-part formats:
 Admins **can** directly change a user's subscription tier from the Admin CMS using the **Subscription modal** in User Management:
 
 1. Go to **Admin > Users** (`/admin/users`)
-2. Find the user → click the **tier badge** (Free / Basic / Pro) in the Subscription column
-3. Select the new tier from the tier picker cards (Free / Basic / Pro)
-4. Click **Confirm** — the change is applied immediately (admin-granted, no Stripe involved)
+2. Find the user → click the **tier badge** (Free / Basic / Pro / Staff) in the Subscription column.
+3. Select the new tier from the tier picker cards (Free / Basic / Pro) in the `UserSubscriptionModal`.
+4. Click **Confirm** — the change is applied immediately (admin-granted, no Stripe involved).
 
 > [!WARNING]
-> Admin-granted tier changes bypass Stripe entirely. If the user later goes to their Billing Portal, it will not reflect this override. Use for support cases and testing only. For real subscriptions, direct users to the Pricing page.
+> Admin-granted tier changes are persisted directly to the `subscriptions` table and bypass Stripe entirely. If the user later goes to their Billing Portal, it will not reflect this override. Use for support cases and testing only. For real subscriptions, direct users to the Pricing page.
 
 Other subscription management options:
 - **Stripe Dashboard** — cancel, refund, apply coupons, extend trials

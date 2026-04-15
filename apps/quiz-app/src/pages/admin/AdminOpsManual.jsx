@@ -410,7 +410,7 @@ export default function AdminOpsManual() {
         <h3 className="rtg-h3">User Table Columns</h3>
         <ul className="rtg-list">
           <li><strong>User</strong> &mdash; avatar + display name + email</li>
-          <li><strong>Subscription</strong> &mdash; tier badge (free / basic / pro / staff)</li>
+          <li><strong>Subscription</strong> &mdash; tier badge (free / basic / pro / staff). Click to change a user&apos;s subscription tier (superadmin only).</li>
           <li><strong>Quizzes</strong> &mdash; completed quiz count</li>
           <li><strong>Tournaments</strong> &mdash; tournament creation count</li>
           <li><strong>Avg Score</strong> &mdash; average quiz score</li>
@@ -513,7 +513,7 @@ export default function AdminOpsManual() {
             <tr>
               <td><TierBadge tier="pro" /></td>
               <td>{TIERS.pro.price}{TIERS.pro.period}</td>
-              <td>+ Doubles, Host Quiz, Tournaments, AI Generate, Buzzer, Export, Certificates</td>
+              <td>+ Doubles, Host Quiz, Tournaments, AI Generate, Buzzer, Export, Certificates, 30 Streak Freezes/mo</td>
             </tr>
           </tbody>
         </table>
@@ -548,9 +548,10 @@ export default function AdminOpsManual() {
             <tr><td>Refund a payment</td><td>Stripe Dashboard &gt; Payments</td></tr>
             <tr><td>Cancel a subscription</td><td>Stripe Dashboard &gt; Subscriptions</td></tr>
             <tr><td>Apply a coupon / promo</td><td>Stripe Dashboard &gt; Coupons</td></tr>
+            <tr><td>Admin Tier Override</td><td>Admin &gt; Users &gt; click tier badge</td></tr>
             <tr><td>Give free Pro access</td><td>Promote to Editor+ role (no Stripe needed)</td></tr>
             <tr><td>View payment history</td><td>Stripe Dashboard &gt; Payments</td></tr>
-            <tr><td>Update product pricing</td><td>Stripe Dashboard + update <code>config/tiers.js</code></td></tr>
+            <tr><td>Update product pricing</td><td>Stripe Dashboard + <code>config/tiers.js</code></td></tr>
           </tbody>
         </table>
 

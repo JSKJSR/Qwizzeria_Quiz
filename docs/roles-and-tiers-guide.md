@@ -29,7 +29,7 @@ Every user in Qwizzeria belongs to one of three pricing tiers. The tier determin
 | Quiz History | - | Yes | Yes |
 | Global Leaderboard | - | Yes | Yes |
 | Resume Saved Sessions | - | Yes | Yes |
-| Streak Freezes | - | 3/month | Unlimited |
+| Streak Freezes | - | 3/month | 30/month |
 | Doubles | - | - | Yes |
 | Host Quiz (multiplayer, 2-8 players) | - | - | Yes |
 | Tournaments (elimination brackets) | - | - | Yes |
@@ -42,7 +42,7 @@ Every user in Qwizzeria belongs to one of three pricing tiers. The tier determin
 
 - **Free tier** is not empty — the Free Quiz is a fully functional, unlimited quiz experience with random questions across all categories. It includes a full Gamification engine (XP, Levels, Badges, Daily Streaks, Daily Missions, and Leagues) to encourage daily engagement and account creation. It is the hook that gets people through the door.
 - **Basic tier** is for individual players who want a structured experience — curated packs, leaderboard competition, the ability to track progress over time, and 3 Streak Freezes per month to protect their daily streak.
-- **Pro tier** is for quiz hosts, educators, and event organizers who need multiplayer, AI generation, buzzer rooms, export capabilities, and unlimited Streak Freezes.
+- **Pro tier** is for quiz hosts, educators, and event organizers who need multiplayer, AI generation, buzzer rooms, export capabilities, and 30 Streak Freezes per month.
 
 ---
 
