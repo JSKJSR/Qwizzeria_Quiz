@@ -27,7 +27,6 @@ export default function FreeQuiz({ resumeData } = {}) {
     const max = state.allQuestions.reduce((sum, q) => sum + q.points, 0);
     return saveBestScore(state.score, max);
   }, [state.phase, state.allQuestions, state.score]);
-  const [shareConfirm, setShareConfirm] = useState(false);
   const [questionCount, setQuestionCount] = useState(QUESTION_COUNTS[0]);
   const [timerSetting, setTimerSetting] = useState(SECONDS_PER_QUESTION);
   const gamificationData = useMemo(() => {
@@ -178,20 +177,6 @@ export default function FreeQuiz({ resumeData } = {}) {
     navigate('/');
   }, [navigate]);
 
-  const handleShareScore = useCallback(() => {
-    const max = state.allQuestions.reduce((sum, q) => sum + q.points, 0);
-    const pct = max > 0 ? Math.round((state.score / max) * 100) : 0;
-    const text = `I scored ${state.score}/${max} (${pct}%) on Qwizzeria! Can you beat me?`;
-    if (navigator.share) {
-      navigator.share({ title: 'Qwizzeria Quiz Score', text }).catch(() => {});
-    } else {
-      navigator.clipboard.writeText(text).then(() => {
-        setShareConfirm(true);
-        setTimeout(() => setShareConfirm(false), 2000);
-      }).catch(() => {});
-    }
-  }, [state.score, state.allQuestions]);
-
   const handleQuestionCountChange = useCallback((qc) => {
     setQuestionCount(qc);
     loadQuiz(qc);
@@ -262,9 +247,7 @@ export default function FreeQuiz({ resumeData } = {}) {
         allQuestions={allQuestions}
         bestStreak={bestStreak}
         isNewBest={isNewBest}
-        shareConfirm={shareConfirm}
         user={user}
-        onShareScore={handleShareScore}
         onPlayAgain={() => loadQuiz()}
         onNavigateHome={() => navigate('/')}
         gamification={gamificationData}

@@ -370,6 +370,97 @@
   color: var(--text-primary);
 }
 
+/* Share panel */
+.free-quiz__share-panel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-lg);
+  padding: var(--space-xl);
+  background: var(--bg-subtle);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius);
+  margin-bottom: var(--space-2xl);
+  position: relative;
+  animation: shareSlideIn 0.25s ease;
+}
+
+@keyframes shareSlideIn {
+  from { opacity: 0; transform: translateY(-8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.free-quiz__share-panel-close {
+  position: absolute;
+  top: var(--space-sm);
+  right: var(--space-sm);
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 1.4rem;
+  padding: 4px 8px;
+  line-height: 1;
+  border-radius: var(--radius-sm, 4px);
+  transition: color var(--duration-fast) ease;
+}
+
+.free-quiz__share-panel-close:hover {
+  color: var(--text-primary);
+}
+
+.free-quiz__share-loading {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  padding: var(--space-lg) 0;
+}
+
+.free-quiz__share-preview {
+  max-width: 100%;
+  width: 400px;
+  border-radius: var(--radius-sm, 6px);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
+}
+
+.free-quiz__share-buttons {
+  display: flex;
+  gap: var(--space-md);
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.free-quiz__share-btn-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0.5rem 1rem;
+  background: var(--bg-subtle);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-pill);
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--duration-fast) ease;
+}
+
+.free-quiz__share-btn-item:hover {
+  background: var(--bg-subtle-hover);
+  color: var(--text-primary);
+  border-color: var(--border-input);
+}
+
+.free-quiz__share-btn-item:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.free-quiz__share-btn-item svg {
+  width: 16px;
+  height: 16px;
+  fill: currentColor;
+}
+
 /* Leaderboard teaser */
 .free-quiz__leaderboard-teaser {
   display: flex;

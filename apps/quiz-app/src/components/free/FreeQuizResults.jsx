@@ -1,7 +1,9 @@
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getScoreMessage, getBestScore } from '@/utils/freeQuizStorage';
 import GamificationSummary from '../GamificationSummary';
 import SignupNudge from './SignupNudge';
+import SharePanel from './SharePanel';
 import { BADGES } from '@/utils/gamification';
 
 function getNudgeMessage({ gamification, isNewBest, user }) {
@@ -31,11 +33,12 @@ function getNudgeMessage({ gamification, isNewBest, user }) {
 
 export default function FreeQuizResults({
   score, maxScore, results, allQuestions, bestStreak,
-  isNewBest, shareConfirm, user,
-  onShareScore, onPlayAgain, onNavigateHome,
+  isNewBest, user,
+  onPlayAgain, onNavigateHome,
   gamification, missionCompletions,
 }) {
   const navigate = useNavigate();
+  const [sharePanelOpen, setSharePanelOpen] = useState(false);
   const pct = maxScore > 0 ? Math.round((score / maxScore) * 100) : 0;
   const correctCount = results.filter(r => r.isCorrect).length;
   const bestScoreData = getBestScore();
@@ -91,9 +94,21 @@ export default function FreeQuizResults({
           )}
         </div>
 
-        <button className="free-quiz__share-btn" onClick={onShareScore} aria-label="Share your score">
-          {shareConfirm ? 'Copied!' : 'Share Score'}
-        </button>
+        {sharePanelOpen ? (
+          <SharePanel
+            score={score}
+            maxScore={maxScore}
+            correctCount={correctCount}
+            totalQuestions={allQuestions.length}
+            bestStreak={bestStreak}
+            gamification={gamification}
+            onClose={() => setSharePanelOpen(false)}
+          />
+        ) : (
+          <button className="free-quiz__share-btn" onClick={() => setSharePanelOpen(true)} aria-label="Share your score">
+            Share Score
+          </button>
+        )}
 
         <div className="free-quiz__review">
           {allQuestions.map((q) => {
