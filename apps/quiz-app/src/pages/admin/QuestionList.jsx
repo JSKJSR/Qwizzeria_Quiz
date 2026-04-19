@@ -101,15 +101,17 @@ export default function QuestionList() {
     });
   }, []);
 
-  // Debounced tag search — skip initial mount so we don't reset pagination
-  const isFirstTagRender = useRef(true);
+  // Debounced tag search — only fires when the trimmed input actually
+  // differs from the last applied tag, so it stays idempotent under
+  // React StrictMode's double-invoked effects (which would otherwise
+  // queue a setPage(1) on mount and yank pagination back to page 1).
+  const lastAppliedTagRef = useRef(filters.tag);
   useEffect(() => {
-    if (isFirstTagRender.current) {
-      isFirstTagRender.current = false;
-      return;
-    }
+    const trimmed = tagInput.trim();
+    if (trimmed === lastAppliedTagRef.current) return;
     const timer = setTimeout(() => {
-      setFilters((prev) => ({ ...prev, tag: tagInput.trim() }));
+      lastAppliedTagRef.current = trimmed;
+      setFilters((prev) => ({ ...prev, tag: trimmed }));
       setPage(1);
     }, 400);
     return () => clearTimeout(timer);
