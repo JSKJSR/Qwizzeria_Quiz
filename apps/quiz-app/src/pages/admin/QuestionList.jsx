@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import {
   fetchAllQuestions,
@@ -45,9 +45,14 @@ export default function QuestionList() {
   const [searchParams, setSearchParams] = useSearchParams();
   const page = Number(searchParams.get('page')) || 1;
   const setPage = useCallback((newPage) => {
-    const p = typeof newPage === 'function' ? newPage(page) : newPage;
-    setSearchParams((prev) => { prev.set('page', String(p)); return prev; }, { replace: true });
-  }, [page, setSearchParams]);
+    setSearchParams((prev) => {
+      const next = new URLSearchParams(prev);
+      const current = Number(next.get('page')) || 1;
+      const p = typeof newPage === 'function' ? newPage(current) : newPage;
+      next.set('page', String(p));
+      return next;
+    }, { replace: true });
+  }, [setSearchParams]);
   const [categories, setCategories] = useState([]);
   const [filters, setFilters] = useState({ category: '', status: '', search: '', tag: '' });
   const [tagInput, setTagInput] = useState('');
@@ -96,8 +101,13 @@ export default function QuestionList() {
     });
   }, []);
 
-  // Debounced tag search
+  // Debounced tag search — skip initial mount so we don't reset pagination
+  const isFirstTagRender = useRef(true);
   useEffect(() => {
+    if (isFirstTagRender.current) {
+      isFirstTagRender.current = false;
+      return;
+    }
     const timer = setTimeout(() => {
       setFilters((prev) => ({ ...prev, tag: tagInput.trim() }));
       setPage(1);
